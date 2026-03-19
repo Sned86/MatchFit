@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>MatchFit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1214,7 +1215,7 @@ function openFreeOnDateModal(isoDate){
             <div class="browse-club-name">${c.name}</div>
             <div class="browse-club-meta">📍 ${c.location} · ${c.distance} mi away</div>
             <div class="browse-club-tags">
-              <span class="tag tag-level">${c.level}</span>
+              
               ${c.kickoffAvail ? `<span class="tag" style="background:#f1f5f9;color:var(--slate)">⏱ ${c.kickoffAvail}</span>` : ''}
               ${c.venueAvail ? `<span class="tag" style="background:#f1f5f9;color:var(--slate)">${c.venueAvail==='home'?'🏠 Home only':c.venueAvail==='away'?'🚌 Away only':'🔄 H/A'}</span>` : ''}
             </div>
@@ -1460,7 +1461,7 @@ function onTeamSearch(q){
   let html=m.map(c=>`
     <div class="team-result-row" onclick="selectTeam(${c.id})">
       <div class="team-result-logo">${c.logo}</div>
-      <div><div class="team-result-name">${c.name}</div><div class="team-result-meta">${c.level} · ${c.location}</div></div>
+      <div><div class="team-result-name">${c.name}</div><div class="team-result-meta">${c.location}</div></div>
     </div>`).join('');
   html+=`<div class="team-result-browse" onclick="switchTab('browse');closeSearchDropdown()">🔍 Browse all teams →</div>`;
   el.innerHTML=html;
@@ -1541,7 +1542,7 @@ function renderResultsSheet(){
           <div class="result-name">${c.name}</div>
           <div class="result-location">📍 ${c.location}</div>
           <div class="result-tags">
-            <span class="tag tag-level">${c.level}</span>
+            
             <span class="tag tag-league">${c.league}</span>
           </div>
         </div>
@@ -1609,7 +1610,7 @@ function openShortlistModal(){
         ${badgeHtml(c,38,10)}
         <div class="shortlist-info">
           <div class="shortlist-name">${c.name}</div>
-          <div class="shortlist-meta">${c.level} · ${d} mi</div>
+          <div class="shortlist-meta">${d} mi</div>
           <div class="shortlist-meta" style="margin-top:2px">${c.availableDate?fmtDate(c.availableDate):'Date TBC'} · ${c.kickoffAvail||'Kick-off TBC'}</div>
           <div class="shortlist-meta" style="margin-top:1px">${venueLabel}</div>
         </div>
@@ -2159,7 +2160,7 @@ function renderBrowse(){
           <div class="browse-club-name">${c.name}</div>
           <div class="browse-club-meta">📍 ${c.location} · ${c.distance} mi away</div>
           <div class="browse-club-tags">
-            <span class="tag tag-level">${c.level}</span>
+            
             <span class="tag tag-league">${c.league}</span>
           </div>
         </div>
@@ -2181,7 +2182,7 @@ function openTeamProfile(clubId){
         <div>
           <div class="tp-name">${c.name}</div>
           <div class="tp-location">📍 ${c.location} · ${dist} miles away</div>
-          <div class="tp-level">${c.level}</div>
+          
         </div>
       </div>
       <div class="tp-stats">
@@ -2254,16 +2255,14 @@ function submitRegister(){closeModal('register-modal');toast('Club registered! W
 // INIT — load from Supabase then boot app
 // ═══════════════════════════════════════════
 function mapClub(row) {
-  // Map Supabase clubs table columns → app's internal club shape
   const name = row.name || '';
   const words = name.replace(/[&']/g,'').split(' ');
   const logo = words.map(w=>w[0]||'').join('').slice(0,3).toUpperCase();
-  const step = row.step || null;
   return {
     id:           row.id,
     name:         name,
     logo:         logo,
-    level:        step ? `Step ${step}` : 'Unknown',
+    level:        '',
     league:       row.league || '',
     location:     [row.location, row.county].filter(Boolean).join(', '),
     lat:          parseFloat(row.lat)  || 0,
@@ -2305,7 +2304,7 @@ async function initApp() {
     // Load clubs
     const { data: clubRows, error: clubErr } = await sb
       .from('clubs')
-      .select('id, name, league, location, county, lat, lng, ground, badge_url, step, active')
+      .select('id, name, league, location, county, lat, lng, ground, badge_url, active')
       .eq('active', true)
       .order('name');
 
