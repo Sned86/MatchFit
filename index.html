@@ -416,6 +416,30 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 .shortlist-actions{display:flex;gap:6px}
 .btn-shortlist-offer{padding:6px 11px;background:var(--green);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:white;cursor:pointer}
 .btn-shortlist-remove{padding:6px 11px;background:white;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--slate);cursor:pointer}
+
+/* ── Auth Wall ── */
+#auth-wall{position:fixed;inset:0;background:var(--bg-soft);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.auth-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:400px;padding:32px 28px;display:flex;flex-direction:column;gap:20px}
+.auth-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:4px}
+.auth-logo-mark{width:38px;height:38px;background:var(--green);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.auth-logo-text{font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy)}
+.auth-logo-text span{color:var(--green)}
+.auth-title{font-size:18px;font-weight:800;color:var(--navy);text-align:center}
+.auth-sub{font-size:13px;color:var(--text-muted);text-align:center;margin-top:-12px}
+.auth-error{padding:10px 13px;background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius-sm);font-size:12px;color:var(--red-dark);font-weight:600;display:none}
+.auth-error.visible{display:block}
+.auth-info{padding:10px 13px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-sm);font-size:12px;color:var(--amber-dark);font-weight:600;display:none}
+.auth-info.visible{display:block}
+.auth-switch{text-align:center;font-size:13px;color:var(--text-muted)}
+.auth-switch a{color:var(--green);font-weight:700;cursor:pointer;text-decoration:none}
+.auth-submit{width:100%;padding:13px;background:var(--green);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:white;cursor:pointer;transition:background 0.15s}
+.auth-submit:hover{background:var(--green-dark)}
+.auth-submit:disabled{opacity:0.6;cursor:not-allowed}
+/* Club search within register form */
+#reg-club-results{margin-top:5px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);overflow:hidden;display:none;box-shadow:var(--shadow);max-height:180px;overflow-y:auto}
+#reg-club-results.visible{display:block}
+#reg-club-selected{margin-top:6px;display:none}
+#reg-club-selected.visible{display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--green-xlight);border:1.5px solid var(--green-mid);border-radius:var(--radius-sm)}
 </style>
 </head>
 <body>
@@ -510,7 +534,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" value="manager@ashfordutd.co.uk"></div>
       <div class="form-field"><label class="form-label">Phone</label><input class="form-input" type="tel" value="07700 900123"></div>
       <button class="form-submit" onclick="closeModal('account-modal');toast('Settings saved')">Save Changes</button>
-      <button style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--red);cursor:pointer" onclick="closeModal('account-modal')">Sign Out</button>
+      <button style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--red);cursor:pointer" onclick="submitSignOut()">Sign Out</button>
     </div>
   </div>
 </div>
@@ -762,6 +786,79 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <!-- ══════════════════════════════════════════
      APP SHELL
 ══════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     AUTH WALL
+══════════════════════════════════════════ -->
+<div id="auth-wall">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">⚽</div>
+      <div class="auth-logo-text">Match<span>Fit</span></div>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div id="auth-login-panel">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your account</div>
+      <div class="auth-error" id="login-error"></div>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="login-email" placeholder="name@club.co.uk" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+      </div>
+      <button class="auth-submit" id="login-btn" onclick="submitLogin()">Sign In</button>
+      <div class="auth-switch">Don't have an account? <a onclick="showAuthPanel('register')">Register your club</a></div>
+    </div>
+
+    <!-- REGISTER PANEL -->
+    <div id="auth-register-panel" style="display:none;flex-direction:column;gap:15px">
+      <div class="auth-title">Register your club</div>
+      <div class="auth-sub">Join MatchFit — free to sign up</div>
+      <div class="auth-error" id="register-error"></div>
+      <div class="form-field">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" type="text" id="reg-name" placeholder="Full name">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="reg-email" placeholder="name@club.co.uk" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="reg-password" placeholder="Choose a password" autocomplete="new-password">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Your Club <span style="color:var(--red)">*</span></label>
+        <div class="team-search-wrap">
+          <span class="team-search-icon">🔍</span>
+          <input type="text" class="team-search-input" id="reg-club-search" placeholder="Search for your club…" oninput="onRegClubSearch(this.value)" autocomplete="off">
+        </div>
+        <div id="reg-club-results"></div>
+        <div id="reg-club-selected">
+          <div style="flex:1;font-size:13px;font-weight:700;color:var(--green-dark)" id="reg-club-selected-name"></div>
+          <span style="font-size:14px;color:var(--slate-light);cursor:pointer" onclick="clearRegClub()">×</span>
+        </div>
+      </div>
+      <div class="form-hint">Your registration will be reviewed before you get full access.</div>
+      <button class="auth-submit" id="register-btn" onclick="submitRegister()">Request Access →</button>
+      <div class="auth-switch">Already have an account? <a onclick="showAuthPanel('login')">Sign in</a></div>
+    </div>
+
+    <!-- PENDING PANEL -->
+    <div id="auth-pending-panel" style="display:none;flex-direction:column;gap:15px;text-align:center">
+      <div style="font-size:40px">⏳</div>
+      <div class="auth-title">Registration pending</div>
+      <div class="auth-sub" style="line-height:1.6">Your registration has been submitted and is awaiting approval. You'll be able to access MatchFit once it's been verified.</div>
+      <div class="auth-info visible" id="pending-club-name"></div>
+      <button class="auth-submit" style="background:var(--slate)" onclick="submitSignOut()">Sign Out</button>
+    </div>
+
+  </div>
+</div>
+
 <header class="header">
   <div class="header-top">
     <div class="logo">
@@ -776,7 +873,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     </div>
   </div>
   <div class="header-bottom">
-    <button class="register-btn" onclick="openModal('register-modal')">Register your club</button>
+    <button class="register-btn" id="header-club-btn" onclick="openModal('account-modal')">Ashford United FC</button>
   </div>
 </header>
 
@@ -1115,7 +1212,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ═══════════════════════════════════════════
 // DATABASE
 // ═══════════════════════════════════════════
-const MY = { id:1, name:'Ashford United FC', logo:'AU', lat:51.146, lng:0.874, ground:'Homelands Stadium',
+let MY = { id:1, name:'Ashford United FC', logo:'AU', lat:51.146, lng:0.874, ground:'Homelands Stadium',
   badge:'https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Ashford_United_FC_badge.png/120px-Ashford_United_FC_badge.png' };
 
 // Club data — populated from Supabase on load, falls back to [] if unavailable
@@ -2224,9 +2321,186 @@ function markAllRead(){
 }
 
 // ═══════════════════════════════════════════
-// REGISTER
+// AUTH
 // ═══════════════════════════════════════════
-function submitRegister(){closeModal('register-modal');toast('Club registered! Welcome to MatchFit 🎉');}
+let regSelectedClub = null;
+
+function showAuthPanel(panel) {
+  document.getElementById('auth-login-panel').style.display    = panel==='login'    ? 'flex' : 'none';
+  document.getElementById('auth-register-panel').style.display = panel==='register' ? 'flex' : 'none';
+  document.getElementById('auth-pending-panel').style.display  = panel==='pending'  ? 'flex' : 'none';
+  document.getElementById('auth-login-panel').style.flexDirection    = 'column';
+  document.getElementById('auth-register-panel').style.flexDirection = 'column';
+  document.getElementById('auth-pending-panel').style.flexDirection  = 'column';
+  // clear errors
+  ['login-error','register-error'].forEach(id=>{
+    const el=document.getElementById(id);el.textContent='';el.classList.remove('visible');
+  });
+}
+
+function showAuthError(panelPrefix, msg) {
+  const el = document.getElementById(panelPrefix+'-error');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function setAuthLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Please wait…' : (btnId==='login-btn' ? 'Sign In' : 'Request Access →');
+}
+
+// Club search within register form
+function onRegClubSearch(q) {
+  q = q.trim().toLowerCase();
+  const results = document.getElementById('reg-club-results');
+  if (!q) { results.classList.remove('visible'); results.innerHTML=''; return; }
+  const matches = CLUBS.filter(c => c.name.toLowerCase().includes(q)).slice(0, 6);
+  if (!matches.length) {
+    results.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--text-muted)">No clubs found</div>';
+  } else {
+    results.innerHTML = matches.map(c => `
+      <div class="team-result-row" onclick="selectRegClub(${c.id})">
+        <div class="team-result-logo">${c.logo}</div>
+        <div>
+          <div class="team-result-name">${c.name}</div>
+          <div class="team-result-meta">${c.location} · ${c.league}</div>
+        </div>
+      </div>`).join('');
+  }
+  results.classList.add('visible');
+}
+
+function selectRegClub(id) {
+  regSelectedClub = CLUBS.find(c => c.id === id);
+  if (!regSelectedClub) return;
+  document.getElementById('reg-club-search').value = '';
+  document.getElementById('reg-club-results').classList.remove('visible');
+  document.getElementById('reg-club-results').innerHTML = '';
+  document.getElementById('reg-club-selected-name').textContent = regSelectedClub.name;
+  document.getElementById('reg-club-selected').classList.add('visible');
+  document.getElementById('reg-club-selected').style.display = 'flex';
+}
+
+function clearRegClub() {
+  regSelectedClub = null;
+  document.getElementById('reg-club-selected').classList.remove('visible');
+  document.getElementById('reg-club-selected').style.display = 'none';
+  document.getElementById('reg-club-search').value = '';
+}
+
+async function submitLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { showAuthError('login','Please enter your email and password.'); return; }
+  setAuthLoading('login-btn', true);
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  setAuthLoading('login-btn', false);
+  if (error) { showAuthError('login', error.message); return; }
+  // onAuthStateChange will handle the rest
+}
+
+async function submitRegister() {
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if (!name)              { showAuthError('register','Please enter your name.'); return; }
+  if (!email)             { showAuthError('register','Please enter your email.'); return; }
+  if (password.length<6)  { showAuthError('register','Password must be at least 6 characters.'); return; }
+  if (!regSelectedClub)   { showAuthError('register','Please search for and select your club.'); return; }
+
+  setAuthLoading('register-btn', true);
+
+  // 1. Create auth user
+  const { data: signUpData, error: signUpErr } = await sb.auth.signUp({
+    email, password,
+    options: { data: { full_name: name } }
+  });
+  if (signUpErr) { showAuthError('register', signUpErr.message); setAuthLoading('register-btn', false); return; }
+
+  const userId = signUpData.user?.id;
+  if (!userId) { showAuthError('register','Registration failed — please try again.'); setAuthLoading('register-btn', false); return; }
+
+  // 2. Insert user_clubs row with pending status
+  const { error: ucErr } = await sb.from('user_clubs').insert({
+    user_id: userId,
+    club_id: regSelectedClub.id,
+    status: 'pending'
+  });
+  if (ucErr) { showAuthError('register', 'Account created but club link failed: ' + ucErr.message); setAuthLoading('register-btn', false); return; }
+
+  setAuthLoading('register-btn', false);
+  // onAuthStateChange will pick up the new session and show pending screen
+}
+
+async function submitSignOut() {
+  await sb.auth.signOut();
+  // Reset app state
+  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null };
+  CLUBS = []; FIXTURES = [];
+  document.getElementById('auth-wall').style.display = 'flex';
+  document.getElementById('header-club-btn').textContent = '';
+  showAuthPanel('login');
+}
+
+async function handleAuthSession(session) {
+  if (!session) {
+    document.getElementById('auth-wall').style.display = 'flex';
+    showAuthPanel('login');
+    return;
+  }
+
+  // Look up user_clubs for this user
+  const { data: ucRows, error: ucErr } = await sb
+    .from('user_clubs')
+    .select('club_id, status')
+    .eq('user_id', session.user.id)
+    .limit(1)
+    .single();
+
+  if (ucErr || !ucRows) {
+    // Registered but no club link yet — show pending
+    document.getElementById('auth-wall').style.display = 'flex';
+    document.getElementById('pending-club-name').textContent = 'Awaiting club verification.';
+    showAuthPanel('pending');
+    return;
+  }
+
+  if (ucRows.status === 'pending') {
+    // Find club name for the pending message
+    const club = CLUBS.find(c => c.id === ucRows.club_id);
+    document.getElementById('auth-wall').style.display = 'flex';
+    document.getElementById('pending-club-name').textContent =
+      club ? `Club requested: ${club.name}` : 'Your registration is pending approval.';
+    showAuthPanel('pending');
+    return;
+  }
+
+  if (ucRows.status === 'rejected') {
+    document.getElementById('auth-wall').style.display = 'flex';
+    showAuthError('login', 'Your registration was not approved. Please contact support.');
+    showAuthPanel('login');
+    await sb.auth.signOut();
+    return;
+  }
+
+  // status === 'approved' — load their club as MY and show the app
+  const club = CLUBS.find(c => c.id === ucRows.club_id);
+  if (club) {
+    MY = {
+      id:     club.id,
+      name:   club.name,
+      logo:   club.logo,
+      lat:    club.lat,
+      lng:    club.lng,
+      ground: club.ground,
+      badge:  club.badge,
+    };
+    document.getElementById('header-club-btn').textContent = club.name;
+  }
+
+  document.getElementById('auth-wall').style.display = 'none';
+}
 
 // ═══════════════════════════════════════════
 // INIT — load from Supabase then boot app
@@ -2319,7 +2593,17 @@ async function initApp() {
   buildDateStrip();
   buildKickoffPills();
   renderBrowse();
+
+  // Check auth state
+  const { data: { session } } = await sb.auth.getSession();
+  await handleAuthSession(session);
 }
+
+// Listen for auth changes (login / logout)
+sb.auth.onAuthStateChange(async (_event, session) => {
+  // Re-run session handler whenever auth state changes
+  await handleAuthSession(session);
+});
 
 initApp();
 </script>
