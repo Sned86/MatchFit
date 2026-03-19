@@ -2422,11 +2422,21 @@ async function submitRegister() {
   if (!userId) { showAuthError('register','Registration failed — please try again.'); setAuthLoading('register-btn', false); return; }
 
   // 2. Insert user_clubs row with pending status
-  const { error: ucErr } = await sb.from('user_clubs').insert({
-    user_id: userId,
-    club_id: regSelectedClub.id,
-    status: 'pending'
-  });
+  // Small delay to ensure auth user is fully committed before foreign key insert
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  let ucErr = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const { error } = await sb.from('user_clubs').insert({
+      user_id: userId,
+      club_id: regSelectedClub.id,
+      status: 'pending'
+    });
+    ucErr = error;
+    if (!ucErr) break;
+    // Wait a bit longer before retrying
+    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+  }
   if (ucErr) { showAuthError('register', 'Account created but club link failed: ' + ucErr.message); setAuthLoading('register-btn', false); return; }
 
   setAuthLoading('register-btn', false);
