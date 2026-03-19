@@ -1003,8 +1003,6 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <label class="field-label">Filter by League</label>
     <div class="browse-filters" id="browse-league-filters">
       <button class="browse-filter-btn active" onclick="setBrowseLeague(this,'all')">All Leagues</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Test League 1')">Test League 1</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Test League 2')">Test League 2</button>
     </div>
   </div>
   <div id="browse-clubs-list"></div>
@@ -2116,6 +2114,19 @@ function confirmCancellation(){
 // ═══════════════════════════════════════════
 // BROWSE TEAMS
 // ═══════════════════════════════════════════
+function buildLeagueFilters(){
+  const leagues = [...new Set(CLUBS.map(c=>c.league).filter(Boolean))].sort();
+  const container = document.getElementById('browse-league-filters');
+  // Remove any previously added dynamic buttons (keep "All Leagues")
+  container.querySelectorAll('.browse-filter-btn:not(:first-child)').forEach(b=>b.remove());
+  leagues.forEach(league=>{
+    const btn = document.createElement('button');
+    btn.className = 'browse-filter-btn';
+    btn.textContent = league;
+    btn.onclick = () => setBrowseLeague(btn, league);
+    container.appendChild(btn);
+  });
+}
 function setBrowseLeague(btn,val){
   document.querySelectorAll('#browse-league-filters .browse-filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');browseLeague=val;renderBrowse();
@@ -2300,6 +2311,9 @@ async function initApp() {
     console.warn('Supabase fixtures fetch failed:', err.message);
     // Non-fatal — app still works without fixtures
   }
+
+  // Build dynamic league filters from loaded club data
+  buildLeagueFilters();
 
   // Boot the UI
   buildDateStrip();
