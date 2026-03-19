@@ -2288,7 +2288,7 @@ async function initApp() {
     // Load clubs
     const { data: clubRows, error: clubErr } = await sb
       .from('clubs')
-      .select('id, name, step, league, location, county, lat, lng, ground, badge_url, active')
+      .select('id, name, league, location, county, lat, lng, ground, badge_url, active')
       .eq('active', true)
       .order('name');
 
