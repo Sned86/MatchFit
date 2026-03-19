@@ -1118,359 +1118,27 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+// ═══════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://huokcisnlcaezqcroyon.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_yeJQjoAwU9YqH5FWeai5Dg_grJxgGk-';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // ═══════════════════════════════════════════
 // DATABASE
 // ═══════════════════════════════════════════
 const MY = { id:1, name:'Ashford United FC', logo:'AU', lat:51.146, lng:0.874, ground:'Homelands Stadium',
   badge:'https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Ashford_United_FC_badge.png/120px-Ashford_United_FC_badge.png' };
 
-// Non-league club database — Steps 1–4, 2025-26 season (336 clubs)
-// All clubs verified from thefishy.co.uk. Availability fields null = not yet posted.
-const CLUBS = [
-  {id:1001,name:'York City',logo:'YC',level:'Step 1',league:'National League',location:'York, North Yorkshire',lat:53.9685,lng:-1.0436,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'LNER Community Stadium',badge:null},
-  {id:1002,name:'Rochdale',logo:'R',level:'Step 1',league:'National League',location:'Rochdale, Greater Manchester',lat:53.6113,lng:-2.1561,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Crown Oil Arena',badge:null},
-  {id:1003,name:'Carlisle United',logo:'CU',level:'Step 1',league:'National League',location:'Carlisle, Cumbria',lat:54.8946,lng:-2.9357,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Brunton Park',badge:null},
-  {id:1004,name:'Boreham Wood',logo:'BW',level:'Step 1',league:'National League',location:'Borehamwood, Hertfordshire',lat:51.6573,lng:-0.2725,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Meadow Park',badge:null},
-  {id:1005,name:'Forest Green Rovers',logo:'FGR',level:'Step 1',league:'National League',location:'Nailsworth, Gloucestershire',lat:51.696,lng:-2.2228,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The New Lawn',badge:null},
-  {id:1006,name:'Scunthorpe United',logo:'SU',level:'Step 1',league:'National League',location:'Scunthorpe, Lincolnshire',lat:53.5811,lng:-0.6601,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Glanford Park',badge:null},
-  {id:1007,name:'FC Halifax Town',logo:'FHT',level:'Step 1',league:'National League',location:'Halifax, West Yorkshire',lat:53.7267,lng:-1.8638,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Shay',badge:null},
-  {id:1008,name:'Southend United',logo:'SU',level:'Step 1',league:'National League',location:'Southend-on-Sea, Essex',lat:51.5404,lng:0.7076,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Roots Hall',badge:null},
-  {id:1009,name:'Hartlepool United',logo:'HU',level:'Step 1',league:'National League',location:'Hartlepool, County Durham',lat:54.6833,lng:-1.2071,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Suit Direct Stadium',badge:null},
-  {id:1010,name:'Wealdstone',logo:'W',level:'Step 1',league:'National League',location:'Ruislip, Greater London',lat:51.5618,lng:-0.4192,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Grosvenor Vale',badge:null},
-  {id:1011,name:'Yeovil Town',logo:'YT',level:'Step 1',league:'National League',location:'Yeovil, Somerset',lat:50.9475,lng:-2.6773,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Huish Park',badge:null},
-  {id:1012,name:'Gateshead',logo:'G',level:'Step 1',league:'National League',location:'Gateshead, Tyne and Wear',lat:54.9607,lng:-1.6093,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Gateshead International Stadium',badge:null},
-  {id:1013,name:'Morecambe',logo:'M',level:'Step 1',league:'National League',location:'Morecambe, Lancashire',lat:54.0776,lng:-2.8736,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Mazuma Mobile Stadium',badge:null},
-  {id:1014,name:'Altrincham',logo:'A',level:'Step 1',league:'National League',location:'Altrincham, Greater Manchester',lat:53.3875,lng:-2.3532,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'J.Davidson Stadium',badge:null},
-  {id:1015,name:'Eastleigh',logo:'E',level:'Step 1',league:'National League',location:'Eastleigh, Hampshire',lat:50.9721,lng:-1.3498,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Silverlake Stadium',badge:null},
-  {id:1016,name:'Aldershot Town',logo:'AT',level:'Step 1',league:'National League',location:'Aldershot, Hampshire',lat:51.248,lng:-0.7713,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'EBB Stadium',badge:null},
-  {id:1017,name:'Woking',logo:'W',level:'Step 1',league:'National League',location:'Woking, Surrey',lat:51.3086,lng:-0.5634,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Kingfield Stadium',badge:null},
-  {id:1018,name:'Boston United',logo:'BU',level:'Step 1',league:'National League',location:'Boston, Lincolnshire',lat:52.9793,lng:-0.0358,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Jakemans Community Stadium',badge:null},
-  {id:1019,name:'Brackley Town',logo:'BT',level:'Step 1',league:'National League',location:'Brackley, Northamptonshire',lat:52.053,lng:-1.1478,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'St James Park',badge:null},
-  {id:1020,name:'Braintree Town',logo:'BT',level:'Step 1',league:'National League',location:'Braintree, Essex',lat:51.8778,lng:0.5496,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Cressing Road',badge:null},
-  {id:1021,name:'Solihull Moors',logo:'SM',level:'Step 1',league:'National League',location:'Solihull, West Midlands',lat:52.4209,lng:-1.7713,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'SportNation.bet Stadium',badge:null},
-  {id:1022,name:'Sutton United',logo:'SU',level:'Step 1',league:'National League',location:'Sutton, Greater London',lat:51.362,lng:-0.1924,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'VBS Community Stadium',badge:null},
-  {id:1023,name:'Tamworth',logo:'T',level:'Step 1',league:'National League',location:'Tamworth, Staffordshire',lat:52.636,lng:-1.6948,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Lamb Ground',badge:null},
-  {id:1024,name:'Truro City',logo:'TC',level:'Step 1',league:'National League',location:'Truro, Cornwall',lat:50.2626,lng:-5.0527,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Treyew Road',badge:null},
-  {id:2001,name:'AFC Fylde',logo:'AF',level:'Step 2',league:'National League North',location:'Kirkham, Lancashire',lat:53.7777,lng:-2.8785,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Mill Farm',badge:null},
-  {id:2002,name:'South Shields',logo:'SS',level:'Step 2',league:'National League North',location:'South Shields, Tyne and Wear',lat:54.9992,lng:-1.4298,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'1st Cloud Arena',badge:null},
-  {id:2003,name:'Merthyr Town',logo:'MT',level:'Step 2',league:'National League North',location:'Merthyr Tydfil, Wales',lat:51.7478,lng:-3.3782,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Penydarren Park',badge:null},
-  {id:2004,name:'Kidderminster Harriers',logo:'KH',level:'Step 2',league:'National League North',location:'Kidderminster, Worcestershire',lat:52.3897,lng:-2.2449,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Aggborough Stadium',badge:null},
-  {id:2005,name:'Radcliffe Borough',logo:'RB',level:'Step 2',league:'National League North',location:'Radcliffe, Greater Manchester',lat:53.5597,lng:-2.327,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Stainton Park',badge:null},
-  {id:2006,name:'Darlington',logo:'D',level:'Step 2',league:'National League North',location:'Darlington, County Durham',lat:54.5227,lng:-1.5598,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Blackwell Meadows',badge:null},
-  {id:2007,name:'Scarborough Athletic',logo:'SA',level:'Step 2',league:'National League North',location:'Scarborough, North Yorkshire',lat:54.2772,lng:-0.4054,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Flamingo Land Stadium',badge:null},
-  {id:2008,name:'Macclesfield',logo:'M',level:'Step 2',league:'National League North',location:'Macclesfield, Cheshire',lat:53.262,lng:-2.1269,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Moss Rose',badge:null},
-  {id:2009,name:'AFC Telford United',logo:'ATU',level:'Step 2',league:'National League North',location:'Telford, Shropshire',lat:52.6765,lng:-2.4513,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'New Bucks Head',badge:null},
-  {id:2010,name:'Marine',logo:'M',level:'Step 2',league:'National League North',location:'Crosby, Merseyside',lat:53.4861,lng:-3.0263,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rossett Park',badge:null},
-  {id:2011,name:'Chester',logo:'C',level:'Step 2',league:'National League North',location:'Chester, Cheshire',lat:53.1905,lng:-2.8892,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Deva Stadium',badge:null},
-  {id:2012,name:'Spennymoor Town',logo:'ST',level:'Step 2',league:'National League North',location:'Spennymoor, County Durham',lat:54.6995,lng:-1.5964,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Brewery Field',badge:null},
-  {id:2013,name:'Curzon Ashton',logo:'CA',level:'Step 2',league:'National League North',location:'Ashton-under-Lyne, Greater Manchester',lat:53.4875,lng:-2.074,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Tameside Stadium',badge:null},
-  {id:2014,name:'Buxton',logo:'B',level:'Step 2',league:'National League North',location:'Buxton, Derbyshire',lat:53.2575,lng:-1.9145,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Silverlands',badge:null},
-  {id:2015,name:'Chorley',logo:'C',level:'Step 2',league:'National League North',location:'Chorley, Lancashire',lat:53.6545,lng:-2.6251,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Victory Park',badge:null},
-  {id:2016,name:'Bedford Town',logo:'BT',level:'Step 2',league:'National League North',location:'Bedford, Bedfordshire',lat:52.1386,lng:-0.4571,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Eyrie',badge:null},
-  {id:2017,name:'Southport',logo:'S',level:'Step 2',league:'National League North',location:'Southport, Merseyside',lat:53.6388,lng:-2.9829,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Haig Avenue',badge:null},
-  {id:2018,name:'King\'s Lynn Town',logo:'KLT',level:'Step 2',league:'National League North',location:'King\'s Lynn, Norfolk',lat:52.7547,lng:0.4039,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Walks Stadium',badge:null},
-  {id:2019,name:'Worksop Town',logo:'WT',level:'Step 2',league:'National League North',location:'Worksop, Nottinghamshire',lat:53.3031,lng:-1.1228,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Sandy Lane',badge:null},
-  {id:2020,name:'Peterborough Sports',logo:'PS',level:'Step 2',league:'National League North',location:'Peterborough, Cambridgeshire',lat:52.5695,lng:-0.2405,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Lincoln Road',badge:null},
-  {id:2021,name:'Oxford City',logo:'OC',level:'Step 2',league:'National League North',location:'Oxford, Oxfordshire',lat:51.7572,lng:-1.222,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Court Place Farm',badge:null},
-  {id:2022,name:'Alfreton Town',logo:'AT',level:'Step 2',league:'National League North',location:'Alfreton, Derbyshire',lat:53.0977,lng:-1.3837,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Impact Arena',badge:null},
-  {id:2023,name:'Hereford FC',logo:'HF',level:'Step 2',league:'National League North',location:'Hereford, Herefordshire',lat:52.0566,lng:-2.716,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Edgar Street',badge:null},
-  {id:2024,name:'Leamington',logo:'L',level:'Step 2',league:'National League North',location:'Leamington Spa, Warwickshire',lat:52.2904,lng:-1.5359,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'New Windmill Ground',badge:null},
-  {id:2101,name:'AFC Hornchurch',logo:'AH',level:'Step 2',league:'National League South',location:'Hornchurch, Essex',lat:51.5568,lng:0.2105,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hornchurch Stadium',badge:null},
-  {id:2102,name:'Worthing',logo:'W',level:'Step 2',league:'National League South',location:'Worthing, West Sussex',lat:50.8138,lng:-0.3815,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Woodside Road',badge:null},
-  {id:2103,name:'Weston-super-Mare',logo:'W',level:'Step 2',league:'National League South',location:'Weston-super-Mare, Somerset',lat:51.3456,lng:-2.9785,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Optima Stadium',badge:null},
-  {id:2104,name:'Dorking Wanderers',logo:'DW',level:'Step 2',league:'National League South',location:'Dorking, Surrey',lat:51.2296,lng:-0.3349,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Meadowbank',badge:null},
-  {id:2105,name:'Torquay United',logo:'TU',level:'Step 2',league:'National League South',location:'Torquay, Devon',lat:50.4657,lng:-3.5274,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Plainmoor',badge:null},
-  {id:2106,name:'Horsham',logo:'H',level:'Step 2',league:'National League South',location:'Horsham, West Sussex',lat:51.0607,lng:-0.3278,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hop Oast',badge:null},
-  {id:2107,name:'Hemel Hempstead Town',logo:'HHT',level:'Step 2',league:'National League South',location:'Hemel Hempstead, Hertfordshire',lat:51.7482,lng:-0.4498,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Vauxhall Road',badge:null},
-  {id:2108,name:'Maidenhead United',logo:'MU',level:'Step 2',league:'National League South',location:'Maidenhead, Berkshire',lat:51.5237,lng:-0.7193,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'York Road',badge:null},
-  {id:2109,name:'Maidstone United',logo:'MU',level:'Step 2',league:'National League South',location:'Maidstone, Kent',lat:51.2791,lng:0.5094,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-07-26',ground:'Gallagher Stadium',badge:null},
-  {id:2110,name:'Ebbsfleet United',logo:'EU',level:'Step 2',league:'National League South',location:'Northfleet, Kent',lat:51.4063,lng:0.3377,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-07-12',ground:'Kuflink Stadium',badge:null},
-  {id:2111,name:'AFC Totton',logo:'AT',level:'Step 2',league:'National League South',location:'Totton, Hampshire',lat:50.9171,lng:-1.4882,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Testwood Park',badge:null},
-  {id:2112,name:'Dover Athletic',logo:'DA',level:'Step 2',league:'National League South',location:'Dover, Kent',lat:51.1272,lng:1.3122,venueAvail:'away',kickoffAvail:'15:00',availableDate:'2026-08-08',ground:'Crabble Athletic Ground',badge:null},
-  {id:2113,name:'Dagenham & Redbridge',logo:'DR',level:'Step 2',league:'National League South',location:'Dagenham, Greater London',lat:51.5432,lng:0.1605,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-08-01',ground:'Chigwell Construction Stadium',badge:null},
-  {id:2114,name:'Chesham United',logo:'CU',level:'Step 2',league:'National League South',location:'Chesham, Buckinghamshire',lat:51.7062,lng:-0.6119,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Meadow',badge:null},
-  {id:2115,name:'Chelmsford City',logo:'CC',level:'Step 2',league:'National League South',location:'Chelmsford, Essex',lat:51.7349,lng:0.4739,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Melbourne Park',badge:null},
-  {id:2116,name:'Truro City',logo:'TC',level:'Step 2',league:'National League South',location:'Truro, Cornwall',lat:50.2626,lng:-5.0527,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Treyew Road',badge:null},
-  {id:2117,name:'Braintree Town',logo:'BT',level:'Step 2',league:'National League South',location:'Braintree, Essex',lat:51.8778,lng:0.5496,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Cressing Road',badge:null},
-  {id:2118,name:'Taunton Town',logo:'TT',level:'Step 2',league:'National League South',location:'Taunton, Somerset',lat:51.0201,lng:-3.0984,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Longrun Meadow',badge:null},
-  {id:2119,name:'Bath City',logo:'BC',level:'Step 2',league:'National League South',location:'Bath, Somerset',lat:51.3785,lng:-2.3519,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Twerton Park',badge:null},
-  {id:2120,name:'Farnborough',logo:'F',level:'Step 2',league:'National League South',location:'Farnborough, Hampshire',lat:51.2875,lng:-0.7493,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Cherrywood Road',badge:null},
-  {id:2121,name:'Havant & Waterlooville',logo:'HW',level:'Step 2',league:'National League South',location:'Havant, Hampshire',lat:50.8514,lng:-1.0066,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Westleigh Park',badge:null},
-  {id:2122,name:'Slough Town',logo:'ST',level:'Step 2',league:'National League South',location:'Slough, Berkshire',lat:51.5105,lng:-0.595,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Arbour Park',badge:null},
-  {id:2123,name:'Welling United',logo:'WU',level:'Step 2',league:'National League South',location:'Welling, Greater London',lat:51.4638,lng:0.1069,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Park View Road',badge:null},
-  {id:2124,name:'Eastbourne Borough',logo:'EB',level:'Step 2',league:'National League South',location:'Eastbourne, East Sussex',lat:50.7792,lng:0.2709,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Priory Lane',badge:null},
-  {id:3001,name:'Folkestone Invicta',logo:'FI',level:'Step 3',league:'Isthmian League Premier',location:'Folkestone, Kent',lat:51.081,lng:1.1664,venueAvail:'either',kickoffAvail:'15:00',availableDate:'2026-07-25',ground:'Cheriton Road',badge:null},
-  {id:3002,name:'Aveley',logo:'A',level:'Step 3',league:'Isthmian League Premier',location:'Aveley, Essex',lat:51.5107,lng:0.2975,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Parkside',badge:null},
-  {id:3003,name:'Brentwood Town',logo:'BT',level:'Step 3',league:'Isthmian League Premier',location:'Brentwood, Essex',lat:51.6213,lng:0.3002,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Arena',badge:null},
-  {id:3004,name:'Billericay Town',logo:'BT',level:'Step 3',league:'Isthmian League Premier',location:'Billericay, Essex',lat:51.6274,lng:0.4162,venueAvail:'either',kickoffAvail:'15:00',availableDate:'2026-07-18',ground:'New Lodge',badge:null},
-  {id:3005,name:'Chatham Town',logo:'CT',level:'Step 3',league:'Isthmian League Premier',location:'Chatham, Kent',lat:51.3792,lng:0.5202,venueAvail:'either',kickoffAvail:'15:00',availableDate:'2026-08-01',ground:'Maidstone Road Sports Ground',badge:null},
-  {id:3006,name:'Cray Wanderers',logo:'CW',level:'Step 3',league:'Isthmian League Premier',location:'St Mary Cray, Greater London',lat:51.3886,lng:0.0993,venueAvail:'away',kickoffAvail:'14:00',availableDate:'2026-08-08',ground:'Hayes Lane',badge:null},
-  {id:3007,name:'Dartford',logo:'D',level:'Step 3',league:'Isthmian League Premier',location:'Dartford, Kent',lat:51.4558,lng:0.2178,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-07-25',ground:'Princes Park',badge:null},
-  {id:3008,name:'Ramsgate',logo:'R',level:'Step 3',league:'Isthmian League Premier',location:'Ramsgate, Kent',lat:51.3338,lng:1.4164,venueAvail:'either',kickoffAvail:'14:00',availableDate:'2026-08-08',ground:'Prices Avenue',badge:null},
-  {id:3009,name:'Burgess Hill Town',logo:'BHT',level:'Step 3',league:'Isthmian League Premier',location:'Burgess Hill, West Sussex',lat:50.957,lng:-0.1248,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Leylands Park',badge:null},
-  {id:3010,name:'Whitehawk',logo:'W',level:'Step 3',league:'Isthmian League Premier',location:'Brighton, East Sussex',lat:50.8213,lng:-0.107,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Enclosed Ground',badge:null},
-  {id:3011,name:'St Albans City',logo:'SAC',level:'Step 3',league:'Isthmian League Premier',location:'St Albans, Hertfordshire',lat:51.749,lng:-0.3412,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Clarence Park',badge:null},
-  {id:3012,name:'Chichester City',logo:'CC',level:'Step 3',league:'Isthmian League Premier',location:'Chichester, West Sussex',lat:50.8353,lng:-0.7801,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Oaklands Park',badge:null},
-  {id:3013,name:'Dulwich Hamlet',logo:'DH',level:'Step 3',league:'Isthmian League Premier',location:'Dulwich, Greater London',lat:51.4494,lng:-0.0741,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Champion Hill',badge:null},
-  {id:3014,name:'Lewes',logo:'L',level:'Step 3',league:'Isthmian League Premier',location:'Lewes, East Sussex',lat:50.8761,lng:0.0109,venueAvail:'away',kickoffAvail:'15:00',availableDate:'2026-07-26',ground:'The Dripping Pan',badge:null},
-  {id:3015,name:'Cheshunt',logo:'C',level:'Step 3',league:'Isthmian League Premier',location:'Cheshunt, Hertfordshire',lat:51.7023,lng:-0.0292,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Andrew Cohen Stadium',badge:null},
-  {id:3016,name:'Hashtag United',logo:'HU',level:'Step 3',league:'Isthmian League Premier',location:'Thurrock, Essex',lat:51.4786,lng:0.3603,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rookery Hill',badge:null},
-  {id:3017,name:'Carshalton Athletic',logo:'CA',level:'Step 3',league:'Isthmian League Premier',location:'Carshalton, Greater London',lat:51.3654,lng:-0.1671,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'War Memorial Sports Ground',badge:null},
-  {id:3018,name:'Wingate & Finchley',logo:'WF',level:'Step 3',league:'Isthmian League Premier',location:'Finchley, Greater London',lat:51.5993,lng:-0.1718,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Maurice Rebak Stadium',badge:null},
-  {id:3019,name:'Potters Bar Town',logo:'PBT',level:'Step 3',league:'Isthmian League Premier',location:'Potters Bar, Hertfordshire',lat:51.694,lng:-0.173,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Parkfield',badge:null},
-  {id:3020,name:'Margate',logo:'M',level:'Step 3',league:'Isthmian League Premier',location:'Margate, Kent',lat:51.386,lng:1.387,venueAvail:'away',kickoffAvail:'15:00',availableDate:'2026-07-26',ground:'Hartsdown Park',badge:null},
-  {id:3021,name:'Tonbridge Angels',logo:'TA',level:'Step 3',league:'Isthmian League Premier',location:'Tonbridge, Kent',lat:51.1953,lng:0.2738,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-07-19',ground:'Longmead Stadium',badge:null},
-  {id:3022,name:'Corinthian-Casuals',logo:'C',level:'Step 3',league:'Isthmian League Premier',location:'Tolworth, Surrey',lat:51.3798,lng:-0.2871,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'King George\'s Field',badge:null},
-  {id:3101,name:'Hebburn Town',logo:'HT',level:'Step 3',league:'Northern Premier League',location:'Hebburn, Tyne and Wear',lat:54.9708,lng:-1.5131,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hebburn Sports Ground',badge:null},
-  {id:3102,name:'Hednesford Town',logo:'HT',level:'Step 3',league:'Northern Premier League',location:'Hednesford, Staffordshire',lat:52.7122,lng:-2.0009,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Keys Park',badge:null},
-  {id:3103,name:'FC United of Manchester',logo:'FUO',level:'Step 3',league:'Northern Premier League',location:'Manchester, Greater Manchester',lat:53.51,lng:-2.1838,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Broadhurst Park',badge:null},
-  {id:3104,name:'Warrington Rylands',logo:'WR',level:'Step 3',league:'Northern Premier League',location:'Warrington, Cheshire',lat:53.3897,lng:-2.597,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Gorsey Lane',badge:null},
-  {id:3105,name:'Stockton Town',logo:'ST',level:'Step 3',league:'Northern Premier League',location:'Stockton-on-Tees, County Durham',lat:54.57,lng:-1.3282,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bishopton Road West',badge:null},
-  {id:3106,name:'Warrington Town',logo:'WT',level:'Step 3',league:'Northern Premier League',location:'Warrington, Cheshire',lat:53.3872,lng:-2.586,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Cantilever Park',badge:null},
-  {id:3107,name:'Bamber Bridge',logo:'BB',level:'Step 3',league:'Northern Premier League',location:'Bamber Bridge, Lancashire',lat:53.7313,lng:-2.6657,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Sir Tom Finney Stadium',badge:null},
-  {id:3108,name:'Gainsborough Trinity',logo:'GT',level:'Step 3',league:'Northern Premier League',location:'Gainsborough, Lincolnshire',lat:53.3982,lng:-0.7685,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Martin & Co Arena',badge:null},
-  {id:3109,name:'Lancaster City',logo:'LC',level:'Step 3',league:'Northern Premier League',location:'Lancaster, Lancashire',lat:54.0444,lng:-2.7952,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Giant Axe',badge:null},
-  {id:3110,name:'Ashton United',logo:'AU',level:'Step 3',league:'Northern Premier League',location:'Ashton-under-Lyne, Greater Manchester',lat:53.4924,lng:-2.0898,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hurst Cross',badge:null},
-  {id:3111,name:'Ilkeston Town',logo:'IT',level:'Step 3',league:'Northern Premier League',location:'Ilkeston, Derbyshire',lat:52.9756,lng:-1.3092,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'New Manor Ground',badge:null},
-  {id:3112,name:'Guiseley AFC',logo:'GA',level:'Step 3',league:'Northern Premier League',location:'Guiseley, West Yorkshire',lat:53.8773,lng:-1.7115,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Nethermoor Park',badge:null},
-  {id:3113,name:'Cleethorpes Town',logo:'CT',level:'Step 3',league:'Northern Premier League',location:'Cleethorpes, Lincolnshire',lat:53.5611,lng:-0.0278,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Linden Club Ground',badge:null},
-  {id:3114,name:'Prescot Cables',logo:'PC',level:'Step 3',league:'Northern Premier League',location:'Prescot, Merseyside',lat:53.4291,lng:-2.7937,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Valerie Park',badge:null},
-  {id:3115,name:'Whitby Town',logo:'WT',level:'Step 3',league:'Northern Premier League',location:'Whitby, North Yorkshire',lat:54.4878,lng:-0.6146,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Turnbull Ground',badge:null},
-  {id:3116,name:'Rushall Olympic',logo:'RO',level:'Step 3',league:'Northern Premier League',location:'Rushall, West Midlands',lat:52.6166,lng:-1.9361,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Dales Lane',badge:null},
-  {id:3117,name:'Mickleover FC',logo:'MF',level:'Step 3',league:'Northern Premier League',location:'Mickleover, Derbyshire',lat:52.9015,lng:-1.5602,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Don Amott Arena',badge:null},
-  {id:3118,name:'Stafford Rangers',logo:'SR',level:'Step 3',league:'Northern Premier League',location:'Stafford, Staffordshire',lat:52.8078,lng:-2.1068,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Marston Road',badge:null},
-  {id:3119,name:'Nantwich Town',logo:'NT',level:'Step 3',league:'Northern Premier League',location:'Nantwich, Cheshire',lat:53.0676,lng:-2.5262,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Weaver Stadium',badge:null},
-  {id:3120,name:'Mossley AFC',logo:'MA',level:'Step 3',league:'Northern Premier League',location:'Mossley, Greater Manchester',lat:53.5309,lng:-2.027,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Seel Park',badge:null},
-  {id:3121,name:'Hyde United',logo:'HU',level:'Step 3',league:'Northern Premier League',location:'Hyde, Greater Manchester',lat:53.4519,lng:-2.0723,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ewen Fields',badge:null},
-  {id:3122,name:'Matlock Town',logo:'MT',level:'Step 3',league:'Northern Premier League',location:'Matlock, Derbyshire',lat:53.1432,lng:-1.5586,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Criterion Ground',badge:null},
-  {id:3201,name:'Spalding United',logo:'SU',level:'Step 3',league:'Southern League Premier Central',location:'Spalding, Lincolnshire',lat:52.7888,lng:-0.1527,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Sir Halley Stewart Playing Field',badge:null},
-  {id:3202,name:'Harborough Town',logo:'HT',level:'Step 3',league:'Southern League Premier Central',location:'Market Harborough, Leicestershire',lat:52.4762,lng:-0.9211,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bowden\'s Park',badge:null},
-  {id:3203,name:'Real Bedford',logo:'RB',level:'Step 3',league:'Southern League Premier Central',location:'Bedford, Bedfordshire',lat:52.1386,lng:-0.4571,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'McMullen Park',badge:null},
-  {id:3204,name:'Quorn FC',logo:'QF',level:'Step 3',league:'Southern League Premier Central',location:'Quorn, Leicestershire',lat:52.7434,lng:-1.1622,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Farley Way Stadium',badge:null},
-  {id:3205,name:'Redditch United',logo:'RU',level:'Step 3',league:'Southern League Premier Central',location:'Redditch, Worcestershire',lat:52.3093,lng:-1.9434,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Valley Stadium',badge:null},
-  {id:3206,name:'Halesowen Town',logo:'HT',level:'Step 3',league:'Southern League Premier Central',location:'Halesowen, West Midlands',lat:52.45,lng:-2.0513,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Grove',badge:null},
-  {id:3207,name:'Needham Market',logo:'NM',level:'Step 3',league:'Southern League Premier Central',location:'Needham Market, Suffolk',lat:52.1544,lng:1.0443,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bloomfields',badge:null},
-  {id:3208,name:'Worcester City',logo:'WC',level:'Step 3',league:'Southern League Premier Central',location:'Worcester, Worcestershire',lat:52.1876,lng:-2.2235,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Aggborough',badge:null},
-  {id:3209,name:'Leiston FC',logo:'LF',level:'Step 3',league:'Southern League Premier Central',location:'Leiston, Suffolk',lat:52.2067,lng:1.5783,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Victory Road',badge:null},
-  {id:3210,name:'Banbury United',logo:'BU',level:'Step 3',league:'Southern League Premier Central',location:'Banbury, Oxfordshire',lat:52.0627,lng:-1.3391,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Banbury Plant Hire Community Stadium',badge:null},
-  {id:3211,name:'Kettering Town',logo:'KT',level:'Step 3',league:'Southern League Premier Central',location:'Kettering, Northamptonshire',lat:52.3985,lng:-0.7315,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Latimer Park',badge:null},
-  {id:3212,name:'Stourbridge',logo:'S',level:'Step 3',league:'Southern League Premier Central',location:'Stourbridge, West Midlands',lat:52.4574,lng:-2.1489,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The War Memorial Athletic Ground',badge:null},
-  {id:3213,name:'AFC Rushden & Diamonds',logo:'ARD',level:'Step 3',league:'Southern League Premier Central',location:'Rushden, Northamptonshire',lat:52.2881,lng:-0.6073,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hayden Road',badge:null},
-  {id:3214,name:'Alvechurch',logo:'A',level:'Step 3',league:'Southern League Premier Central',location:'Alvechurch, Worcestershire',lat:52.36,lng:-1.9638,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Lye Meadow',badge:null},
-  {id:3215,name:'Corby Town',logo:'CT',level:'Step 3',league:'Southern League Premier Central',location:'Corby, Northamptonshire',lat:52.493,lng:-0.696,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Steel Park',badge:null},
-  {id:3216,name:'Stratford Town',logo:'ST',level:'Step 3',league:'Southern League Premier Central',location:'Stratford-upon-Avon, Warwickshire',lat:52.1969,lng:-1.7197,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Knights Lane',badge:null},
-  {id:3217,name:'Peterborough Northern Star',logo:'PNS',level:'Step 3',league:'Southern League Premier Central',location:'Peterborough, Cambridgeshire',lat:52.5735,lng:-0.2354,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Lincoln Road',badge:null},
-  {id:3218,name:'Royston Town',logo:'RT',level:'Step 3',league:'Southern League Premier Central',location:'Royston, Hertfordshire',lat:52.0476,lng:-0.0188,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Garden Walk',badge:null},
-  {id:3219,name:'Hitchin Town',logo:'HT',level:'Step 3',league:'Southern League Premier Central',location:'Hitchin, Hertfordshire',lat:51.9476,lng:-0.2793,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Top Field',badge:null},
-  {id:3220,name:'Lowestoft Town',logo:'LT',level:'Step 3',league:'Southern League Premier Central',location:'Lowestoft, Suffolk',lat:52.4766,lng:1.7337,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Crown Meadow',badge:null},
-  {id:3221,name:'Stamford AFC',logo:'SA',level:'Step 3',league:'Southern League Premier Central',location:'Stamford, Lincolnshire',lat:52.6524,lng:-0.4798,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Zeeco Stadium',badge:null},
-  {id:3222,name:'Bromsgrove Sporting',logo:'BS',level:'Step 3',league:'Southern League Premier Central',location:'Bromsgrove, Worcestershire',lat:52.3355,lng:-2.0592,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Victoria Ground',badge:null},
-  {id:3301,name:'Walton & Hersham',logo:'WH',level:'Step 3',league:'Southern League Premier South',location:'Walton-on-Thames, Surrey',lat:51.3881,lng:-0.4089,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Stompond Lane',badge:null},
-  {id:3302,name:'Gloucester City',logo:'GC',level:'Step 3',league:'Southern League Premier South',location:'Gloucester, Gloucestershire',lat:51.8679,lng:-2.237,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'New Meadow Park',badge:null},
-  {id:3303,name:'Poole Town',logo:'PT',level:'Step 3',league:'Southern League Premier South',location:'Poole, Dorset',lat:50.7175,lng:-1.987,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Tatnam Ground',badge:null},
-  {id:3304,name:'Farnham Town',logo:'FT',level:'Step 3',league:'Southern League Premier South',location:'Farnham, Surrey',lat:51.2144,lng:-0.7965,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Memorial Ground',badge:null},
-  {id:3305,name:'Sholing FC',logo:'SF',level:'Step 3',league:'Southern League Premier South',location:'Sholing, Hampshire',lat:50.9067,lng:-1.3605,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Sholing Sports Centre',badge:null},
-  {id:3306,name:'Gosport Borough',logo:'GB',level:'Step 3',league:'Southern League Premier South',location:'Gosport, Hampshire',lat:50.7961,lng:-1.1495,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Privett Park',badge:null},
-  {id:3307,name:'Chertsey Town',logo:'CT',level:'Step 3',league:'Southern League Premier South',location:'Chertsey, Surrey',lat:51.3893,lng:-0.5059,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Alwyns Lane',badge:null},
-  {id:3308,name:'Berkhamsted Town',logo:'BT',level:'Step 3',league:'Southern League Premier South',location:'Berkhamsted, Hertfordshire',lat:51.762,lng:-0.5612,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Broadwater',badge:null},
-  {id:3309,name:'Havant & Waterlooville',logo:'HW',level:'Step 3',league:'Southern League Premier South',location:'Havant, Hampshire',lat:50.8514,lng:-1.0066,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Westleigh Park',badge:null},
-  {id:3310,name:'Bracknell Town',logo:'BT',level:'Step 3',league:'Southern League Premier South',location:'Bracknell, Berkshire',lat:51.4154,lng:-0.7478,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Larges Lane',badge:null},
-  {id:3311,name:'Uxbridge FC',logo:'UF',level:'Step 3',league:'Southern League Premier South',location:'Uxbridge, Greater London',lat:51.5422,lng:-0.4826,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Honeycroft',badge:null},
-  {id:3312,name:'Swindon Supermarine',logo:'SS',level:'Step 3',league:'Southern League Premier South',location:'South Marston, Wiltshire',lat:51.5889,lng:-1.7485,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Webb\'s Wood Stadium',badge:null},
-  {id:3313,name:'Moneyfields',logo:'M',level:'Step 3',league:'Southern League Premier South',location:'Portsmouth, Hampshire',lat:50.8196,lng:-1.0491,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Dover Road Ground',badge:null},
-  {id:3314,name:'Marlow',logo:'M',level:'Step 3',league:'Southern League Premier South',location:'Marlow, Buckinghamshire',lat:51.5719,lng:-0.7757,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Alfred Davis Memorial Ground',badge:null},
-  {id:3315,name:'Beaconsfield Town',logo:'BT',level:'Step 3',league:'Southern League Premier South',location:'Beaconsfield, Buckinghamshire',lat:51.6108,lng:-0.6453,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Holloways Park',badge:null},
-  {id:3316,name:'Salisbury FC',logo:'SF',level:'Step 3',league:'Southern League Premier South',location:'Salisbury, Wiltshire',lat:51.0688,lng:-1.802,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Raymond McEnhill Stadium',badge:null},
-  {id:3317,name:'Winchester City',logo:'WC',level:'Step 3',league:'Southern League Premier South',location:'Winchester, Hampshire',lat:51.0632,lng:-1.3082,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Rileys Floodlit Stadium',badge:null},
-  {id:3318,name:'Hartley Wintney',logo:'HW',level:'Step 3',league:'Southern League Premier South',location:'Hartley Wintney, Hampshire',lat:51.3328,lng:-0.9328,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Memorial Playing Fields',badge:null},
-  {id:3319,name:'AFC Sudbury',logo:'AS',level:'Step 3',league:'Southern League Premier South',location:'Sudbury, Suffolk',lat:52.0373,lng:0.7338,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The MEL Group Stadium',badge:null},
-  {id:3320,name:'Yate Town',logo:'YT',level:'Step 3',league:'Southern League Premier South',location:'Yate, Gloucestershire',lat:51.5413,lng:-2.4076,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Lodge Road',badge:null},
-  {id:3321,name:'Tiverton Town',logo:'TT',level:'Step 3',league:'Southern League Premier South',location:'Tiverton, Devon',lat:50.9014,lng:-3.4881,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ladysmead',badge:null},
-  {id:3322,name:'Paulton Rovers',logo:'PR',level:'Step 3',league:'Southern League Premier South',location:'Paulton, Somerset',lat:51.3178,lng:-2.5025,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Athletic Ground',badge:null},
-  {id:4001,name:'Felixstowe & Walton United',logo:'FWU',level:'Step 4',league:'Isthmian League North',location:'Felixstowe, Suffolk',lat:51.9624,lng:1.349,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Goldstar Ground',badge:null},
-  {id:4002,name:'Maldon & Tiptree',logo:'MT',level:'Step 4',league:'Isthmian League North',location:'Maldon, Essex',lat:51.7313,lng:0.6756,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Wallace Binder Ground',badge:null},
-  {id:4003,name:'Waltham Abbey',logo:'WA',level:'Step 4',league:'Isthmian League North',location:'Waltham Abbey, Essex',lat:51.6853,lng:-0.0059,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Capershotts',badge:null},
-  {id:4004,name:'Bowers & Pitsea',logo:'BP',level:'Step 4',league:'Isthmian League North',location:'Pitsea, Essex',lat:51.5641,lng:0.5114,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Len Salmon Stadium',badge:null},
-  {id:4005,name:'Stanway Rovers',logo:'SR',level:'Step 4',league:'Isthmian League North',location:'Colchester, Essex',lat:51.8867,lng:0.8645,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Denny Bros Ground',badge:null},
-  {id:4006,name:'Gorleston',logo:'G',level:'Step 4',league:'Isthmian League North',location:'Gorleston, Norfolk',lat:52.5744,lng:1.7282,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Emerald Park',badge:null},
-  {id:4007,name:'Redbridge',logo:'R',level:'Step 4',league:'Isthmian League North',location:'Redbridge, Greater London',lat:51.5884,lng:0.0878,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Oakside Stadium',badge:null},
-  {id:4008,name:'Wroxham',logo:'W',level:'Step 4',league:'Isthmian League North',location:'Wroxham, Norfolk',lat:52.7099,lng:1.4174,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Trafford Park',badge:null},
-  {id:4009,name:'Tilbury',logo:'T',level:'Step 4',league:'Isthmian League North',location:'Tilbury, Essex',lat:51.4619,lng:0.3599,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Chadfields',badge:null},
-  {id:4010,name:'Witham Town',logo:'WT',level:'Step 4',league:'Isthmian League North',location:'Witham, Essex',lat:51.8019,lng:0.6407,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Spa Road',badge:null},
-  {id:4011,name:'Concord Rangers',logo:'CR',level:'Step 4',league:'Isthmian League North',location:'Canvey Island, Essex',lat:51.5174,lng:0.5974,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Aspect Arena',badge:null},
-  {id:4012,name:'Enfield Town',logo:'ET',level:'Step 4',league:'Isthmian League North',location:'Enfield, Greater London',lat:51.6519,lng:-0.0769,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Queen Elizabeth II Stadium',badge:null},
-  {id:4013,name:'Heybridge Swifts',logo:'HS',level:'Step 4',league:'Isthmian League North',location:'Heybridge, Essex',lat:51.738,lng:0.6862,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Scraley Road',badge:null},
-  {id:4014,name:'Bury Town',logo:'BT',level:'Step 4',league:'Isthmian League North',location:'Bury St Edmunds, Suffolk',lat:52.2461,lng:0.7166,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ram Meadow',badge:null},
-  {id:4015,name:'Soham Town Rangers',logo:'STR',level:'Step 4',league:'Isthmian League North',location:'Soham, Cambridgeshire',lat:52.3351,lng:0.3381,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Julius Martin Lane',badge:null},
-  {id:4016,name:'Histon FC',logo:'HF',level:'Step 4',league:'Isthmian League North',location:'Histon, Cambridgeshire',lat:52.245,lng:0.1111,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Glass World Stadium',badge:null},
-  {id:4017,name:'Norwich United',logo:'NU',level:'Step 4',league:'Isthmian League North',location:'Norwich, Norfolk',lat:52.6195,lng:1.2959,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Planation Park',badge:null},
-  {id:4018,name:'FC Clacton',logo:'FC',level:'Step 4',league:'Isthmian League North',location:'Clacton-on-Sea, Essex',lat:51.7875,lng:1.1522,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rush Green Road',badge:null},
-  {id:4019,name:'Great Wakering Rovers',logo:'GWR',level:'Step 4',league:'Isthmian League North',location:'Great Wakering, Essex',lat:51.5558,lng:0.7527,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Burroughs Park',badge:null},
-  {id:4020,name:'Cambridge City',logo:'CC',level:'Step 4',league:'Isthmian League North',location:'Cambridge, Cambridgeshire',lat:52.2053,lng:0.1218,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Histon FC (groundshare)',badge:null},
-  {id:4021,name:'Barking',logo:'B',level:'Step 4',league:'Isthmian League North',location:'Barking, Greater London',lat:51.5401,lng:0.0798,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Mayesbrook Park',badge:null},
-  {id:4022,name:'Romford',logo:'R',level:'Step 4',league:'Isthmian League North',location:'Romford, Essex',lat:51.5756,lng:0.1842,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ship Lane',badge:null},
-  {id:4101,name:'Leatherhead',logo:'L',level:'Step 4',league:'Isthmian League South Central',location:'Leatherhead, Surrey',lat:51.2964,lng:-0.3304,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Fetcham Grove',badge:null},
-  {id:4102,name:'Moneyfields',logo:'M',level:'Step 4',league:'Isthmian League South Central',location:'Portsmouth, Hampshire',lat:50.8196,lng:-1.0491,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Dover Road Ground',badge:null},
-  {id:4103,name:'Westfield',logo:'W',level:'Step 4',league:'Isthmian League South Central',location:'Woking, Surrey',lat:51.3162,lng:-0.5646,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Woking & Horsell FC',badge:null},
-  {id:4104,name:'Hanworth Villa',logo:'HV',level:'Step 4',league:'Isthmian League South Central',location:'Hanworth, Greater London',lat:51.4457,lng:-0.3843,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rectory Meadow',badge:null},
-  {id:4105,name:'AFC Portchester',logo:'AP',level:'Step 4',league:'Isthmian League South Central',location:'Portchester, Hampshire',lat:50.8444,lng:-1.1183,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Portchester Community Centre',badge:null},
-  {id:4106,name:'Hayes & Yeading United',logo:'HYU',level:'Step 4',league:'Isthmian League South Central',location:'Hayes, Greater London',lat:51.5083,lng:-0.4209,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Farm Park',badge:null},
-  {id:4107,name:'Harrow Borough',logo:'HB',level:'Step 4',league:'Isthmian League South Central',location:'Harrow, Greater London',lat:51.5889,lng:-0.3542,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Earlsmead',badge:null},
-  {id:4108,name:'Egham Town',logo:'ET',level:'Step 4',league:'Isthmian League South Central',location:'Egham, Surrey',lat:51.4327,lng:-0.5553,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Runnymede Stadium',badge:null},
-  {id:4109,name:'Hartley Wintney',logo:'HW',level:'Step 4',league:'Isthmian League South Central',location:'Hartley Wintney, Hampshire',lat:51.3328,lng:-0.9328,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Memorial Playing Fields',badge:null},
-  {id:4110,name:'Bedfont Sports',logo:'BS',level:'Step 4',league:'Isthmian League South Central',location:'Bedfont, Greater London',lat:51.4459,lng:-0.4272,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bedfont Sports Club',badge:null},
-  {id:4111,name:'Southall',logo:'S',level:'Step 4',league:'Isthmian League South Central',location:'Southall, Greater London',lat:51.5116,lng:-0.3764,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Ground',badge:null},
-  {id:4112,name:'Kingstonian',logo:'K',level:'Step 4',league:'Isthmian League South Central',location:'Kingston upon Thames, Greater London',lat:51.4087,lng:-0.2945,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Kingsmeadow',badge:null},
-  {id:4113,name:'Metropolitan Police',logo:'MP',level:'Step 4',league:'Isthmian League South Central',location:'Imber Court, Surrey',lat:51.3943,lng:-0.3326,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Imber Court',badge:null},
-  {id:4114,name:'Raynes Park Vale',logo:'RPV',level:'Step 4',league:'Isthmian League South Central',location:'Raynes Park, Greater London',lat:51.4076,lng:-0.2235,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Prince Georges Playing Field',badge:null},
-  {id:4115,name:'Spelthorne Sports',logo:'SS',level:'Step 4',league:'Isthmian League South Central',location:'Ashford, Surrey',lat:51.4339,lng:-0.4722,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Maurice Tarrant Ground',badge:null},
-  {id:4116,name:'Camberley Town',logo:'CT',level:'Step 4',league:'Isthmian League South Central',location:'Camberley, Surrey',lat:51.3348,lng:-0.7424,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Krooner Park',badge:null},
-  {id:4117,name:'CB Hounslow United',logo:'CHU',level:'Step 4',league:'Isthmian League South Central',location:'Hounslow, Greater London',lat:51.4706,lng:-0.3741,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rectory Road',badge:null},
-  {id:4118,name:'Guildford City',logo:'GC',level:'Step 4',league:'Isthmian League South Central',location:'Guildford, Surrey',lat:51.2366,lng:-0.5703,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Spectrum Leisure Centre',badge:null},
-  {id:4119,name:'AFC Whyteleafe',logo:'AW',level:'Step 4',league:'Isthmian League South Central',location:'Whyteleafe, Surrey',lat:51.3129,lng:-0.1162,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Church Road',badge:null},
-  {id:4120,name:'Fleet Town',logo:'FT',level:'Step 4',league:'Isthmian League South Central',location:'Fleet, Hampshire',lat:51.2834,lng:-0.8346,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Calthorpe Park',badge:null},
-  {id:4121,name:'Jersey Bulls',logo:'JB',level:'Step 4',league:'Isthmian League South Central',location:'St Brelade, Jersey',lat:49.1842,lng:-2.2062,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Springfield Stadium',badge:null},
-  {id:4122,name:'Horndean',logo:'H',level:'Step 4',league:'Isthmian League South Central',location:'Horndean, Hampshire',lat:50.8989,lng:-1.0077,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Five Heads Park',badge:null},
-  {id:4201,name:'Three Bridges',logo:'TB',level:'Step 4',league:'Isthmian League South East',location:'Crawley, West Sussex',lat:51.1093,lng:-0.1799,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Jubilee Field',badge:null},
-  {id:4202,name:'Whyteleafe',logo:'W',level:'Step 4',league:'Isthmian League South East',location:'Whyteleafe, Surrey',lat:51.3129,lng:-0.1162,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Church Road',badge:null},
-  {id:4203,name:'AFC Croydon Athletic',logo:'ACA',level:'Step 4',league:'Isthmian League South East',location:'Croydon, Greater London',lat:51.3563,lng:-0.0609,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Mayfield Stadium',badge:null},
-  {id:4204,name:'Faversham Town',logo:'FT',level:'Step 4',league:'Isthmian League South East',location:'Faversham, Kent',lat:51.315,lng:0.8906,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-07-18',ground:'Salters Lane',badge:null},
-  {id:4205,name:'Sittingbourne',logo:'S',level:'Step 4',league:'Isthmian League South East',location:'Sittingbourne, Kent',lat:51.3411,lng:0.7365,venueAvail:'away',kickoffAvail:'14:00',availableDate:'2026-07-19',ground:'Bourne Park',badge:null},
-  {id:4206,name:'Margate',logo:'M',level:'Step 4',league:'Isthmian League South East',location:'Margate, Kent',lat:51.386,lng:1.387,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hartsdown Park',badge:null},
-  {id:4207,name:'Merstham',logo:'M',level:'Step 4',league:'Isthmian League South East',location:'Merstham, Surrey',lat:51.2534,lng:-0.1596,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Moat Farm',badge:null},
-  {id:4208,name:'Herne Bay',logo:'HB',level:'Step 4',league:'Isthmian League South East',location:'Herne Bay, Kent',lat:51.371,lng:1.1261,venueAvail:'either',kickoffAvail:null,availableDate:'2026-07-12',ground:'Winch\'s Field',badge:null},
-  {id:4209,name:'Broadbridge Heath',logo:'BH',level:'Step 4',league:'Isthmian League South East',location:'Horsham, West Sussex',lat:51.0739,lng:-0.3596,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Broadbridge Heath Sports Centre',badge:null},
-  {id:4210,name:'Sheppey United',logo:'SU',level:'Step 4',league:'Isthmian League South East',location:'Sheerness, Kent',lat:51.4428,lng:0.762,venueAvail:'home',kickoffAvail:'14:30',availableDate:'2026-07-18',ground:'Holm Park',badge:null},
-  {id:4211,name:'Deal Town',logo:'DT',level:'Step 4',league:'Isthmian League South East',location:'Deal, Kent',lat:51.222,lng:1.4004,venueAvail:'away',kickoffAvail:'15:00',availableDate:'2026-07-25',ground:'Charles Ground',badge:null},
-  {id:4212,name:'Beckenham Town',logo:'BT',level:'Step 4',league:'Isthmian League South East',location:'Beckenham, Greater London',lat:51.4129,lng:-0.0192,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Eden Park Avenue',badge:null},
-  {id:4213,name:'Sevenoaks Town',logo:'ST',level:'Step 4',league:'Isthmian League South East',location:'Sevenoaks, Kent',lat:51.272,lng:0.1875,venueAvail:'either',kickoffAvail:null,availableDate:'2026-08-01',ground:'Greatness Park',badge:null},
-  {id:4214,name:'VCD Athletic',logo:'VA',level:'Step 4',league:'Isthmian League South East',location:'Crayford, Greater London',lat:51.4631,lng:0.1845,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'VCD Sports Ground',badge:null},
-  {id:4215,name:'Erith Town',logo:'ET',level:'Step 4',league:'Isthmian League South East',location:'Erith, Greater London',lat:51.4807,lng:0.1782,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Erith Sports Stadium',badge:null},
-  {id:4216,name:'Whitstable Town',logo:'WT',level:'Step 4',league:'Isthmian League South East',location:'Whitstable, Kent',lat:51.359,lng:1.0247,venueAvail:'home',kickoffAvail:'15:00',availableDate:'2026-08-01',ground:'Belmont Ground',badge:null},
-  {id:4217,name:'Crowborough Athletic',logo:'CA',level:'Step 4',league:'Isthmian League South East',location:'Crowborough, East Sussex',lat:51.0573,lng:0.1673,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Crowborough Community Stadium',badge:null},
-  {id:4218,name:'Phoenix Sports',logo:'PS',level:'Step 4',league:'Isthmian League South East',location:'Sidcup, Greater London',lat:51.4315,lng:0.1118,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Mayplace Road East',badge:null},
-  {id:4219,name:'Haywards Heath Town',logo:'HHT',level:'Step 4',league:'Isthmian League South East',location:'Haywards Heath, West Sussex',lat:50.9978,lng:-0.0997,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hanbury Park',badge:null},
-  {id:4220,name:'Horsham YMCA',logo:'HY',level:'Step 4',league:'Isthmian League South East',location:'Horsham, West Sussex',lat:51.0607,lng:-0.3278,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Gorings Mead',badge:null},
-  {id:4221,name:'Shoreham',logo:'S',level:'Step 4',league:'Isthmian League South East',location:'Shoreham-by-Sea, West Sussex',lat:50.8342,lng:-0.2774,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Middle Road',badge:null},
-  {id:4222,name:'Eastbourne Town',logo:'ET',level:'Step 4',league:'Isthmian League South East',location:'Eastbourne, East Sussex',lat:50.7739,lng:0.2748,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Saffrons',badge:null},
-  {id:4301,name:'Redcar Athletic',logo:'RA',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Redcar, North Yorkshire',lat:54.6188,lng:-1.0745,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Green Lane',badge:null},
-  {id:4302,name:'Emley AFC',logo:'EA',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Emley, West Yorkshire',lat:53.6064,lng:-1.6563,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Welfare Ground',badge:null},
-  {id:4303,name:'Matlock Town',logo:'MT',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Matlock, Derbyshire',lat:53.1432,lng:-1.5586,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Criterion Ground',badge:null},
-  {id:4304,name:'Bradford Park Avenue',logo:'BPA',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Bradford, West Yorkshire',lat:53.8013,lng:-1.7354,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Horsfall Stadium',badge:null},
-  {id:4305,name:'Pontefract Collieries',logo:'PC',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Pontefract, West Yorkshire',lat:53.6914,lng:-1.309,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Skinner Lane',badge:null},
-  {id:4306,name:'Dunston UTS',logo:'DU',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Dunston, Tyne and Wear',lat:54.9597,lng:-1.6505,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'UTS Stadium',badge:null},
-  {id:4307,name:'Handsworth',logo:'H',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Sheffield, South Yorkshire',lat:53.4166,lng:-1.4379,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Windsor Foodservice Stadium',badge:null},
-  {id:4308,name:'Brighouse Town',logo:'BT',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Brighouse, West Yorkshire',lat:53.7029,lng:-1.781,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'St Giles Road',badge:null},
-  {id:4309,name:'Sheffield FC',logo:'SF',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Sheffield, South Yorkshire',lat:53.3963,lng:-1.4445,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Coach & Horses Ground',badge:null},
-  {id:4310,name:'Ossett United',logo:'OU',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Ossett, West Yorkshire',lat:53.6802,lng:-1.5775,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ingfield',badge:null},
-  {id:4311,name:'Morpeth Town',logo:'MT',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Morpeth, Northumberland',lat:55.1661,lng:-1.6899,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Craik Park',badge:null},
-  {id:4312,name:'Shildon AFC',logo:'SA',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Shildon, County Durham',lat:54.6278,lng:-1.6506,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Dean Street',badge:null},
-  {id:4313,name:'Seaham Red Star',logo:'SRS',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Seaham, County Durham',lat:54.8394,lng:-1.3409,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Seaham Town Park',badge:null},
-  {id:4314,name:'Sunderland RCA',logo:'SR',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Sunderland, Tyne and Wear',lat:54.9055,lng:-1.5538,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Meadow Park',badge:null},
-  {id:4315,name:'Pickering Town',logo:'PT',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Pickering, North Yorkshire',lat:54.2486,lng:-0.7783,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Recreation Club Ground',badge:null},
-  {id:4316,name:'Farsley Celtic',logo:'FC',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Farsley, West Yorkshire',lat:53.8227,lng:-1.6555,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Throstle Nest',badge:null},
-  {id:4317,name:'Goole AFC',logo:'GA',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Goole, East Yorkshire',lat:53.7042,lng:-0.873,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Victoria Pleasure Grounds',badge:null},
-  {id:4318,name:'Knaresborough Town',logo:'KT',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Knaresborough, North Yorkshire',lat:54.0094,lng:-1.4683,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Manse Lane',badge:null},
-  {id:4319,name:'Grimsby Borough',logo:'GB',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Grimsby, Lincolnshire',lat:53.5651,lng:-0.0766,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bradley Community Stadium',badge:null},
-  {id:4320,name:'Staveley MW',logo:'SM',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Staveley, Derbyshire',lat:53.2706,lng:-1.3502,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Inkersall Road',badge:null},
-  {id:4321,name:'Thackley AFC',logo:'TA',level:'Step 4',league:'Northern Premier League Div 1 East',location:'Thackley, West Yorkshire',lat:53.8386,lng:-1.7641,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Dennyfield',badge:null},
-  {id:4322,name:'North Ferriby',logo:'NF',level:'Step 4',league:'Northern Premier League Div 1 East',location:'North Ferriby, East Yorkshire',lat:53.7262,lng:-0.5136,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Grange Lane',badge:null},
-  {id:4401,name:'Bury AFC',logo:'BA',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Bury, Greater Manchester',lat:53.593,lng:-2.2975,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Gigg Lane',badge:null},
-  {id:4402,name:'Lower Breck',logo:'LB',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Liverpool, Merseyside',lat:53.4272,lng:-2.9648,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Anfield Sports & Community Centre',badge:null},
-  {id:4403,name:'Runcorn Linnets',logo:'RL',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Runcorn, Cheshire',lat:53.3435,lng:-2.7343,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The DCBL Stadium',badge:null},
-  {id:4404,name:'Avro FC',logo:'AF',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Failsworth, Greater Manchester',lat:53.5128,lng:-2.1682,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Vestacare Stadium',badge:null},
-  {id:4405,name:'Bootle AFC',logo:'BA',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Bootle, Merseyside',lat:53.4446,lng:-2.9965,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Delta Taxis Stadium',badge:null},
-  {id:4406,name:'Vauxhall Motors',logo:'VM',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Ellesmere Port, Cheshire',lat:53.2792,lng:-2.9039,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rivacre Road',badge:null},
-  {id:4407,name:'City of Liverpool',logo:'COL',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Liverpool, Merseyside',lat:53.4272,lng:-2.9648,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Anfield Sports & Community Centre',badge:null},
-  {id:4408,name:'Padiham',logo:'P',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Padiham, Lancashire',lat:53.7968,lng:-2.3147,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Ruby Civil Engineers Stadium',badge:null},
-  {id:4409,name:'Ramsbottom United',logo:'RU',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Ramsbottom, Greater Manchester',lat:53.6476,lng:-2.3175,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Harry Williams Riverside Stadium',badge:null},
-  {id:4410,name:'Congleton Town',logo:'CT',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Congleton, Cheshire',lat:53.1606,lng:-2.2181,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Booth Street Ground',badge:null},
-  {id:4411,name:'Colne',logo:'C',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Colne, Lancashire',lat:53.8561,lng:-2.175,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Harrison Drive',badge:null},
-  {id:4412,name:'Longridge Town',logo:'LT',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Longridge, Lancashire',lat:53.8305,lng:-2.5975,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Mike Riding Ground',badge:null},
-  {id:4413,name:'Clitheroe',logo:'C',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Clitheroe, Lancashire',lat:53.8715,lng:-2.3951,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Shawbridge',badge:null},
-  {id:4414,name:'Irlam',logo:'I',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Irlam, Greater Manchester',lat:53.4413,lng:-2.4262,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Silver Street',badge:null},
-  {id:4415,name:'Winsford United',logo:'WU',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Winsford, Cheshire',lat:53.1979,lng:-2.5189,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Barton Stadium',badge:null},
-  {id:4416,name:'1874 Northwich',logo:'1N',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Northwich, Cheshire',lat:53.2601,lng:-2.5178,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Townfield',badge:null},
-  {id:4417,name:'Trafford FC',logo:'TF',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Stretford, Greater Manchester',lat:53.4465,lng:-2.3444,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Shawe View',badge:null},
-  {id:4418,name:'Maine Road',logo:'MR',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Manchester, Greater Manchester',lat:53.4614,lng:-2.239,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Brantingham Road',badge:null},
-  {id:4419,name:'Skelmersdale United',logo:'SU',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Skelmersdale, Lancashire',lat:53.547,lng:-2.7726,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Stormy Corner',badge:null},
-  {id:4420,name:'Squires Gate',logo:'SG',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Blackpool, Lancashire',lat:53.7768,lng:-3.0355,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'School Road',badge:null},
-  {id:4421,name:'Chadderton',logo:'C',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Chadderton, Greater Manchester',lat:53.5384,lng:-2.1325,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Andrew Street',badge:null},
-  {id:4422,name:'Ashton Athletic',logo:'AA',level:'Step 4',league:'Northern Premier League Div 1 West',location:'Ashton-in-Makerfield, Greater Manchester',lat:53.4913,lng:-2.6435,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Brocstedes Park',badge:null},
-  {id:4501,name:'Carlton Town',logo:'CT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Carlton, Nottinghamshire',lat:52.9754,lng:-1.0851,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bill Stokeld Stadium',badge:null},
-  {id:4502,name:'Anstey Nomads',logo:'AN',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Anstey, Leicestershire',lat:52.6884,lng:-1.1629,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Pack Horse Ground',badge:null},
-  {id:4503,name:'Basford United',logo:'BU',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Basford, Nottinghamshire',lat:52.9882,lng:-1.176,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Greenwich Avenue',badge:null},
-  {id:4504,name:'Coleshill Town',logo:'CT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Coleshill, Warwickshire',lat:52.5015,lng:-1.7083,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Parkfield',badge:null},
-  {id:4505,name:'Belper Town',logo:'BT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Belper, Derbyshire',lat:53.0234,lng:-1.4814,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Christchurch Meadow',badge:null},
-  {id:4506,name:'Wellingborough Town',logo:'WT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Wellingborough, Northamptonshire',lat:52.3034,lng:-0.697,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Dog & Duck Ground',badge:null},
-  {id:4507,name:'Mickleover Sports',logo:'MS',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Mickleover, Derbyshire',lat:52.9015,lng:-1.5602,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Don Amott Arena',badge:null},
-  {id:4508,name:'Shepshed Dynamo',logo:'SD',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Shepshed, Leicestershire',lat:52.7717,lng:-1.2975,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Dovecote',badge:null},
-  {id:4509,name:'Rugby Borough',logo:'RB',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Rugby, Warwickshire',lat:52.3715,lng:-1.2637,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Butlin Road',badge:null},
-  {id:4510,name:'AFC Rushden & Diamonds',logo:'ARD',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Rushden, Northamptonshire',lat:52.2881,lng:-0.6073,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hayden Road',badge:null},
-  {id:4511,name:'Racing Club Warwick',logo:'RCW',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Warwick, Warwickshire',lat:52.2834,lng:-1.5901,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Townsend Meadow',badge:null},
-  {id:4512,name:'Corby Town',logo:'CT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Corby, Northamptonshire',lat:52.493,lng:-0.696,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Steel Park',badge:null},
-  {id:4513,name:'Lichfield City',logo:'LC',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Lichfield, Staffordshire',lat:52.6826,lng:-1.8274,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Brownsfield Park',badge:null},
-  {id:4514,name:'Sutton Coldfield Town',logo:'SCT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Sutton Coldfield, West Midlands',lat:52.5601,lng:-1.8194,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Coles Lane',badge:null},
-  {id:4515,name:'Long Eaton United',logo:'LEU',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Long Eaton, Derbyshire',lat:52.8956,lng:-1.2737,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Grange Park',badge:null},
-  {id:4516,name:'Coventry Sphinx',logo:'CS',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Coventry, West Midlands',lat:52.3965,lng:-1.5,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Sphinx Drive',badge:null},
-  {id:4517,name:'Boldmere St Michaels',logo:'BSM',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Sutton Coldfield, West Midlands',lat:52.5601,lng:-1.8194,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Trevor Brown Memorial Ground',badge:null},
-  {id:4518,name:'Lye Town',logo:'LT',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Lye, West Midlands',lat:52.4581,lng:-2.1139,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Sports Ground',badge:null},
-  {id:4519,name:'Westfields',logo:'W',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Hereford, Herefordshire',lat:52.0566,lng:-2.716,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Thorn Park',badge:null},
-  {id:4520,name:'Highgate United',logo:'HU',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Highgate, West Midlands',lat:52.45,lng:-1.8028,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Coppice',badge:null},
-  {id:4521,name:'Sporting Khalsa',logo:'SK',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Wolverhampton, West Midlands',lat:52.5855,lng:-2.1291,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Aspray Arena',badge:null},
-  {id:4522,name:'AFC Bridgnorth',logo:'AB',level:'Step 4',league:'Northern Premier League Div 1 Midlands',location:'Bridgnorth, Shropshire',lat:52.5343,lng:-2.4198,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Crown Meadow',badge:null},
-  {id:4601,name:'Leighton Town',logo:'LT',level:'Step 4',league:'Southern League Div 1 Central',location:'Leighton Buzzard, Bedfordshire',lat:51.9152,lng:-0.6596,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bell Close',badge:null},
-  {id:4602,name:'Hitchin Town',logo:'HT',level:'Step 4',league:'Southern League Div 1 Central',location:'Hitchin, Hertfordshire',lat:51.9476,lng:-0.2793,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Top Field',badge:null},
-  {id:4603,name:'Biggleswade Town',logo:'BT',level:'Step 4',league:'Southern League Div 1 Central',location:'Biggleswade, Bedfordshire',lat:52.0847,lng:-0.2596,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Langford Road',badge:null},
-  {id:4604,name:'Biggleswade FC',logo:'BF',level:'Step 4',league:'Southern League Div 1 Central',location:'Biggleswade, Bedfordshire',lat:52.0847,lng:-0.2596,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Second Meadow',badge:null},
-  {id:4605,name:'Hertford Town',logo:'HT',level:'Step 4',league:'Southern League Div 1 Central',location:'Hertford, Hertfordshire',lat:51.796,lng:-0.0778,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hertingfordbury Park',badge:null},
-  {id:4606,name:'Thame United',logo:'TU',level:'Step 4',league:'Southern League Div 1 Central',location:'Thame, Oxfordshire',lat:51.748,lng:-0.9736,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'ASM Stadium',badge:null},
-  {id:4607,name:'Ware',logo:'W',level:'Step 4',league:'Southern League Div 1 Central',location:'Ware, Hertfordshire',lat:51.8119,lng:-0.0301,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Wodson Park',badge:null},
-  {id:4608,name:'Barton Rovers',logo:'BR',level:'Step 4',league:'Southern League Div 1 Central',location:'Barton-le-Clay, Bedfordshire',lat:51.9819,lng:-0.4323,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Barton Recreation Ground',badge:null},
-  {id:4609,name:'Beaconsfield Town',logo:'BT',level:'Step 4',league:'Southern League Div 1 Central',location:'Beaconsfield, Buckinghamshire',lat:51.6108,lng:-0.6453,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Holloways Park',badge:null},
-  {id:4610,name:'London Colney',logo:'LC',level:'Step 4',league:'Southern League Div 1 Central',location:'London Colney, Hertfordshire',lat:51.7285,lng:-0.2857,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Cotlandswick',badge:null},
-  {id:4611,name:'Aylesbury Vale Dynamos',logo:'AVD',level:'Step 4',league:'Southern League Div 1 Central',location:'Aylesbury, Buckinghamshire',lat:51.8168,lng:-0.8277,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Haywood Way',badge:null},
-  {id:4612,name:'St Ives Town',logo:'SIT',level:'Step 4',league:'Southern League Div 1 Central',location:'St Ives, Cambridgeshire',lat:52.3261,lng:-0.0734,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Westwood Road',badge:null},
-  {id:4613,name:'Kidlington',logo:'K',level:'Step 4',league:'Southern League Div 1 Central',location:'Kidlington, Oxfordshire',lat:51.8253,lng:-1.2895,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Yarnton Road',badge:null},
-  {id:4614,name:'Wantage Town',logo:'WT',level:'Step 4',league:'Southern League Div 1 Central',location:'Wantage, Oxfordshire',lat:51.5879,lng:-1.4275,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Alfredian Park',badge:null},
-  {id:4615,name:'Harlow Town',logo:'HT',level:'Step 4',league:'Southern League Div 1 Central',location:'Harlow, Essex',lat:51.7748,lng:0.1083,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Harlow Arena',badge:null},
-  {id:4616,name:'Dunstable Town',logo:'DT',level:'Step 4',league:'Southern League Div 1 Central',location:'Dunstable, Bedfordshire',lat:51.8863,lng:-0.5238,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Creasey Park',badge:null},
-  {id:4617,name:'Newport Pagnell Town',logo:'NPT',level:'Step 4',league:'Southern League Div 1 Central',location:'Newport Pagnell, Buckinghamshire',lat:52.0852,lng:-0.7153,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Willen Road',badge:null},
-  {id:4618,name:'Welwyn Garden City',logo:'WGC',level:'Step 4',league:'Southern League Div 1 Central',location:'Welwyn Garden City, Hertfordshire',lat:51.8047,lng:-0.2053,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Herns Lane',badge:null},
-  {id:4619,name:'Ampthill Town',logo:'AT',level:'Step 4',league:'Southern League Div 1 Central',location:'Ampthill, Bedfordshire',lat:52.0274,lng:-0.4981,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ampthill Park',badge:null},
-  {id:4620,name:'Stotfold',logo:'S',level:'Step 4',league:'Southern League Div 1 Central',location:'Stotfold, Bedfordshire',lat:52.0139,lng:-0.2327,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Roker Park',badge:null},
-  {id:4621,name:'St Neots Town',logo:'SNT',level:'Step 4',league:'Southern League Div 1 Central',location:'St Neots, Cambridgeshire',lat:52.2281,lng:-0.2713,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Rowley Park',badge:null},
-  {id:4622,name:'Buckingham Town',logo:'BT',level:'Step 4',league:'Southern League Div 1 Central',location:'Buckingham, Buckinghamshire',lat:52.0036,lng:-0.9871,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ford Meadow',badge:null},
-  {id:4701,name:'Frome Town',logo:'FT',level:'Step 4',league:'Southern League Div 1 South',location:'Frome, Somerset',lat:51.2297,lng:-2.3245,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Badgers Hill',badge:null},
-  {id:4702,name:'Malvern Town',logo:'MT',level:'Step 4',league:'Southern League Div 1 South',location:'Malvern, Worcestershire',lat:52.1181,lng:-2.3168,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Langland Avenue',badge:null},
-  {id:4703,name:'Portishead Town',logo:'PT',level:'Step 4',league:'Southern League Div 1 South',location:'Portishead, Somerset',lat:51.4926,lng:-2.7635,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bristol Road',badge:null},
-  {id:4704,name:'Winchester City',logo:'WC',level:'Step 4',league:'Southern League Div 1 South',location:'Winchester, Hampshire',lat:51.0632,lng:-1.3082,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Rileys Floodlit Stadium',badge:null},
-  {id:4705,name:'Shaftesbury',logo:'S',level:'Step 4',league:'Southern League Div 1 South',location:'Shaftesbury, Dorset',lat:51.0063,lng:-2.1944,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Cockrams',badge:null},
-  {id:4706,name:'Bishop\'s Cleeve',logo:'BC',level:'Step 4',league:'Southern League Div 1 South',location:'Bishops Cleeve, Gloucestershire',lat:51.9495,lng:-2.05,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Kayte Lane',badge:null},
-  {id:4707,name:'Hartpury University',logo:'HU',level:'Step 4',league:'Southern League Div 1 South',location:'Hartpury, Gloucestershire',lat:51.8946,lng:-2.3164,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hartpury University Centre',badge:null},
-  {id:4708,name:'Exmouth Town',logo:'ET',level:'Step 4',league:'Southern League Div 1 South',location:'Exmouth, Devon',lat:50.6217,lng:-3.4099,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Southern Road',badge:null},
-  {id:4709,name:'Larkhall Athletic',logo:'LA',level:'Step 4',league:'Southern League Div 1 South',location:'Larkhall, Somerset',lat:51.3777,lng:-2.3523,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Plain Ham',badge:null},
-  {id:4710,name:'Corsham Town',logo:'CT',level:'Step 4',league:'Southern League Div 1 South',location:'Corsham, Wiltshire',lat:51.4345,lng:-2.1919,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Southbank',badge:null},
-  {id:4711,name:'Bridgwater United',logo:'BU',level:'Step 4',league:'Southern League Div 1 South',location:'Bridgwater, Somerset',lat:51.1277,lng:-3.0019,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'College Way',badge:null},
-  {id:4712,name:'Odd Down',logo:'OD',level:'Step 4',league:'Southern League Div 1 South',location:'Bath, Somerset',lat:51.3633,lng:-2.3618,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Lew Hill Memorial Ground',badge:null},
-  {id:4713,name:'Cirencester Town',logo:'CT',level:'Step 4',league:'Southern League Div 1 South',location:'Cirencester, Gloucestershire',lat:51.7235,lng:-1.9744,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Corinium Stadium',badge:null},
-  {id:4714,name:'Bristol Manor Farm',logo:'BMF',level:'Step 4',league:'Southern League Div 1 South',location:'Bristol, Bristol',lat:51.495,lng:-2.6543,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'The Creek',badge:null},
-  {id:4715,name:'Plymouth Parkway',logo:'PP',level:'Step 4',league:'Southern League Div 1 South',location:'Plymouth, Devon',lat:50.4203,lng:-4.1363,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Bolitho Park',badge:null},
-  {id:4716,name:'Torrington AFC',logo:'TA',level:'Step 4',league:'Southern League Div 1 South',location:'Great Torrington, Devon',lat:50.9467,lng:-4.1418,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Vicarage Field',badge:null},
-  {id:4717,name:'Ilfracombe Town',logo:'IT',level:'Step 4',league:'Southern League Div 1 South',location:'Ilfracombe, Devon',lat:51.2077,lng:-4.1186,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Marlborough Park',badge:null},
-  {id:4718,name:'Wellington AFC',logo:'WA',level:'Step 4',league:'Southern League Div 1 South',location:'Wellington, Somerset',lat:50.9754,lng:-3.2261,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Wellington Playing Field',badge:null},
-  {id:4719,name:'Clevedon Town',logo:'CT',level:'Step 4',league:'Southern League Div 1 South',location:'Clevedon, Somerset',lat:51.4429,lng:-2.858,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Hand Stadium',badge:null},
-  {id:4720,name:'Tavistock AFC',logo:'TA',level:'Step 4',league:'Southern League Div 1 South',location:'Tavistock, Devon',lat:50.5487,lng:-4.144,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Langsford Park',badge:null},
-  {id:4721,name:'Keynsham Town',logo:'KT',level:'Step 4',league:'Southern League Div 1 South',location:'Keynsham, Somerset',lat:51.4132,lng:-2.4995,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Crown Field',badge:null},
-  {id:4722,name:'Brislington',logo:'B',level:'Step 4',league:'Southern League Div 1 South',location:'Bristol, Bristol',lat:51.4326,lng:-2.5479,venueAvail:null,kickoffAvail:null,availableDate:null,ground:'Ironmould Lane',badge:null},
-];
+// Club data — populated from Supabase on load, falls back to [] if unavailable
+let CLUBS = [];
 
-// Fixture database
-const FIXTURES = [
-  { id:'f1', homeId:1, awayId:4,  date:'2025-07-12', kickoff:'15:00', status:'confirmed', venue:'home' },
-  { id:'f2', homeId:3, awayId:1,  date:'2025-08-02', kickoff:'14:00', status:'offered',   venue:'away' },
-];
+
+// Fixtures — populated from Supabase on load
+let FIXTURES = [];
 
 // ═══════════════════════════════════════════
 // STATE
@@ -2583,11 +2251,98 @@ function markAllRead(){
 function submitRegister(){closeModal('register-modal');toast('Club registered! Welcome to MatchFit 🎉');}
 
 // ═══════════════════════════════════════════
-// INIT
+// INIT — load from Supabase then boot app
 // ═══════════════════════════════════════════
-buildDateStrip();
-buildKickoffPills();
-renderBrowse();
+function mapClub(row) {
+  // Map Supabase clubs table columns → app's internal club shape
+  const name = row.name || '';
+  const words = name.replace(/[&']/g,'').split(' ');
+  const logo = words.map(w=>w[0]||'').join('').slice(0,3).toUpperCase();
+  const step = row.step || null;
+  return {
+    id:           row.id,
+    name:         name,
+    logo:         logo,
+    level:        step ? `Step ${step}` : 'Unknown',
+    league:       row.league || '',
+    location:     [row.location, row.county].filter(Boolean).join(', '),
+    lat:          parseFloat(row.lat)  || 0,
+    lng:          parseFloat(row.lng)  || 0,
+    ground:       row.ground || '',
+    badge:        row.badge_url || null,
+    venueAvail:   null,
+    kickoffAvail: null,
+    availableDate:null,
+  };
+}
+
+function mapFixture(row) {
+  return {
+    id:       row.id,
+    homeId:   row.club_a_id,
+    awayId:   row.club_b_id,
+    date:     row.proposed_date,
+    kickoff:  row.proposed_time ? row.proposed_time.slice(0,5) : null,
+    status:   row.status,
+    venue:    row.venue_type,
+  };
+}
+
+function showLoadingState(msg) {
+  document.getElementById('browse-clubs-list').innerHTML =
+    `<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">${msg}</div></div>`;
+}
+
+function showLoadError(msg) {
+  document.getElementById('browse-clubs-list').innerHTML =
+    `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load data</div><div class="empty-sub">${msg}</div></div>`;
+}
+
+async function initApp() {
+  showLoadingState('Loading clubs…');
+
+  try {
+    // Load clubs
+    const { data: clubRows, error: clubErr } = await sb
+      .from('clubs')
+      .select('id, name, league, location, county, lat, lng, ground, badge_url, step, active')
+      .eq('active', true)
+      .order('name');
+
+    if (clubErr) throw clubErr;
+
+    CLUBS = (clubRows || []).map(mapClub);
+    console.log(`Loaded ${CLUBS.length} clubs from Supabase`);
+
+  } catch(err) {
+    console.warn('Supabase clubs fetch failed:', err.message);
+    showLoadError('Could not reach the database. Please refresh to try again.');
+  }
+
+  try {
+    // Load fixtures
+    const { data: fixRows, error: fixErr } = await sb
+      .from('fixtures')
+      .select('id, club_a_id, club_b_id, proposed_date, proposed_time, venue_type, status')
+      .order('proposed_date');
+
+    if (fixErr) throw fixErr;
+
+    FIXTURES = (fixRows || []).map(mapFixture);
+    console.log(`Loaded ${FIXTURES.length} fixtures from Supabase`);
+
+  } catch(err) {
+    console.warn('Supabase fixtures fetch failed:', err.message);
+    // Non-fatal — app still works without fixtures
+  }
+
+  // Boot the UI
+  buildDateStrip();
+  buildKickoffPills();
+  renderBrowse();
+}
+
+initApp();
 </script>
 </body>
 </html>
