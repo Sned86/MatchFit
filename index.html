@@ -1000,25 +1000,11 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <div style="font-size:13px;color:var(--text-muted);margin-top:2px">Find clubs to propose a match directly</div>
   </div>
   <div>
-    <label class="field-label">Filter by Level</label>
-    <div class="browse-filters" id="browse-level-filters">
-      <button class="browse-filter-btn active" onclick="setBrowseLevel(this,'all')">All Levels</button>
-      <button class="browse-filter-btn" onclick="setBrowseLevel(this,'Step 1')">Step 1</button>
-      <button class="browse-filter-btn" onclick="setBrowseLevel(this,'Step 2')">Step 2</button>
-      <button class="browse-filter-btn" onclick="setBrowseLevel(this,'Step 3')">Step 3</button>
-      <button class="browse-filter-btn" onclick="setBrowseLevel(this,'Step 4')">Step 4</button>
-    </div>
-  </div>
-  <div>
     <label class="field-label">Filter by League</label>
     <div class="browse-filters" id="browse-league-filters">
       <button class="browse-filter-btn active" onclick="setBrowseLeague(this,'all')">All Leagues</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'National League')">National League</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'National League North')">NL North</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'National League South')">NL South</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Isthmian')">Isthmian</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Northern Premier')">Northern Premier</button>
-      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Southern League')">Southern League</button>
+      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Test League 1')">Test League 1</button>
+      <button class="browse-filter-btn" onclick="setBrowseLeague(this,'Test League 2')">Test League 2</button>
     </div>
   </div>
   <div id="browse-clubs-list"></div>
@@ -1148,7 +1134,7 @@ let selDates=[], selVenues=[], selKickoffs=[], selLevels=[], maxDist=50, selTeam
 let comparing=[], shortlist=[], results=[], searched=false;
 let currentOfferClub=null, offerContext=null, offerDate=null, offerKickoff=null, offerVenue=null, offerNeutralGround='';
 let nrDate=null, nrVenue='either', nrKickoffs=[], nrLevels=[], nrDist=50;
-let browseLevel='all', browseLeague='all';
+let browseLeague='all';
 let cancelReason='';
 
 // ═══════════════════════════════════════════
@@ -2130,17 +2116,12 @@ function confirmCancellation(){
 // ═══════════════════════════════════════════
 // BROWSE TEAMS
 // ═══════════════════════════════════════════
-function setBrowseLevel(btn,val){
-  document.querySelectorAll('#browse-level-filters .browse-filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');browseLevel=val;renderBrowse();
-}
 function setBrowseLeague(btn,val){
   document.querySelectorAll('#browse-league-filters .browse-filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');browseLeague=val;renderBrowse();
 }
 function renderBrowse(){
   let clubs=CLUBS.map(c=>({...c,distance:haversine(MY.lat,MY.lng,c.lat,c.lng)}));
-  if(browseLevel!=='all')clubs=clubs.filter(c=>c.level.includes(browseLevel));
   if(browseLeague!=='all'){
     const lq=browseLeague.toLowerCase();
     clubs=clubs.filter(c=>{
