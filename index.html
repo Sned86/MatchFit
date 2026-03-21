@@ -2756,7 +2756,7 @@ async function initApp() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active&order=name.asc`,
+      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url&order=name.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
