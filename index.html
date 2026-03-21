@@ -855,7 +855,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     </div>
     <div class="header-actions">
       <button class="icon-btn" onclick="switchTab('notifications')" title="Notifications">
-        🔔<span class="notif-dot"></span>
+        🔔
       </button>
       <button class="icon-btn" onclick="openModal('account-modal')" title="Account Settings">⚙️</button>
     </div>
@@ -978,101 +978,31 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 
   <!-- ── Open Availability ── -->
   <div class="subtab-panel active" id="subtab-open">
-    <div class="req-card">
-      <div class="req-card-top">
-        <div>
-          <div class="req-date">Saturday 26 July 2026</div>
-          <div class="req-meta">Home · 15:00</div>
-        </div>
-        <div class="status-pill status-searching">Searching</div>
+    <div class="avail-empty">
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No availability posted</div>
+        <div class="empty-sub">Tap "+ Post Availability" to let clubs know when you're free.</div>
       </div>
-      <div class="searching-row"><div class="pulse-dot"></div>Notifying clubs that match your criteria…</div>
-      <div class="req-footer-row">
-        <button class="btn-cancel-game" onclick="openCancelModal('Sat 26 Jul · Home · 15:00 (Open availability)')">✕ Cancel</button>
-        <button class="btn-see-free" onclick="openFreeOnDateModal('2026-07-26')">👀 See who's free</button>
-      </div>
-    </div>
-    <div class="empty-state" style="margin-top:24px">
-      <div class="empty-icon">📅</div>
-      <div class="empty-title">No other open slots</div>
-      <div class="empty-sub">Post availability above to let clubs know when you're free.</div>
     </div>
   </div>
 
   <!-- ── Under Offer ── -->
   <div class="subtab-panel" id="subtab-offer">
-    <div class="req-card">
-      <div class="req-card-top">
-        <div>
-          <div class="req-date">Saturday 2 August 2026</div>
-          <div class="req-meta">Away · 14:00</div>
-        </div>
-        <div class="status-pill status-matched">Offer Received</div>
-      </div>
-      <div class="match-detail-box">
-        <div class="match-club"><div class="match-club-logo">FA</div>Folkestone Athletic FC</div>
-        <div class="match-club-stats">
-          <div class="mcs-item"><div class="mcs-key">Distance</div><div class="mcs-val">18.4 mi</div></div>
-          <div class="mcs-item"><div class="mcs-key">Travel</div><div class="mcs-val">~28 min</div></div>
-          <div class="mcs-item"><div class="mcs-key">Level</div><div class="mcs-val">Step 5</div></div>
-          <div class="mcs-item"><div class="mcs-key">Kick-off</div><div class="mcs-val">14:00</div></div>
-        </div>
-        <div class="match-actions">
-          <button class="btn-confirm" onclick="confirmMatch()">✓ Accept</button>
-          <button class="btn-counter" onclick="openModal('counter-modal')">⇄ Counter</button>
-          <button class="btn-decline" onclick="declineOffer()">Decline</button>
-        </div>
-      </div>
+    <div class="empty-state">
+      <div class="empty-icon">📨</div>
+      <div class="empty-title">No offers yet</div>
+      <div class="empty-sub">Match offers from other clubs will appear here.</div>
     </div>
   </div>
 
   <!-- ── Confirmed ── -->
   <div class="subtab-panel" id="subtab-confirmed">
-
-    <div class="section-label" style="font-size:11px;font-weight:700;color:var(--slate-light);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">July 2026</div>
-    <div class="req-card">
-      <div class="req-card-top">
-        <div>
-          <div class="req-date">Saturday 18 July 2026</div>
-          <div class="req-meta">Away · 15:00 · vs Hythe Town FC</div>
-        </div>
-        <div class="status-pill status-confirmed">Confirmed</div>
-      </div>
-      <div class="match-detail-box" style="background:var(--green-xlight)">
-        <div class="match-club"><div class="match-club-logo">HT</div>Hythe Town FC</div>
-        <div class="match-club-stats">
-          <div class="mcs-item"><div class="mcs-key">Venue</div><div class="mcs-val">Reachfields Stadium</div></div>
-          <div class="mcs-item"><div class="mcs-key">Kick-off</div><div class="mcs-val">15:00</div></div>
-          <div class="mcs-item"><div class="mcs-key">Distance</div><div class="mcs-val">10.4 mi</div></div>
-        </div>
-      </div>
-      <div class="req-footer-row">
-        <button class="btn-cancel-game" onclick="openCancelModal('Sat 18 Jul · Away · 15:00 vs Hythe Town FC')">✕ Cancel Fixture</button>
-      </div>
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <div class="empty-title">No confirmed fixtures</div>
+      <div class="empty-sub">Fixtures confirmed with other clubs will appear here.</div>
     </div>
-
-    <div class="section-label" style="font-size:11px;font-weight:700;color:var(--slate-light);letter-spacing:0.5px;text-transform:uppercase;margin:16px 0 8px">August 2026</div>
-    <div class="req-card" id="aug2-card">
-      <div class="req-card-top">
-        <div>
-          <div class="req-date">Saturday 2 August 2026</div>
-          <div class="req-meta">Away · 14:00 · vs Folkestone Invicta</div>
-        </div>
-        <div class="status-pill status-confirmed" id="aug2-status">Confirmed</div>
-      </div>
-      <div class="match-detail-box" style="background:var(--green-xlight)" id="aug2-detail">
-        <div class="match-club"><div class="match-club-logo">FI</div>Folkestone Invicta</div>
-        <div class="match-club-stats">
-          <div class="mcs-item"><div class="mcs-key">Venue</div><div class="mcs-val">Cheriton Road</div></div>
-          <div class="mcs-item"><div class="mcs-key">Kick-off</div><div class="mcs-val">14:00</div></div>
-          <div class="mcs-item"><div class="mcs-key">Distance</div><div class="mcs-val">19.2 mi</div></div>
-        </div>
-      </div>
-      <div class="req-footer-row">
-        <button class="btn-cancel-game" onclick="openCancelModal('Sat 2 Aug · Away · 14:00 vs Folkestone Invicta')">✕ Cancel Fixture</button>
-      </div>
-    </div>
-
   </div><!-- /subtab-confirmed -->
 
 </div><!-- /screen-requests -->
@@ -1100,51 +1030,10 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <button style="font-size:12px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600" onclick="markAllRead()">Mark all read</button>
   </div>
 
-  <div class="notif-item unread">
-    <div class="notif-icon notif-icon-offer">📨</div>
-    <div class="notif-body">
-      <div class="notif-title">Match offer from Folkestone Athletic</div>
-      <div class="notif-sub">They've offered a fixture on Sat 2 Aug · Away · 14:00. Review and respond.</div>
-      <div class="notif-time">2 hours ago</div>
-      <div class="notif-actions">
-        <button class="btn-notif-primary" onclick="goToUnderOffer();markAllRead()">View Offer</button>
-        <button class="btn-notif-secondary" onclick="this.closest('.notif-item').classList.remove('unread')">Dismiss</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="notif-item unread">
-    <div class="notif-icon notif-icon-match">🏆</div>
-    <div class="notif-body">
-      <div class="notif-title">New club matched your availability</div>
-      <div class="notif-sub">Canterbury City FC is available on Sat 26 Jul and matches your criteria.</div>
-      <div class="notif-time">5 hours ago</div>
-      <div class="notif-actions">
-        <button class="btn-notif-primary" onclick="switchTab('requests');markAllRead()">See Details</button>
-        <button class="btn-notif-secondary" onclick="this.closest('.notif-item').classList.remove('unread')">Dismiss</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="notif-item unread">
-    <div class="notif-icon notif-icon-confirm">✅</div>
-    <div class="notif-body">
-      <div class="notif-title">Fixture confirmed</div>
-      <div class="notif-sub">Your fixture vs Hythe Town FC on Sat 12 Jul is confirmed. Both clubs notified.</div>
-      <div class="notif-time">Yesterday</div>
-      <div class="notif-actions">
-        <button class="btn-notif-primary" onclick="goToConfirmed();markAllRead()">View Fixture</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="notif-item">
-    <div class="notif-icon notif-icon-cancel">❌</div>
-    <div class="notif-body">
-      <div class="notif-title">Fixture cancelled by Dover Wanderers</div>
-      <div class="notif-sub">Dover Wanderers cancelled the fixture on Sat 5 Jul. Reason: Not enough players. Your availability has been re-opened.</div>
-      <div class="notif-time">3 days ago</div>
-    </div>
+  <div class="empty-state">
+    <div class="empty-icon">🔔</div>
+    <div class="empty-title">No notifications yet</div>
+    <div class="empty-sub">Match offers, confirmations and updates will appear here.</div>
   </div>
 </div>
 
@@ -1206,7 +1095,7 @@ let AVAILABILITY = [];
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let selDates=[], selVenues=[], selKickoffs=[], selLevels=[], maxDist=50, selTeam=null;
+let selDates=[], selVenues=[], selKickoffs=[], maxDist=50, selTeam=null;
 let comparing=[], shortlist=[], results=[], searched=false;
 let currentOfferClub=null, offerContext=null, offerDate=null, offerKickoff=null, offerVenue=null, offerNeutralGround='';
 let nrDate=null, nrVenue='either', nrKickoffs=[], nrDist=50;
@@ -1502,15 +1391,7 @@ function selectSeg2(btn,group,val){
   btn.closest('.kickoff-group,.pill-group,.seg-ctrl').querySelectorAll('.kickoff-pill,.pill-btn,.seg-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
 }
-function toggleAnyLevel(btn){
-  document.querySelectorAll('#level-pills .pill-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');selLevels=[];
-}
-function toggleLevel(btn,val){
-  document.querySelector('#level-pills .any-pill').classList.remove('selected');
-  if(btn.classList.contains('selected')){btn.classList.remove('selected');selLevels=selLevels.filter(x=>x!==val);if(!selLevels.length)document.querySelector('#level-pills .any-pill').classList.add('selected');}
-  else{btn.classList.add('selected');selLevels.push(val);}
-}
+
 function updateDist(v){maxDist=parseInt(v);document.getElementById('dist-label').textContent=v+' miles'}
 
 // ═══════════════════════════════════════════
@@ -1570,7 +1451,6 @@ function doSearch(){
     }
 
     if(selDates.length>0&&c.availableDate&&!selDates.includes(c.availableDate))return false;
-    if(selLevels.length>0&&!selLevels.includes(c.level))return false;
     if(selKickoffs.length>0&&!selKickoffs.includes(c.kickoff))return false;
     return true;
   }).sort((a,b)=>a.distance-b.distance);
