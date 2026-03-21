@@ -1067,7 +1067,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       <div class="info-cell"><div class="info-key-sm">Contact Phone</div><div class="info-val-sm" id="myclub-contact-phone">—</div></div>
       <div class="info-cell"><div class="info-key-sm">Website</div><div class="info-val-sm" id="myclub-website">—</div></div>
     </div>
-    <div id="myclub-edit-form" style="display:none;padding:14px 15px;display:none;flex-direction:column;gap:12px">
+    <div id="myclub-edit-form" style="display:none;padding:14px 15px;flex-direction:column;gap:12px">
       <div class="form-row">
         <div class="form-field"><label class="form-label">Nickname</label><input class="form-input" id="edit-nickname" placeholder="e.g. The Nuts"></div>
         <div class="form-field"><label class="form-label">Home Colours</label><input class="form-input" id="edit-home-colours" placeholder="e.g. Red & White"></div>
@@ -2533,9 +2533,15 @@ async function saveClubDetails() {
     if (!res.ok) throw new Error('Save failed');
     // Update MY and re-render
     Object.assign(MY, updates);
+    // Close edit form first so view grid is visible when renderMyClub runs
+    const view = document.getElementById('myclub-details-view');
+    const form = document.getElementById('myclub-edit-form');
+    const btn  = document.getElementById('myclub-edit-btn');
+    form.style.display = 'none';
+    view.style.display = 'grid';
+    btn.textContent = '✏️ Edit';
     const userEmail = currentSession?.user?.email || '';
     renderMyClub(MY, userEmail);
-    toggleClubEdit();
     toast('Club details saved ✓');
   } catch(err) {
     toast('Error saving: ' + err.message);
