@@ -595,19 +595,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
           <span style="font-size:11px;color:var(--slate-light)">Other time</span>
         </div>
       </div>
-      <div class="form-field">
-        <label class="form-label">Preferred Opposition Level</label>
-        <div class="pill-group" id="nr-level-pills">
-          <button class="pill-btn any-pill selected" onclick="toggleNrAnyLevel(this)">Any Level</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 1')">Step 1</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 2')">Step 2</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 3')">Step 3</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 4')">Step 4</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 5')">Step 5</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 6')">Step 6</button>
-          <button class="pill-btn" onclick="toggleNrLevel(this,'Step 7 &amp; below')">Step 7 &amp; below</button>
-        </div>
-      </div>
+
       <div class="form-field" id="nr-dist-field">
         <label class="form-label">Max Travel Distance <span id="nr-dist-label" style="font-size:13px;font-weight:700;color:var(--green);float:right">50 miles</span></label>
         <input type="range" min="10" max="100" step="5" value="50" oninput="updateNrDist(this.value)">
@@ -1212,13 +1200,16 @@ let CLUBS = [];
 // Fixtures — populated from Supabase on load
 let FIXTURES = [];
 
+// Availability — open slots posted by clubs
+let AVAILABILITY = [];
+
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
 let selDates=[], selVenues=[], selKickoffs=[], selLevels=[], maxDist=50, selTeam=null;
 let comparing=[], shortlist=[], results=[], searched=false;
 let currentOfferClub=null, offerContext=null, offerDate=null, offerKickoff=null, offerVenue=null, offerNeutralGround='';
-let nrDate=null, nrVenue='either', nrKickoffs=[], nrLevels=[], nrDist=50;
+let nrDate=null, nrVenue='either', nrKickoffs=[], nrDist=50;
 let browseLeague='all';
 let currentSession = null;
 let cancelReason='';
@@ -2150,35 +2141,58 @@ function selectNrVenue(btn,val){
   const df=document.getElementById('nr-dist-field');
   df.style.display=val==='home'?'none':'flex';df.style.flexDirection='column';
 }
-function toggleNrAnyLevel(btn){document.querySelectorAll('#nr-level-pills .pill-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');nrLevels=[];}
-function toggleNrLevel(btn,val){
-  document.querySelector('#nr-level-pills .any-pill').classList.remove('selected');
-  if(btn.classList.contains('selected')){btn.classList.remove('selected');nrLevels=nrLevels.filter(x=>x!==val);if(!nrLevels.length)document.querySelector('#nr-level-pills .any-pill').classList.add('selected');}
-  else{btn.classList.add('selected');nrLevels.push(val);}
-}
+
 function updateNrDist(v){nrDist=parseInt(v);document.getElementById('nr-dist-label').textContent=v+' miles'}
 function updateNrSubmitBtn(){
   const b=document.getElementById('nr-submit-btn');
   b.style.opacity=nrDate?'1':'0.45';b.style.cursor=nrDate?'pointer':'not-allowed';
 }
-function submitNewRequest(){
+async function submitNewRequest(){
   if(!nrDate){toast('Please select a date first');return;}
-  const venueLabel=nrVenue==='home'?'Home':nrVenue==='away'?'Away':'Home or Away';
-  const kickLabel=nrKickoffs.length===0?'Any time':nrKickoffs.join(', ');
-  const levelLabel=nrLevels.length?nrLevels.join(', '):'Any Level';
-  const newCard=document.createElement('div');newCard.className='req-card';
-  newCard.innerHTML=`
-    <div class="req-card-top">
-      <div><div class="req-date">${fmtDate(nrDate)}</div><div class="req-meta">${venueLabel} · ${kickLabel} · ${levelLabel}</div></div>
-      <div class="status-pill status-searching">Searching</div>
-    </div>
-    <div class="searching-row"><div class="pulse-dot"></div>Notifying clubs that match your criteria…</div>
-    <div class="req-footer-row"><button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(nrDate)} · ${venueLabel} · ${kickLabel}')">✕ Cancel</button></div>`;
-  const sectionRow=document.querySelector('#screen-requests .section-row');
-  sectionRow.insertAdjacentElement('afterend',newCard);
-  nrDate=null;nrVenue='either';nrKickoffs=[];nrLevels=[];
-  closeModal('newreq-modal');
-  toast('Availability posted — clubs will be notified');
+  if(!MY.id){toast('Please sign in first');return;}
+
+  const btn = document.getElementById('nr-submit-btn');
+  btn.disabled=true; btn.textContent='Posting…';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/availability`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        club_id:      MY.id,
+        date:         nrDate,
+        venue:        nrVenue,
+        kickoff_pref: nrKickoffs.length ? nrKickoffs : null,
+        max_distance: nrDist,
+        notes:        document.getElementById('nr-notes').value.trim() || null,
+        status:       'open'
+      })
+    });
+
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.message || 'Failed to post availability');
+    }
+
+    // Reset form state
+    nrDate=null; nrVenue='either'; nrKickoffs=[]; nrDist=50;
+    closeModal('newreq-modal');
+    toast('Availability posted ✓');
+
+    // Reload availability and refresh UI
+    await loadAvailability();
+    renderMyFixtures();
+
+  } catch(err) {
+    toast('Error: ' + err.message);
+  } finally {
+    btn.disabled=false; btn.textContent='Post Availability';
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2571,6 +2585,8 @@ async function handleAuthSession(session) {
     };
     document.getElementById('header-club-btn').textContent = club.name;
     renderMyClub(club, userEmail);
+    await loadAvailability();
+    renderMyFixtures();
   }
 
   document.getElementById('auth-wall').style.display = 'none';
@@ -2622,43 +2638,118 @@ function showLoadError(msg) {
     `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load data</div><div class="empty-sub">${msg}</div></div>`;
 }
 
+async function loadAvailability() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/availability?status=eq.open&select=*&order=date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
+    );
+    const rows = await res.json();
+    AVAILABILITY = Array.isArray(rows) ? rows : [];
+    console.log(`Loaded ${AVAILABILITY.length} availability slots`);
+    // Attach availability to clubs for search/browse
+    CLUBS.forEach(c => {
+      const avail = AVAILABILITY.filter(a => a.club_id === c.id);
+      if(avail.length) {
+        c.availableDate  = avail[0].date;
+        c.venueAvail     = avail[0].venue;
+        c.kickoffAvail   = avail[0].kickoff_pref ? avail[0].kickoff_pref[0] : null;
+      } else {
+        c.availableDate  = null;
+        c.venueAvail     = null;
+        c.kickoffAvail   = null;
+      }
+    });
+  } catch(err) {
+    console.warn('Availability fetch failed:', err.message);
+  }
+}
+
+function renderMyFixtures() {
+  // Render the Open sub-tab with real availability from AVAILABILITY
+  const myAvail = AVAILABILITY.filter(a => a.club_id === MY.id);
+  const panel = document.getElementById('subtab-open');
+  if(!panel) return;
+
+  const existing = panel.querySelectorAll('.req-card.live-avail');
+  existing.forEach(el => el.remove());
+
+  if(!myAvail.length) {
+    const empty = panel.querySelector('.avail-empty');
+    if(!empty) {
+      const div = document.createElement('div');
+      div.className='avail-empty';
+      div.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No availability posted</div><div class="empty-sub">Tap "+ Post Availability" to let clubs know when you're free.</div></div>`;
+      panel.insertAdjacentElement('afterbegin', div);
+    }
+  } else {
+    const empty = panel.querySelector('.avail-empty');
+    if(empty) empty.remove();
+    myAvail.forEach(a => {
+      const venueLabel = a.venue==='home'?'Home':a.venue==='away'?'Away':'Home or Away';
+      const kickLabel  = a.kickoff_pref?.length ? a.kickoff_pref.join(', ') : 'Any time';
+      const card = document.createElement('div');
+      card.className = 'req-card live-avail';
+      card.innerHTML = `
+        <div class="req-card-top">
+          <div><div class="req-date">${fmtDate(a.date)}</div><div class="req-meta">${venueLabel} · ${kickLabel}</div></div>
+          <div class="status-pill status-searching">Open</div>
+        </div>
+        <div class="searching-row"><div class="pulse-dot"></div>Visible to other clubs…</div>
+        <div class="req-footer-row"><button class="btn-cancel-game" onclick="cancelAvailability(${a.id})">✕ Cancel</button></div>`;
+      panel.insertAdjacentElement('afterbegin', card);
+    });
+  }
+}
+
+async function cancelAvailability(availId) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/availability?id=eq.${availId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+      },
+      body: JSON.stringify({ status: 'cancelled' })
+    });
+    toast('Availability cancelled');
+    await loadAvailability();
+    renderMyFixtures();
+  } catch(err) {
+    toast('Error cancelling: ' + err.message);
+  }
+}
+
 async function initApp() {
   showLoadingState('Loading clubs…');
 
   try {
-    // Load clubs
-    const { data: clubRows, error: clubErr } = await sb
-      .from('clubs')
-      .select('id, name, league, location, county, lat, lng, ground, badge_url, active')
-      .eq('active', true)
-      .order('name');
-
-    if (clubErr) throw clubErr;
-
-    CLUBS = (clubRows || []).map(mapClub);
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active&order=name.asc`,
+      { headers: { 'apikey': SUPABASE_KEY } }
+    );
+    const clubRows = await res.json();
+    CLUBS = Array.isArray(clubRows) ? clubRows.map(mapClub) : [];
     console.log(`Loaded ${CLUBS.length} clubs from Supabase`);
-
   } catch(err) {
     console.warn('Supabase clubs fetch failed:', err.message);
     showLoadError('Could not reach the database. Please refresh to try again.');
   }
 
   try {
-    // Load fixtures
-    const { data: fixRows, error: fixErr } = await sb
-      .from('fixtures')
-      .select('id, club_a_id, club_b_id, proposed_date, proposed_time, venue_type, status')
-      .order('proposed_date');
-
-    if (fixErr) throw fixErr;
-
-    FIXTURES = (fixRows || []).map(mapFixture);
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY } }
+    );
+    const fixRows = await res.json();
+    FIXTURES = Array.isArray(fixRows) ? fixRows.map(mapFixture) : [];
     console.log(`Loaded ${FIXTURES.length} fixtures from Supabase`);
-
   } catch(err) {
     console.warn('Supabase fixtures fetch failed:', err.message);
-    // Non-fatal — app still works without fixtures
   }
+
+  await loadAvailability();
 
   // Build dynamic league filters from loaded club data
   buildLeagueFilters();
