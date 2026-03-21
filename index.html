@@ -1438,10 +1438,12 @@ function doSearch(){
     const d=haversine(MY.lat,MY.lng,c.lat,c.lng);
     return{...c,distance:d,travelTime:travel(d)};
   }).filter(c=>{
+    // Never show the logged-in club in results
+    if(c.id===MY.id)return false;
+    // Only show clubs with open availability
+    if(!c.availableDate)return false;
     if(c.distance>maxDist)return false;
     if(selVenues.length){
-      // selVenues = venues from USER perspective; venueAvail is from CLUB perspective
-      // user wants 'home' → club must be venueAvail:'away'; user wants 'away' → club venueAvail:'home'
       const clubOk=selVenues.some(v=>
         (v==='home'&&c.venueAvail==='away')||
         (v==='away'&&c.venueAvail==='home')||
@@ -1449,9 +1451,8 @@ function doSearch(){
       );
       if(!clubOk)return false;
     }
-
-    if(selDates.length>0&&c.availableDate&&!selDates.includes(c.availableDate))return false;
-    if(selKickoffs.length>0&&!selKickoffs.includes(c.kickoff))return false;
+    if(selDates.length>0&&!selDates.includes(c.availableDate))return false;
+    if(selKickoffs.length>0&&c.kickoffAvail&&!selKickoffs.includes(c.kickoffAvail))return false;
     return true;
   }).sort((a,b)=>a.distance-b.distance);
   searched=true;
