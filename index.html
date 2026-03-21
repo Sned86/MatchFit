@@ -1104,21 +1104,9 @@ const SUPABASE_URL = 'https://huokcisnlcaezqcroyon.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentSession = null;
-
-// ═══════════════════════════════════════════
-// DATABASE
-// ═══════════════════════════════════════════
-let MY = { id:1, name:'Ashford United FC', logo:'AU', lat:51.146, lng:0.874, ground:MY.ground||'Your ground',
-  badge:'https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Ashford_United_FC_badge.png/120px-Ashford_United_FC_badge.png' };
-
-// Club data — populated from Supabase on load, falls back to [] if unavailable
+let MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null };
 let CLUBS = [];
-
-
-// Fixtures — populated from Supabase on load
 let FIXTURES = [];
-
-// Availability — open slots posted by clubs
 let AVAILABILITY = [];
 
 // ═══════════════════════════════════════════
