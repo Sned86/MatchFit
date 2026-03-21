@@ -2364,7 +2364,7 @@ async function submitLogin() {
 
   } catch(err) {
     setAuthLoading('login-btn', false);
-    showAuthError('login', 'Network error — please try again.');
+    console.error('Login error:', err); showAuthError('login', 'Error: ' + err.message);
   }
 }
 
@@ -2389,7 +2389,7 @@ async function submitRegister() {
     });
     signUpData = await signUpRes.json();
   } catch(e) {
-    showAuthError('register', 'Network error — please try again.');
+    console.error('Register error:', err); showAuthError('register', 'Error: ' + err.message);
     setAuthLoading('register-btn', false); return;
   }
 
