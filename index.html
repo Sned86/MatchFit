@@ -565,32 +565,27 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       </div>
       <div class="form-field">
         <label class="form-label">Venue</label>
-        <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr">
-          <button class="seg-btn" onclick="selectNrVenue(this,'home')" style="line-height:1.3;padding:8px 6px">
-            🏠 Home<br><span style="font-size:10px;font-weight:500;opacity:0.75">Homelands Stadium</span>
+        <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <button class="seg-btn" id="nr-venue-home" onclick="selectNrVenue(this,'home')" style="line-height:1.3;padding:8px 4px">
+            🏠 Home<br><span id="nr-home-ground" style="font-size:10px;font-weight:500;opacity:0.75">—</span>
           </button>
-          <button class="seg-btn" onclick="selectNrVenue(this,'away')" style="line-height:1.3;padding:8px 6px">
-            🚌 Away<br><span style="font-size:10px;font-weight:500;opacity:0.75">Opponent's ground</span>
+          <button class="seg-btn" onclick="selectNrVenue(this,'away')" style="line-height:1.3;padding:8px 4px">
+            🚌 Away<br><span style="font-size:10px;font-weight:500;opacity:0.75">Opp's ground</span>
           </button>
-          <button class="seg-btn selected" onclick="selectNrVenue(this,'either')">&#128260; Either</button>
+          <button class="seg-btn selected" onclick="selectNrVenue(this,'either')" style="padding:8px 4px">&#128260; Either</button>
+          <button class="seg-btn" onclick="selectNrVenue(this,'neutral')" style="padding:8px 4px">⚖️ Neutral</button>
+        </div>
+        <div id="nr-neutral-wrap" style="display:none;margin-top:8px;display:none">
+          <input type="text" class="form-input" id="nr-neutral-postcode" placeholder="Neutral ground postcode (e.g. TN24 0AA)" style="margin-bottom:6px">
+          <div style="font-size:11px;color:var(--slate-light)">We'll use this to calculate distances for other clubs.</div>
         </div>
       </div>
       <div class="form-field">
         <label class="form-label">Preferred Kick-off Time <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--slate-light)">(select one or more)</span></label>
         <div class="kickoff-group" id="nr-kickoff-group">
           <button class="kickoff-pill any-pill selected" onclick="toggleNrKickoff(this,'any')">Any time</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'10:00')">10:00</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'10:30')">10:30</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'11:00')">11:00</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'13:00')">13:00</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'14:00')">14:00</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'14:30')">14:30</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'15:00')">15:00</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'15:30')">15:30</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'19:00')">19:00</button>
-          <button class="kickoff-pill" onclick="toggleNrKickoff(this,'19:30')">19:30</button>
         </div>
-        <div class="kickoff-custom-wrap">
+        <div class="kickoff-custom-wrap" style="margin-top:8px">
           <input type="time" class="kickoff-custom-input" id="nr-kickoff-custom-input" onchange="addCustomKickoff('nr')" placeholder="Other time…">
           <span style="font-size:11px;color:var(--slate-light)">Other time</span>
         </div>
@@ -598,8 +593,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 
       <div class="form-field" id="nr-dist-field">
         <label class="form-label">Max Travel Distance <span id="nr-dist-label" style="font-size:13px;font-weight:700;color:var(--green);float:right">50 miles</span></label>
-        <input type="range" min="10" max="100" step="5" value="50" oninput="updateNrDist(this.value)">
-        <div class="range-labels"><span>10 miles</span><span>100 miles</span></div>
+        <input type="range" min="0" max="100" step="5" value="50" oninput="updateNrDist(this.value)">
+        <div class="range-labels"><span>0 miles</span><span>Any distance</span></div>
       </div>
       <div class="form-field">
         <label class="form-label">Additional Notes <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
@@ -913,7 +908,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <label class="field-label">Search for a Specific Club <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
         <div class="team-search-wrap">
           <span class="team-search-icon">🔍</span>
-          <input type="text" class="team-search-input" id="team-search-input" placeholder="e.g. Folkestone Athletic…" oninput="onTeamSearch(this.value)" autocomplete="off">
+          <input type="text" class="team-search-input" id="team-search-input" placeholder="Start typing a club name…" oninput="onTeamSearch(this.value)" autocomplete="off">
         </div>
         <div class="team-search-results" id="team-search-results"></div>
         <div id="team-selected-wrap"></div>
@@ -937,8 +932,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       </div>
       <div>
         <label class="field-label">Maximum Travel Distance <span class="range-val" id="dist-label">50 miles</span></label>
-        <input type="range" min="10" max="100" step="5" value="50" oninput="updateDist(this.value)">
-        <div class="range-labels"><span>10 miles</span><span>100 miles</span></div>
+        <input type="range" min="0" max="100" step="5" value="50" id="dist-slider" oninput="updateDist(this.value)">
+        <div class="range-labels"><span>0 miles</span><span>Any distance</span></div>
       </div>
     </div>
     <div class="cta-wrap">
@@ -966,7 +961,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <div class="new-req-sub">Let other clubs know when you're free and what you're looking for</div>
       </div>
     </div>
-    <button class="btn-new-req" style="width:100%;margin-top:13px" onclick="openModal('newreq-modal');buildNrDateStrip();updateNrSubmitBtn()">+ Post Availability</button>
+    <button class="btn-new-req" style="width:100%;margin-top:13px" onclick="openModal('newreq-modal');buildNrDateStrip();buildNrKickoffPills(null);document.getElementById('nr-home-ground').textContent=MY.ground||'Your ground';updateNrSubmitBtn()">+ Post Availability</button>
   </div>
 
   <!-- Sub-tab bar -->
@@ -1041,26 +1036,59 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <div class="screen" id="screen-myclub">
   <div class="profile-header">
     <div class="profile-top">
-      <div class="profile-crest" id="myclub-crest">—</div>
-      <div>
-        <div class="profile-name" id="myclub-name">—</div>
+      <div id="myclub-badge-wrap" style="width:54px;height:54px;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div id="myclub-name" style="font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--navy);line-height:1.2">—</div>
         <div class="profile-location" id="myclub-location"></div>
         <div class="profile-level" id="myclub-league"></div>
       </div>
     </div>
     <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-fixtures">—</div><div class="profile-stat-key">Friendlies</div></div>
-      <div class="profile-stat"><div class="profile-stat-val">—</div><div class="profile-stat-key">Rating</div></div>
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-active">—</div><div class="profile-stat-key">Active</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-confirmed">—</div><div class="profile-stat-key">Confirmed</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Unconfirmed</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-open-avail">—</div><div class="profile-stat-key">Open Slots</div></div>
     </div>
   </div>
   <div class="info-section">
-    <div class="info-section-head">Club Details</div>
-    <div class="info-grid-2">
+    <div class="info-section-head" style="display:flex;align-items:center;justify-content:space-between">
+      Club Details
+      <button id="myclub-edit-btn" onclick="toggleClubEdit()" style="padding:4px 12px;background:var(--green-xlight);border:1.5px solid var(--green-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--green-dark);cursor:pointer">✏️ Edit</button>
+    </div>
+    <div class="info-grid-2" id="myclub-details-view">
       <div class="info-cell"><div class="info-key-sm">Ground</div><div class="info-val-sm" id="myclub-ground">—</div></div>
       <div class="info-cell"><div class="info-key-sm">League</div><div class="info-val-sm" id="myclub-league-detail">—</div></div>
       <div class="info-cell"><div class="info-key-sm">Location</div><div class="info-val-sm" id="myclub-location-detail">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Email</div><div class="info-val-sm" id="myclub-email">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Contact Email</div><div class="info-val-sm" id="myclub-email">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Nickname</div><div class="info-val-sm" id="myclub-nickname">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Contact Name</div><div class="info-val-sm" id="myclub-contact-name">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Home Colours</div><div class="info-val-sm" id="myclub-home-colours">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Away Colours</div><div class="info-val-sm" id="myclub-away-colours">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Contact Phone</div><div class="info-val-sm" id="myclub-contact-phone">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Website</div><div class="info-val-sm" id="myclub-website">—</div></div>
+    </div>
+    <div id="myclub-edit-form" style="display:none;padding:14px 15px;display:none;flex-direction:column;gap:12px">
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Nickname</label><input class="form-input" id="edit-nickname" placeholder="e.g. The Nuts"></div>
+        <div class="form-field"><label class="form-label">Home Colours</label><input class="form-input" id="edit-home-colours" placeholder="e.g. Red & White"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Away Colours</label><input class="form-input" id="edit-away-colours" placeholder="e.g. All Blue"></div>
+        <div class="form-field"><label class="form-label">Contact Name</label><input class="form-input" id="edit-contact-name" placeholder="Full name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Contact Email</label><input class="form-input" type="email" id="edit-contact-email" placeholder="name@club.co.uk"></div>
+        <div class="form-field"><label class="form-label">Contact Phone</label><input class="form-input" type="tel" id="edit-contact-phone" placeholder="07700 000000"></div>
+      </div>
+      <div class="form-field"><label class="form-label">Website URL</label><input class="form-input" type="url" id="edit-website" placeholder="https://www.yourclub.co.uk"></div>
+      <div class="form-field"><label class="form-label">Facebook URL</label><input class="form-input" type="url" id="edit-facebook" placeholder="https://facebook.com/yourclub"></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Twitter / X</label><input class="form-input" id="edit-twitter" placeholder="@yourclub"></div>
+        <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="edit-instagram" placeholder="@yourclub"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="form-submit" style="flex:1" onclick="saveClubDetails()">Save Changes</button>
+        <button onclick="toggleClubEdit()" style="flex:1;padding:13px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--slate);cursor:pointer">Cancel</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1079,7 +1107,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ═══════════════════════════════════════════
 // DATABASE
 // ═══════════════════════════════════════════
-let MY = { id:1, name:'Ashford United FC', logo:'AU', lat:51.146, lng:0.874, ground:'Homelands Stadium',
+let MY = { id:1, name:'Ashford United FC', logo:'AU', lat:51.146, lng:0.874, ground:MY.ground||'Your ground',
   badge:'https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Ashford_United_FC_badge.png/120px-Ashford_United_FC_badge.png' };
 
 // Club data — populated from Supabase on load, falls back to [] if unavailable
@@ -1392,7 +1420,10 @@ function selectSeg2(btn,group,val){
   btn.classList.add('selected');
 }
 
-function updateDist(v){maxDist=parseInt(v);document.getElementById('dist-label').textContent=v+' miles'}
+function updateDist(v){
+  maxDist=parseInt(v);
+  document.getElementById('dist-label').textContent = v==='0'||v===0 ? 'Any distance' : v+' miles';
+}
 
 // ═══════════════════════════════════════════
 // TEAM SEARCH (Find screen)
@@ -1401,7 +1432,7 @@ function onTeamSearch(q){
   q=q.trim().toLowerCase();
   const el=document.getElementById('team-search-results');
   if(!q){el.classList.remove('visible');return;}
-  const m=CLUBS.filter(c=>c.name.toLowerCase().includes(q)).slice(0,5);
+  const m=CLUBS.filter(c=>c.name.toLowerCase().startsWith(q)).slice(0,5);
   let html=m.map(c=>`
     <div class="team-result-row" onclick="selectTeam(${c.id})">
       <div class="team-result-logo">${c.logo}</div>
@@ -1442,7 +1473,7 @@ function doSearch(){
     if(c.id===MY.id)return false;
     // Only show clubs with open availability
     if(!c.availableDate)return false;
-    if(c.distance>maxDist)return false;
+    if(maxDist>0&&c.distance>maxDist)return false;
     if(selVenues.length){
       const clubOk=selVenues.some(v=>
         (v==='home'&&c.venueAvail==='away')||
@@ -1498,7 +1529,7 @@ function renderResultsSheet(){
         <div class="result-stat"><div class="result-stat-val">${c.kickoffAvail||'TBC'}</div><div class="result-stat-key">Kick-off</div></div>
         <div class="result-stat" style="padding:7px 4px">
           <div class="result-stat-val" style="font-size:11px;line-height:1.2">${c.venueAvail==='home'?'🚌 Away':c.venueAvail==='away'?'🏠 Home':c.venueAvail==='neutral'?'⚖️ Neutral':'🔄 Any'}</div>
-          <div style="font-size:9px;color:var(--slate-light);font-weight:600;margin-top:3px;line-height:1.3;letter-spacing:0.2px">${c.venueAvail==='home'?c.ground:c.venueAvail==='away'?'Homelands Stadium':c.venueAvail==='neutral'?'TBD':'—'}</div>
+          <div style="font-size:9px;color:var(--slate-light);font-weight:600;margin-top:3px;line-height:1.3;letter-spacing:0.2px">${c.venueAvail==='home'?c.ground:c.venueAvail==='away'?MY.ground||'Your ground':c.venueAvail==='neutral'?'TBD':'—'}</div>
         </div>
       </div>
       <div class="result-actions">
@@ -1614,7 +1645,7 @@ function toggleOfferDetails(){
         <label class="form-label">Propose Different Venue</label>
         <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr">
           <button class="seg-btn" onclick="selectCounterVenue(this,'home')" style="line-height:1.3;padding:8px 4px">
-            🏠 Home<br><span style="font-size:10px;font-weight:500;opacity:0.75">Homelands Stadium</span>
+            🏠 Home<br><span style="font-size:10px;font-weight:500;opacity:0.75">${MY.ground||'Your ground'}</span>
           </button>
           <button class="seg-btn" onclick="selectCounterVenue(this,'away')" style="line-height:1.3;padding:8px 4px">
             🚌 Away<br><span style="font-size:10px;font-weight:500;opacity:0.75">${awayGround}</span>
@@ -1841,7 +1872,7 @@ function buildOfferRequiredFields(){
     f.innerHTML=`<label class="form-label">Confirm Venue <span style="color:var(--red);font-size:13px">*</span></label>
       <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr">
         <button class="seg-btn" onclick="selectOfferReqVenue(this,'home')" style="line-height:1.3;padding:8px 4px">
-          🏠 Home<br><span style="font-size:10px;font-weight:500;opacity:0.75">Homelands Stadium</span>
+          🏠 Home<br><span style="font-size:10px;font-weight:500;opacity:0.75">${MY.ground||'Your ground'}</span>
         </button>
         <button class="seg-btn" onclick="selectOfferReqVenue(this,'away')" style="line-height:1.3;padding:8px 4px">
           🚌 Away<br><span style="font-size:10px;font-weight:500;opacity:0.75">${awayGround}</span>
@@ -1995,12 +2026,30 @@ function declineOffer(){
 }
 
 // ── New availability request ──
+function buildNrKickoffPills(isoDate) {
+  const group = document.getElementById('nr-kickoff-group');
+  if (!group) return;
+  const weekendTimes = ['12:00','13:00','14:00','15:00'];
+  const weekdayTimes = ['18:30','19:00','19:30','19:45'];
+  let times = weekendTimes; // default
+  if (isoDate) {
+    const d = new Date(isoDate + 'T12:00:00');
+    const dow = d.getDay();
+    times = (dow === 0 || dow === 6) ? weekendTimes : weekdayTimes;
+  }
+  group.innerHTML = `<button class="kickoff-pill any-pill selected" onclick="toggleNrKickoff(this,'any')">Any time</button>` +
+    times.map(t => `<button class="kickoff-pill" onclick="toggleNrKickoff(this,'${t}')">${t}</button>`).join('');
+  nrKickoffs = [];
+}
+
 function buildNrDateStrip(){renderDateStrip('nr-date-strip',nrDate,'selectNrDate');}
 function selectNrDate(btn,iso){
   document.querySelectorAll('#nr-date-strip .date-btn').forEach(b=>b.classList.remove('selected'));
   document.getElementById('nr-btn-custom').classList.remove('selected');
   document.getElementById('nr-custom-date-wrap').classList.remove('visible');
-  btn.classList.add('selected');nrDate=iso;updateNrSubmitBtn();
+  btn.classList.add('selected');nrDate=iso;
+  buildNrKickoffPills(iso);
+  updateNrSubmitBtn();
 }
 function openNrCustomDate(){
   document.querySelectorAll('#nr-date-strip .date-btn').forEach(b=>b.classList.remove('selected'));
@@ -2014,16 +2063,29 @@ function selectNrCustomDate(iso){
   const d=new Date(iso+'T12:00:00');
   document.getElementById('nr-btn-custom').innerHTML=
     `<div class="date-any-label">${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}</div><div class="date-any-sub">Custom date</div>`;
+  buildNrKickoffPills(iso);
   updateNrSubmitBtn();
 }
 function selectNrVenue(btn,val){
   btn.closest('.seg-ctrl').querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');nrVenue=val;
+  // Show/hide distance field
   const df=document.getElementById('nr-dist-field');
-  df.style.display=val==='home'?'none':'flex';df.style.flexDirection='column';
+  df.style.display=(val==='home'||val==='neutral')?'none':'flex';
+  df.style.flexDirection='column';
+  // Show/hide neutral postcode field
+  const nw=document.getElementById('nr-neutral-wrap');
+  nw.style.display=val==='neutral'?'flex':'none';
+  nw.style.flexDirection='column';
+  // Update home ground label from MY
+  const hg=document.getElementById('nr-home-ground');
+  if(hg) hg.textContent=MY.ground||'Your ground';
 }
 
-function updateNrDist(v){nrDist=parseInt(v);document.getElementById('nr-dist-label').textContent=v+' miles'}
+function updateNrDist(v){
+  nrDist=parseInt(v);
+  document.getElementById('nr-dist-label').textContent=v==='0'||v===0?'Any distance':v+' miles';
+}
 function updateNrSubmitBtn(){
   const b=document.getElementById('nr-submit-btn');
   b.style.opacity=nrDate?'1':'0.45';b.style.cursor=nrDate?'pointer':'not-allowed';
@@ -2383,25 +2445,94 @@ async function submitSignOut() {
 
 function renderMyClub(club, userEmail) {
   if (!club) return;
+  // Badge
+  const badgeWrap = document.getElementById('myclub-badge-wrap');
+  if (badgeWrap) badgeWrap.innerHTML = badgeHtml(club, 54, 14);
   // Header
-  document.getElementById('myclub-crest').textContent = club.logo || '—';
   document.getElementById('myclub-name').textContent = club.name || '—';
   document.getElementById('myclub-location').textContent = club.location ? '📍 ' + club.location : '';
   document.getElementById('myclub-league').textContent = club.league || '';
-  // Stats — fixture counts from FIXTURES
+  // Stats
   const myFixtures = FIXTURES.filter(f => f.homeId === club.id || f.awayId === club.id);
-  const activeFixtures = myFixtures.filter(f => f.status === 'confirmed');
-  document.getElementById('myclub-fixtures').textContent = myFixtures.length || '0';
-  document.getElementById('myclub-active').textContent = activeFixtures.length || '0';
+  const confirmed   = myFixtures.filter(f => f.status === 'confirmed').length;
+  const unconfirmed = myFixtures.filter(f => f.status !== 'confirmed').length;
+  const openSlots   = AVAILABILITY.filter(a => a.club_id === club.id && a.status === 'open').length;
+  document.getElementById('myclub-confirmed').textContent   = confirmed;
+  document.getElementById('myclub-unconfirmed').textContent = unconfirmed;
+  document.getElementById('myclub-open-avail').textContent  = openSlots;
   // Details grid
-  document.getElementById('myclub-ground').textContent = club.ground || '—';
-  document.getElementById('myclub-league-detail').textContent = club.league || '—';
+  document.getElementById('myclub-ground').textContent          = club.ground || '—';
+  document.getElementById('myclub-league-detail').textContent   = club.league || '—';
   document.getElementById('myclub-location-detail').textContent = club.location || '—';
-  document.getElementById('myclub-email').textContent = userEmail || '—';
+  document.getElementById('myclub-email').textContent           = club.contact_email || userEmail || '—';
+  document.getElementById('myclub-nickname').textContent        = club.nickname || '—';
+  document.getElementById('myclub-contact-name').textContent    = club.contact_name || '—';
+  document.getElementById('myclub-home-colours').textContent    = club.home_colours || '—';
+  document.getElementById('myclub-away-colours').textContent    = club.away_colours || '—';
+  document.getElementById('myclub-contact-phone').textContent   = club.contact_phone || '—';
+  document.getElementById('myclub-website').textContent         = club.website_url || '—';
+  // Populate edit form
+  document.getElementById('edit-nickname').value       = club.nickname || '';
+  document.getElementById('edit-home-colours').value   = club.home_colours || '';
+  document.getElementById('edit-away-colours').value   = club.away_colours || '';
+  document.getElementById('edit-contact-name').value   = club.contact_name || '';
+  document.getElementById('edit-contact-email').value  = club.contact_email || userEmail || '';
+  document.getElementById('edit-contact-phone').value  = club.contact_phone || '';
+  document.getElementById('edit-website').value        = club.website_url || '';
+  document.getElementById('edit-facebook').value       = club.facebook_url || '';
+  document.getElementById('edit-twitter').value        = club.twitter_url || '';
+  document.getElementById('edit-instagram').value      = club.instagram_url || '';
   // Account modal
   document.getElementById('account-modal-club').textContent = club.name || '—';
   document.getElementById('account-email').value = userEmail || '';
   document.getElementById('account-club').value = club.name || '';
+}
+
+function toggleClubEdit() {
+  const view = document.getElementById('myclub-details-view');
+  const form = document.getElementById('myclub-edit-form');
+  const btn  = document.getElementById('myclub-edit-btn');
+  const isEditing = form.style.display === 'flex';
+  view.style.display = isEditing ? 'grid' : 'none';
+  form.style.display = isEditing ? 'none'  : 'flex';
+  btn.textContent    = isEditing ? '✏️ Edit' : '✕ Cancel';
+}
+
+async function saveClubDetails() {
+  if (!MY.id) return;
+  const updates = {
+    nickname:       document.getElementById('edit-nickname').value.trim() || null,
+    home_colours:   document.getElementById('edit-home-colours').value.trim() || null,
+    away_colours:   document.getElementById('edit-away-colours').value.trim() || null,
+    contact_name:   document.getElementById('edit-contact-name').value.trim() || null,
+    contact_email:  document.getElementById('edit-contact-email').value.trim() || null,
+    contact_phone:  document.getElementById('edit-contact-phone').value.trim() || null,
+    website_url:    document.getElementById('edit-website').value.trim() || null,
+    facebook_url:   document.getElementById('edit-facebook').value.trim() || null,
+    twitter_url:    document.getElementById('edit-twitter').value.trim() || null,
+    instagram_url:  document.getElementById('edit-instagram').value.trim() || null,
+  };
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/clubs?id=eq.${MY.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) throw new Error('Save failed');
+    // Update MY and re-render
+    Object.assign(MY, updates);
+    const userEmail = currentSession?.user?.email || '';
+    renderMyClub(MY, userEmail);
+    toggleClubEdit();
+    toast('Club details saved ✓');
+  } catch(err) {
+    toast('Error saving: ' + err.message);
+  }
 }
 
 async function handleAuthSession(session) {
@@ -2481,19 +2612,29 @@ function mapClub(row) {
   const words = name.replace(/[&']/g,'').split(' ');
   const logo = words.map(w=>w[0]||'').join('').slice(0,3).toUpperCase();
   return {
-    id:           row.id,
-    name:         name,
-    logo:         logo,
-    level:        '',
-    league:       row.league || '',
-    location:     [row.location, row.county].filter(Boolean).join(', '),
-    lat:          parseFloat(row.lat)  || 0,
-    lng:          parseFloat(row.lng)  || 0,
-    ground:       row.ground || '',
-    badge:        row.badge_url || null,
-    venueAvail:   null,
-    kickoffAvail: null,
-    availableDate:null,
+    id:            row.id,
+    name:          name,
+    logo:          logo,
+    level:         '',
+    league:        row.league || '',
+    location:      [row.location, row.county].filter(Boolean).join(', '),
+    lat:           parseFloat(row.lat)  || 0,
+    lng:           parseFloat(row.lng)  || 0,
+    ground:        row.ground || '',
+    badge:         row.badge_url || null,
+    nickname:      row.nickname || '',
+    home_colours:  row.home_colours || '',
+    away_colours:  row.away_colours || '',
+    contact_name:  row.contact_name || '',
+    contact_email: row.contact_email || '',
+    contact_phone: row.contact_phone || '',
+    website_url:   row.website_url || '',
+    facebook_url:  row.facebook_url || '',
+    twitter_url:   row.twitter_url || '',
+    instagram_url: row.instagram_url || '',
+    venueAvail:    null,
+    kickoffAvail:  null,
+    availableDate: null,
   };
 }
 
