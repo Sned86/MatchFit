@@ -511,7 +511,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <div class="modal-handle"></div>
     <div class="modal-header">
       <div class="modal-title">Account Settings</div>
-      <div class="modal-sub">Ashford United FC</div>
+      <div class="modal-sub" id="account-modal-club">—</div>
       <button class="modal-close" onclick="closeModal('account-modal')">&#10005;</button>
     </div>
     <div class="modal-body">
@@ -531,8 +531,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         </div>
       </div>
       <div class="form-section-label">Account</div>
-      <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" value="manager@ashfordutd.co.uk"></div>
-      <div class="form-field"><label class="form-label">Phone</label><input class="form-input" type="tel" value="07700 900123"></div>
+      <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" id="account-email" placeholder="—" readonly></div>
+      <div class="form-field"><label class="form-label">Club</label><input class="form-input" type="text" id="account-club" placeholder="—" readonly></div>
       <button class="form-submit" onclick="closeModal('account-modal');toast('Settings saved')">Save Changes</button>
       <button style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--red);cursor:pointer" onclick="submitSignOut()">Sign Out</button>
     </div>
@@ -1164,36 +1164,26 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <div class="screen" id="screen-myclub">
   <div class="profile-header">
     <div class="profile-top">
-      <div class="profile-crest">AU</div>
+      <div class="profile-crest" id="myclub-crest">—</div>
       <div>
-        <div class="profile-name">Ashford United FC</div>
-        <div class="profile-location">📍 Ashford, Kent</div>
-        <div class="profile-level">Step 6 · Kent Invicta League</div>
+        <div class="profile-name" id="myclub-name">—</div>
+        <div class="profile-location" id="myclub-location"></div>
+        <div class="profile-level" id="myclub-league"></div>
       </div>
     </div>
     <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat-val">12</div><div class="profile-stat-key">Friendlies</div></div>
-      <div class="profile-stat"><div class="profile-stat-val">4.8★</div><div class="profile-stat-key">Rating</div></div>
-      <div class="profile-stat"><div class="profile-stat-val">2</div><div class="profile-stat-key">Active</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-fixtures">—</div><div class="profile-stat-key">Friendlies</div></div>
+      <div class="profile-stat"><div class="profile-stat-val">—</div><div class="profile-stat-key">Rating</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-active">—</div><div class="profile-stat-key">Active</div></div>
     </div>
   </div>
   <div class="info-section">
     <div class="info-section-head">Club Details</div>
     <div class="info-grid-2">
-      <div class="info-cell"><div class="info-key-sm">Ground</div><div class="info-val-sm">Homeground Stadium</div></div>
-      <div class="info-cell"><div class="info-key-sm">Capacity</div><div class="info-val-sm">~800</div></div>
-      <div class="info-cell"><div class="info-key-sm">League</div><div class="info-val-sm">Kent Invicta League</div></div>
-      <div class="info-cell"><div class="info-key-sm">Season Start</div><div class="info-val-sm">16 August 2025</div></div>
-      <div class="info-cell"><div class="info-key-sm">Pitch</div><div class="info-val-sm">Grass</div></div>
-      <div class="info-cell"><div class="info-key-sm">Contact</div><div class="info-val-sm">manager@ashfordutd</div></div>
-    </div>
-  </div>
-  <div class="info-section">
-    <div class="info-section-head">Preferred Opposition</div>
-    <div class="pref-levels-wrap">
-      <span class="pref-level-chip">Step 5</span>
-      <span class="pref-level-chip">Step 6</span>
-      <span class="pref-level-chip">Step 7</span>
+      <div class="info-cell"><div class="info-key-sm">Ground</div><div class="info-val-sm" id="myclub-ground">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">League</div><div class="info-val-sm" id="myclub-league-detail">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Location</div><div class="info-val-sm" id="myclub-location-detail">—</div></div>
+      <div class="info-cell"><div class="info-key-sm">Email</div><div class="info-val-sm" id="myclub-email">—</div></div>
     </div>
   </div>
 </div>
@@ -1206,7 +1196,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 // SUPABASE CONFIG
 // ═══════════════════════════════════════════
 const SUPABASE_URL = 'https://huokcisnlcaezqcroyon.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_yeJQjoAwU9YqH5FWeai5Dg_grJxgGk-';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ═══════════════════════════════════════════
@@ -2443,6 +2433,29 @@ async function submitSignOut() {
   showAuthPanel('login');
 }
 
+function renderMyClub(club, userEmail) {
+  if (!club) return;
+  // Header
+  document.getElementById('myclub-crest').textContent = club.logo || '—';
+  document.getElementById('myclub-name').textContent = club.name || '—';
+  document.getElementById('myclub-location').textContent = club.location ? '📍 ' + club.location : '';
+  document.getElementById('myclub-league').textContent = club.league || '';
+  // Stats — fixture counts from FIXTURES
+  const myFixtures = FIXTURES.filter(f => f.homeId === club.id || f.awayId === club.id);
+  const activeFixtures = myFixtures.filter(f => f.status === 'confirmed');
+  document.getElementById('myclub-fixtures').textContent = myFixtures.length || '0';
+  document.getElementById('myclub-active').textContent = activeFixtures.length || '0';
+  // Details grid
+  document.getElementById('myclub-ground').textContent = club.ground || '—';
+  document.getElementById('myclub-league-detail').textContent = club.league || '—';
+  document.getElementById('myclub-location-detail').textContent = club.location || '—';
+  document.getElementById('myclub-email').textContent = userEmail || '—';
+  // Account modal
+  document.getElementById('account-modal-club').textContent = club.name || '—';
+  document.getElementById('account-email').value = userEmail || '';
+  document.getElementById('account-club').value = club.name || '';
+}
+
 async function handleAuthSession(session) {
   if (!session) {
     document.getElementById('auth-wall').style.display = 'flex';
@@ -2497,6 +2510,7 @@ async function handleAuthSession(session) {
       badge:  club.badge,
     };
     document.getElementById('header-club-btn').textContent = club.name;
+    renderMyClub(club, session.user.email);
   }
 
   document.getElementById('auth-wall').style.display = 'none';
