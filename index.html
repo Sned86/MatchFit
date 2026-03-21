@@ -46,7 +46,7 @@ body{background:var(--bg-soft);color:var(--text);font-family:'DM Sans',sans-seri
 /* ── Header ── */
 .header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
-.header-bottom{padding:0 16px 10px}
+.header-bottom{display:none}
 .logo{display:flex;align-items:center;gap:9px}
 .logo-mark{width:32px;height:32px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .logo-text{font-family:'DM Serif Display',serif;font-size:18px;color:var(--navy);letter-spacing:-0.3px}
@@ -855,9 +855,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       <button class="icon-btn" onclick="openModal('account-modal')" title="Account Settings">⚙️</button>
     </div>
   </div>
-  <div class="header-bottom">
-    <button class="register-btn" id="header-club-btn" onclick="openModal('account-modal')">Ashford United FC</button>
-  </div>
+
 </header>
 
 <nav class="nav">
@@ -932,8 +930,11 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       </div>
       <div>
         <label class="field-label">Maximum Travel Distance <span class="range-val" id="dist-label">50 miles</span></label>
-        <input type="range" min="0" max="100" step="5" value="50" id="dist-slider" oninput="updateDist(this.value)">
-        <div class="range-labels"><span>0 miles</span><span>Any distance</span></div>
+        <div id="dist-slider-wrap">
+          <input type="range" min="5" max="100" step="5" value="50" id="dist-slider" oninput="updateDist(this.value)">
+          <div class="range-labels"><span>5 miles</span><span>100 miles</span></div>
+        </div>
+        <button id="dist-any-btn" onclick="toggleAnyDist()" style="margin-top:6px;width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--slate);cursor:pointer;transition:all 0.15s">🌍 Any distance</button>
       </div>
     </div>
     <div class="cta-wrap">
@@ -1410,7 +1411,25 @@ function selectSeg2(btn,group,val){
 
 function updateDist(v){
   maxDist=parseInt(v);
-  document.getElementById('dist-label').textContent = v==='0'||v===0 ? 'Any distance' : v+' miles';
+  document.getElementById('dist-label').textContent = v+' miles';
+  // Deactivate "any distance" toggle when slider moves
+  const btn = document.getElementById('dist-any-btn');
+  if(btn){ btn.style.background='var(--bg)'; btn.style.color='var(--slate)'; btn.style.borderColor='var(--border)'; }
+}
+function toggleAnyDist(){
+  const btn = document.getElementById('dist-any-btn');
+  const isAny = maxDist === 0;
+  if(isAny){
+    // Switch back to slider value
+    const slider = document.getElementById('dist-slider');
+    maxDist = parseInt(slider.value);
+    document.getElementById('dist-label').textContent = maxDist + ' miles';
+    btn.style.background='var(--bg)'; btn.style.color='var(--slate)'; btn.style.borderStyle='dashed'; btn.style.borderColor='var(--border)';
+  } else {
+    maxDist = 0;
+    document.getElementById('dist-label').textContent = 'Any distance';
+    btn.style.background='var(--green-xlight)'; btn.style.color='var(--green-dark)'; btn.style.borderStyle='solid'; btn.style.borderColor='var(--green)';
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2424,7 +2443,7 @@ async function submitSignOut() {
   currentSession = null;
   sessionStorage.removeItem('mf_session');
   // Reset app state
-  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null };
+  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
   CLUBS = []; FIXTURES = [];
   document.getElementById('auth-wall').style.display = 'flex';
   document.getElementById('header-club-btn').textContent = '';
@@ -2575,15 +2594,16 @@ async function handleAuthSession(session) {
   const club = CLUBS.find(c => c.id === ucRows.club_id);
   if (club) {
     MY = {
-      id:     club.id,
-      name:   club.name,
-      logo:   club.logo,
-      lat:    club.lat,
-      lng:    club.lng,
-      ground: club.ground,
-      badge:  club.badge,
+      id:       club.id,
+      name:     club.name,
+      logo:     club.logo,
+      lat:      club.lat,
+      lng:      club.lng,
+      ground:   club.ground,
+      badge:    club.badge,
+      location: club.location,
     };
-    document.getElementById('header-club-btn').textContent = club.name;
+    document.getElementById('account-modal-club').textContent = club.name;
     renderMyClub(club, userEmail);
     await loadAvailability();
     renderMyFixtures();
