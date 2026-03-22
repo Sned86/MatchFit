@@ -966,7 +966,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
   <!-- Sub-tab bar -->
   <div class="subtab-bar">
     <button class="subtab-btn active" onclick="switchSubtab(this,'subtab-open')">Open</button>
-    <button class="subtab-btn" onclick="switchSubtab(this,'subtab-offer')">Under Offer</button>
+    <button class="subtab-btn" onclick="switchSubtab(this,'subtab-offer')">Offers</button>
     <button class="subtab-btn" onclick="switchSubtab(this,'subtab-confirmed')">Confirmed</button>
   </div>
 
@@ -981,12 +981,12 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     </div>
   </div>
 
-  <!-- ── Under Offer ── -->
+  <!-- ── Offers ── -->
   <div class="subtab-panel" id="subtab-offer">
     <div class="empty-state">
       <div class="empty-icon">📨</div>
       <div class="empty-title">No offers yet</div>
-      <div class="empty-sub">Match offers from other clubs will appear here.</div>
+      <div class="empty-sub">Match offers from other clubs will appear here. Fixtures under negotiation will also show in this tab.</div>
     </div>
   </div>
 
@@ -1137,6 +1137,12 @@ function fmtDate(iso){
   const D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return `${D[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]}`;
+}
+function fmtDateFull(iso){
+  const d=new Date(iso+'T12:00:00');
+  const D=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const M=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${D[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 // ═══════════════════════════════════════════
@@ -1825,16 +1831,15 @@ function buildOfferRequiredFields(){
 
   if(!needDate && !needKickoff && !needVenue){ wrap.style.display='none'; return; }
 
-  // Amber notice
+  // Intro note for first contact
   const notice = document.createElement('div');
-  notice.style.cssText='padding:10px 13px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-sm);font-size:12px;color:var(--amber-dark);font-weight:600';
-  const open = [needDate&&'date', needKickoff&&'kick-off time', needVenue&&'venue'].filter(Boolean).join(', ');
-  notice.textContent=`⚠️ ${currentOfferClub.name} left the ${open} open — please confirm:`;
+  notice.style.cssText='padding:10px 13px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:var(--radius-sm);font-size:12px;color:var(--blue-dark);font-weight:600';
+  notice.textContent=`Propose the details for this fixture:`;
   wrap.appendChild(notice);
 
   if(needDate){
     const f=document.createElement('div'); f.className='form-field'; f.id='offer-req-date';
-    f.innerHTML=`<label class="form-label">Confirm Date <span style="color:var(--red);font-size:13px">*</span></label>
+    f.innerHTML=`<label class="form-label">Propose a Date <span style="color:var(--red);font-size:13px">*</span></label>
       <div class="date-strip" id="offer-req-date-strip"></div>
       <div class="date-extra-row" style="margin-top:5px">
         <button class="date-any-btn" id="offer-req-btn-custom" onclick="openOfferReqCustomDate()">
@@ -1851,7 +1856,7 @@ function buildOfferRequiredFields(){
 
   if(needKickoff){
     const f=document.createElement('div'); f.className='form-field';
-    f.innerHTML=`<label class="form-label">Confirm Kick-off Time <span style="color:var(--red);font-size:13px">*</span></label>
+    f.innerHTML=`<label class="form-label">Propose a Kick-off Time <span style="color:var(--red);font-size:13px">*</span></label>
       <div class="kickoff-group" id="offer-req-kickoff-group">
         <button class="kickoff-pill" onclick="selectOfferReqKickoff(this,'10:00')">10:00</button>
         <button class="kickoff-pill" onclick="selectOfferReqKickoff(this,'10:30')">10:30</button>
@@ -1874,7 +1879,7 @@ function buildOfferRequiredFields(){
   if(needVenue){
     const awayGround = currentOfferClub.ground || 'Their ground';
     const f=document.createElement('div'); f.className='form-field';
-    f.innerHTML=`<label class="form-label">Confirm Venue <span style="color:var(--red);font-size:13px">*</span></label>
+    f.innerHTML=`<label class="form-label">Propose a Venue <span style="color:var(--red);font-size:13px">*</span></label>
       <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr">
         <button class="seg-btn" onclick="selectOfferReqVenue(this,'home')" style="line-height:1.3;padding:8px 4px">
           🏠 Home<br><span style="font-size:10px;font-weight:500;opacity:0.75">${MY.ground||'Your ground'}</span>
@@ -2100,11 +2105,16 @@ async function submitNewRequest(){
   if(!MY.id){toast('Please sign in first');return;}
 
   const btn = document.getElementById('nr-submit-btn');
-  btn.disabled=true; btn.textContent='Posting…';
+  const editId = btn.dataset.editId || null;
+  btn.disabled=true; btn.textContent= editId ? 'Updating…' : 'Posting…';
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/availability`, {
-      method: 'POST',
+    const url = editId
+      ? `${SUPABASE_URL}/rest/v1/availability?id=eq.${editId}`
+      : `${SUPABASE_URL}/rest/v1/availability`;
+    const method = editId ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method,
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_KEY,
@@ -2129,8 +2139,10 @@ async function submitNewRequest(){
 
     // Reset form state
     nrDate=null; nrVenue='either'; nrKickoffs=[]; nrDist=50;
+    btn.dataset.editId = '';
+    btn.textContent = 'Post Availability';
     closeModal('newreq-modal');
-    toast('Availability posted ✓');
+    toast(editId ? 'Availability updated ✓' : 'Availability posted ✓');
 
     // Reload availability and refresh UI
     await loadAvailability();
@@ -2182,7 +2194,7 @@ function setBrowseLeague(btn,val){
   btn.classList.add('active');browseLeague=val;renderBrowse();
 }
 function renderBrowse(){
-  let clubs=CLUBS.map(c=>({...c,distance:haversine(MY.lat,MY.lng,c.lat,c.lng)}));
+  let clubs=CLUBS.filter(c=>c.id!==MY.id).map(c=>({...c,distance:haversine(MY.lat,MY.lng,c.lat,c.lng)}));
   if(browseLeague!=='all'){
     const lq=browseLeague.toLowerCase();
     clubs=clubs.filter(c=>{
@@ -2700,17 +2712,14 @@ async function loadAvailability() {
 }
 
 function renderMyFixtures() {
-  // Render the Open sub-tab with real availability from AVAILABILITY
   const myAvail = AVAILABILITY.filter(a => a.club_id === MY.id);
   const panel = document.getElementById('subtab-open');
   if(!panel) return;
 
-  const existing = panel.querySelectorAll('.req-card.live-avail');
-  existing.forEach(el => el.remove());
+  panel.querySelectorAll('.req-card.live-avail').forEach(el => el.remove());
 
   if(!myAvail.length) {
-    const empty = panel.querySelector('.avail-empty');
-    if(!empty) {
+    if(!panel.querySelector('.avail-empty')) {
       const div = document.createElement('div');
       div.className='avail-empty';
       div.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No availability posted</div><div class="empty-sub">Tap "+ Post Availability" to let clubs know when you're free.</div></div>`;
@@ -2720,20 +2729,81 @@ function renderMyFixtures() {
     const empty = panel.querySelector('.avail-empty');
     if(empty) empty.remove();
     myAvail.forEach(a => {
-      const venueLabel = a.venue==='home'?'Home':a.venue==='away'?'Away':'Home or Away';
-      const kickLabel  = a.kickoff_pref?.length ? a.kickoff_pref.join(', ') : 'Any time';
+      const venueMap = {home:'🏠 Home', away:'🚌 Away', either:'🔄 Home or Away', neutral:'⚖️ Neutral'};
+      const venueLabel  = venueMap[a.venue] || a.venue;
+      const kickLabel   = a.kickoff_pref?.length ? a.kickoff_pref.join(' or ') : 'Any time';
+      const distLabel   = a.max_distance ? `Within ${a.max_distance} miles` : 'Any distance';
+      const notesHtml   = a.notes ? `<div style="font-size:12px;color:var(--text-muted);padding:10px 15px;border-top:1px solid var(--border);font-style:italic">"${a.notes}"</div>` : '';
       const card = document.createElement('div');
       card.className = 'req-card live-avail';
       card.innerHTML = `
         <div class="req-card-top">
-          <div><div class="req-date">${fmtDate(a.date)}</div><div class="req-meta">${venueLabel} · ${kickLabel}</div></div>
+          <div>
+            <div class="req-date">${fmtDateFull(a.date)}</div>
+            <div class="req-meta" style="margin-top:4px">${venueLabel} · ${kickLabel}</div>
+            <div class="req-meta" style="margin-top:2px;font-size:11px">${distLabel}</div>
+          </div>
           <div class="status-pill status-searching">Open</div>
         </div>
+        ${notesHtml}
         <div class="searching-row"><div class="pulse-dot"></div>Visible to other clubs…</div>
-        <div class="req-footer-row"><button class="btn-cancel-game" onclick="cancelAvailability(${a.id})">✕ Cancel</button></div>`;
+        <div class="req-footer-row" style="gap:7px">
+          <button class="btn-see-free" onclick="openEditAvailability(${a.id})">✏️ Edit</button>
+          <button class="btn-cancel-game" onclick="cancelAvailability(${a.id})">✕ Cancel</button>
+        </div>`;
       panel.insertAdjacentElement('afterbegin', card);
     });
   }
+}
+
+function openEditAvailability(availId) {
+  const a = AVAILABILITY.find(x => x.id === availId);
+  if(!a) return;
+  // Pre-fill the modal with existing values
+  nrDate  = a.date;
+  nrVenue = a.venue;
+  nrKickoffs = a.kickoff_pref || [];
+  nrDist  = a.max_distance || 50;
+  // Open modal and build UI
+  openModal('newreq-modal');
+  buildNrDateStrip();
+  buildNrKickoffPills(a.date);
+  document.getElementById('nr-home-ground').textContent = MY.ground || 'Your ground';
+  // Set selected date
+  setTimeout(() => {
+    document.querySelectorAll('#nr-date-strip .date-btn').forEach(btn => {
+      if(btn.getAttribute('onclick')?.includes(a.date)) btn.classList.add('selected');
+    });
+    // If date not in strip, show it in custom button
+    const stripDates = buildUpcomingDates().map(d => d.toISOString().split('T')[0]);
+    if(!stripDates.includes(a.date)){
+      const d = new Date(a.date+'T12:00:00');
+      document.getElementById('nr-btn-custom').innerHTML =
+        `<div class="date-any-label">${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}</div><div class="date-any-sub">Custom date</div>`;
+      document.getElementById('nr-btn-custom').classList.add('selected');
+    }
+    // Set venue
+    document.querySelectorAll('#newreq-modal .seg-ctrl .seg-btn').forEach(btn => btn.classList.remove('selected'));
+    const venueMap2 = {home:0, away:1, either:2, neutral:3};
+    const vBtns = document.querySelectorAll('#newreq-modal .seg-ctrl .seg-btn');
+    if(vBtns[venueMap2[a.venue]]) vBtns[venueMap2[a.venue]].classList.add('selected');
+    // Set kickoffs
+    document.querySelectorAll('#nr-kickoff-group .kickoff-pill').forEach(btn => {
+      const val = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+      if(val && nrKickoffs.includes(val)) btn.classList.add('selected');
+      if(val === 'any' && !nrKickoffs.length) btn.classList.add('selected');
+    });
+    // Set distance
+    const slider = document.querySelector('#nr-dist-field input[type=range]');
+    if(slider){ slider.value = a.max_distance || 50; }
+    document.getElementById('nr-dist-label').textContent = (a.max_distance || 50) + ' miles';
+    // Set notes
+    document.getElementById('nr-notes').value = a.notes || '';
+    // Store the id so submitNewRequest knows to update rather than insert
+    document.getElementById('nr-submit-btn').dataset.editId = availId;
+    document.getElementById('nr-submit-btn').textContent = 'Update Availability';
+    updateNrSubmitBtn();
+  }, 50);
 }
 
 async function cancelAvailability(availId) {
