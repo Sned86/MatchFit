@@ -2733,23 +2733,20 @@ function renderMyFixtures() {
       const venueLabel  = venueMap[a.venue] || a.venue;
       const kickLabel   = a.kickoff_pref?.length ? a.kickoff_pref.join(' or ') : 'Any time';
       const distLabel   = a.max_distance ? `Within ${a.max_distance} miles` : 'Any distance';
-      const notesHtml   = a.notes ? `<div style="font-size:11px;color:var(--text-muted);padding:6px 12px;border-top:1px solid var(--border);font-style:italic">"${a.notes}"</div>` : '';
+
       const card = document.createElement('div');
       card.className = 'req-card live-avail';
       card.innerHTML = `
-        <div class="req-card-top">
-          <div>
+        <div class="req-card-top" style="align-items:center">
+          <div style="flex:1;min-width:0">
             <div class="req-date">${fmtDateFull(a.date)}</div>
-            <div class="req-meta" style="margin-top:4px">${venueLabel} · ${kickLabel}</div>
-            <div class="req-meta" style="margin-top:2px;font-size:11px">${distLabel}</div>
+            <div class="req-meta" style="margin-top:3px">${venueLabel} · ${kickLabel} · ${distLabel}</div>
+            ${a.notes ? `<div class="req-meta" style="margin-top:2px;font-style:italic">"${a.notes}"</div>` : ''}
           </div>
-          <div class="status-pill status-searching">Open</div>
-        </div>
-        ${notesHtml}
-        <div class="searching-row"><div class="pulse-dot"></div>Visible to other clubs…</div>
-        <div class="req-footer-row" style="gap:7px">
-          <button class="btn-see-free" onclick="openEditAvailability(${a.id})">✏️ Edit</button>
-          <button class="btn-cancel-game" onclick="cancelAvailability(${a.id})">✕ Cancel</button>
+          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:10px">
+            <button class="btn-see-free" style="padding:5px 10px;font-size:11px" onclick="openEditAvailability(${a.id})">✏️ Edit</button>
+            <button class="btn-cancel-game" style="padding:5px 10px;font-size:11px" onclick="cancelAvailability(${a.id})">✕ Cancel</button>
+          </div>
         </div>`;
       panel.insertAdjacentElement('afterbegin', card);
     });
