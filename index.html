@@ -1030,6 +1030,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 
 <!-- ══ MY CLUB ══ -->
 <div class="screen" id="screen-myclub">
+
+  <!-- Club header -->
   <div class="profile-header">
     <div class="profile-top">
       <div id="myclub-badge-wrap" style="width:54px;height:54px;flex-shrink:0"></div>
@@ -1045,48 +1047,92 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       <div class="profile-stat"><div class="profile-stat-val" id="myclub-open-avail">—</div><div class="profile-stat-key">Open Slots</div></div>
     </div>
   </div>
+
+  <!-- Pre-season calendar -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Pre-season Calendar</div>
+        <div class="card-subtitle" id="cal-month-label">—</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="calPrevMonth()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">‹</button>
+        <button onclick="calNextMonth()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">›</button>
+      </div>
+    </div>
+    <div style="padding:12px 14px">
+      <!-- Day labels -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px">
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">M</div>
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">W</div>
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">F</div>
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+      </div>
+      <!-- Calendar grid -->
+      <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+    </div>
+    <!-- Legend -->
+    <div style="display:flex;gap:14px;padding:10px 14px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>Open</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0"></div>Offer</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Confirmed</div>
+    </div>
+    <!-- Day detail panel -->
+    <div id="cal-day-detail" style="display:none;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg-soft)"></div>
+  </div>
+
+  <!-- Club Details (collapsed) -->
   <div class="info-section">
-    <div class="info-section-head" style="display:flex;align-items:center;justify-content:space-between">
-      Club Details
-      <button id="myclub-edit-btn" onclick="toggleClubEdit()" style="padding:4px 12px;background:var(--green-xlight);border:1.5px solid var(--green-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--green-dark);cursor:pointer">✏️ Edit</button>
+    <div class="info-section-head" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleClubDetailsSection()">
+      <span>Club Details</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="myclub-edit-btn" onclick="event.stopPropagation();toggleClubEdit()" style="padding:4px 12px;background:var(--green-xlight);border:1.5px solid var(--green-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--green-dark);cursor:pointer">✏️ Edit</button>
+        <span id="club-details-chevron" style="font-size:12px;color:var(--slate-light)">▼</span>
+      </div>
     </div>
-    <div class="info-grid-2" id="myclub-details-view">
-      <div class="info-cell"><div class="info-key-sm">Ground</div><div class="info-val-sm" id="myclub-ground">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">League</div><div class="info-val-sm" id="myclub-league-detail">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Location</div><div class="info-val-sm" id="myclub-location-detail">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Contact Email</div><div class="info-val-sm" id="myclub-email">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Nickname</div><div class="info-val-sm" id="myclub-nickname">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Contact Name</div><div class="info-val-sm" id="myclub-contact-name">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Home Colours</div><div class="info-val-sm" id="myclub-home-colours">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Away Colours</div><div class="info-val-sm" id="myclub-away-colours">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Contact Phone</div><div class="info-val-sm" id="myclub-contact-phone">—</div></div>
-      <div class="info-cell"><div class="info-key-sm">Website</div><div class="info-val-sm" id="myclub-website">—</div></div>
-    </div>
-    <div id="myclub-edit-form" style="display:none;padding:14px 15px;flex-direction:column;gap:12px">
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Nickname</label><input class="form-input" id="edit-nickname" placeholder="e.g. The Nuts"></div>
-        <div class="form-field"><label class="form-label">Home Colours</label><input class="form-input" id="edit-home-colours" placeholder="e.g. Red & White"></div>
+    <div id="myclub-details-section" style="display:none">
+      <div class="info-grid-2" id="myclub-details-view">
+        <div class="info-cell"><div class="info-key-sm">Ground</div><div class="info-val-sm" id="myclub-ground">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">League</div><div class="info-val-sm" id="myclub-league-detail">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Location</div><div class="info-val-sm" id="myclub-location-detail">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Contact Email</div><div class="info-val-sm" id="myclub-email">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Nickname</div><div class="info-val-sm" id="myclub-nickname">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Contact Name</div><div class="info-val-sm" id="myclub-contact-name">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Home Colours</div><div class="info-val-sm" id="myclub-home-colours">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Away Colours</div><div class="info-val-sm" id="myclub-away-colours">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Contact Phone</div><div class="info-val-sm" id="myclub-contact-phone">—</div></div>
+        <div class="info-cell"><div class="info-key-sm">Website</div><div class="info-val-sm" id="myclub-website">—</div></div>
       </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Away Colours</label><input class="form-input" id="edit-away-colours" placeholder="e.g. All Blue"></div>
-        <div class="form-field"><label class="form-label">Contact Name</label><input class="form-input" id="edit-contact-name" placeholder="Full name"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Contact Email</label><input class="form-input" type="email" id="edit-contact-email" placeholder="name@club.co.uk"></div>
-        <div class="form-field"><label class="form-label">Contact Phone</label><input class="form-input" type="tel" id="edit-contact-phone" placeholder="07700 000000"></div>
-      </div>
-      <div class="form-field"><label class="form-label">Website URL</label><input class="form-input" type="url" id="edit-website" placeholder="https://www.yourclub.co.uk"></div>
-      <div class="form-field"><label class="form-label">Facebook URL</label><input class="form-input" type="url" id="edit-facebook" placeholder="https://facebook.com/yourclub"></div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Twitter / X</label><input class="form-input" id="edit-twitter" placeholder="@yourclub"></div>
-        <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="edit-instagram" placeholder="@yourclub"></div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="form-submit" style="flex:1" onclick="saveClubDetails()">Save Changes</button>
-        <button onclick="toggleClubEdit()" style="flex:1;padding:13px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--slate);cursor:pointer">Cancel</button>
+      <div id="myclub-edit-form" style="display:none;padding:14px 15px;flex-direction:column;gap:12px">
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Nickname</label><input class="form-input" id="edit-nickname" placeholder="e.g. The Nuts"></div>
+          <div class="form-field"><label class="form-label">Home Colours</label><input class="form-input" id="edit-home-colours" placeholder="e.g. Red & White"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Away Colours</label><input class="form-input" id="edit-away-colours" placeholder="e.g. All Blue"></div>
+          <div class="form-field"><label class="form-label">Contact Name</label><input class="form-input" id="edit-contact-name" placeholder="Full name"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Contact Email</label><input class="form-input" type="email" id="edit-contact-email" placeholder="name@club.co.uk"></div>
+          <div class="form-field"><label class="form-label">Contact Phone</label><input class="form-input" type="tel" id="edit-contact-phone" placeholder="07700 000000"></div>
+        </div>
+        <div class="form-field"><label class="form-label">Website URL</label><input class="form-input" type="url" id="edit-website" placeholder="https://www.yourclub.co.uk"></div>
+        <div class="form-field"><label class="form-label">Facebook URL</label><input class="form-input" type="url" id="edit-facebook" placeholder="https://facebook.com/yourclub"></div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Twitter / X</label><input class="form-input" id="edit-twitter" placeholder="@yourclub"></div>
+          <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="edit-instagram" placeholder="@yourclub"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="form-submit" style="flex:1" onclick="saveClubDetails()">Save Changes</button>
+          <button onclick="toggleClubEdit()" style="flex:1;padding:13px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--slate);cursor:pointer">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
 </main>
@@ -2514,6 +2560,158 @@ function renderMyClub(club, userEmail) {
   document.getElementById('account-modal-club').textContent = club.name || '—';
   document.getElementById('account-email').value = userEmail || '';
   document.getElementById('account-club').value = club.name || '';
+
+  // Render calendar
+  renderCalendar();
+}
+
+// ═══════════════════════════════════════════
+// MY CLUB CALENDAR
+// ═══════════════════════════════════════════
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function toggleClubDetailsSection() {
+  const section  = document.getElementById('myclub-details-section');
+  const chevron  = document.getElementById('club-details-chevron');
+  const isOpen   = section.style.display !== 'none';
+  section.style.display = isOpen ? 'none' : 'block';
+  chevron.textContent   = isOpen ? '▼' : '▲';
+}
+
+function renderCalendar() {
+  const grid      = document.getElementById('cal-grid');
+  const label     = document.getElementById('cal-month-label');
+  if (!grid) return;
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  label.textContent = `${MONTHS[calMonth]} ${calYear}`;
+
+  // Build a lookup of dates → event types for MY club
+  const eventMap = {}; // iso date → array of types: 'open','offer','confirmed'
+
+  // Open availability
+  AVAILABILITY.forEach(a => {
+    if (a.club_id === MY.id && a.status === 'open') {
+      if (!eventMap[a.date]) eventMap[a.date] = [];
+      if (!eventMap[a.date].includes('open')) eventMap[a.date].push('open');
+    }
+  });
+
+  // Fixtures
+  FIXTURES.forEach(f => {
+    if (f.homeId === MY.id || f.awayId === MY.id) {
+      const date = f.date;
+      if (!date) return;
+      if (!eventMap[date]) eventMap[date] = [];
+      const type = f.status === 'confirmed' ? 'confirmed' : 'offer';
+      if (!eventMap[date].includes(type)) eventMap[date].push(type);
+    }
+  });
+
+  // First day of month (adjust so Mon=0)
+  const firstDay = new Date(calYear, calMonth, 1);
+  const startDow = (firstDay.getDay() + 6) % 7; // Mon-based
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date().toISOString().split('T')[0];
+
+  let html = '';
+
+  // Empty cells before first day
+  for (let i = 0; i < startDow; i++) {
+    html += '<div></div>';
+  }
+
+  // Day cells
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso  = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const events = eventMap[iso] || [];
+    const isToday = iso === today;
+    const isSat = new Date(iso+'T12:00:00').getDay() === 6;
+    const isSun = new Date(iso+'T12:00:00').getDay() === 0;
+    const isWeekend = isSat || isSun;
+
+    // Background colour if event
+    let bg = 'transparent';
+    let textCol = isWeekend ? 'var(--green-dark)' : 'var(--navy)';
+    if (events.includes('confirmed'))    { bg='var(--green)';  textCol='white'; }
+    else if (events.includes('offer'))   { bg='var(--amber)';  textCol='white'; }
+    else if (events.includes('open'))    { bg='var(--blue)';   textCol='white'; }
+
+    const border = isToday ? '1.5px solid var(--navy)' : '1.5px solid transparent';
+    const cursor = events.length ? 'pointer' : 'default';
+
+    html += `<div onclick="calDayClick('${iso}')"
+      style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+             border-radius:6px;background:${bg};border:${border};cursor:${cursor};transition:opacity 0.1s">
+      <span style="font-size:12px;font-weight:${isToday?'800':'600'};color:${textCol};line-height:1">${d}</span>
+    </div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // Clear day detail
+  const detail = document.getElementById('cal-day-detail');
+  if (detail) detail.style.display = 'none';
+}
+
+function calDayClick(iso) {
+  const detail = document.getElementById('cal-day-detail');
+  if (!detail) return;
+
+  // Gather events for this day
+  const avail    = AVAILABILITY.filter(a => a.club_id === MY.id && a.status === 'open' && a.date === iso);
+  const fixtures = FIXTURES.filter(f => (f.homeId === MY.id || f.awayId === MY.id) && f.date === iso);
+
+  if (!avail.length && !fixtures.length) { detail.style.display='none'; return; }
+
+  const d = new Date(iso+'T12:00:00');
+  const D = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = `${D[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]}`;
+
+  let html = `<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">${dateStr}</div>`;
+
+  avail.forEach(a => {
+    const venueMap = {home:'🏠 Home',away:'🚌 Away',either:'🔄 Either',neutral:'⚖️ Neutral'};
+    const kick = a.kickoff_pref?.length ? a.kickoff_pref.join(' or ') : 'Any time';
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:var(--radius-sm);margin-bottom:5px">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>
+      <div style="font-size:12px;color:var(--blue-dark)"><strong>Open</strong> · ${venueMap[a.venue]||a.venue} · ${kick}</div>
+    </div>`;
+  });
+
+  fixtures.forEach(f => {
+    const isConfirmed = f.status === 'confirmed';
+    const bg    = isConfirmed ? 'var(--green-xlight)' : 'var(--amber-light)';
+    const border= isConfirmed ? 'var(--green-mid)'    : '#fcd34d';
+    const dot   = isConfirmed ? 'var(--green)'        : 'var(--amber)';
+    const col   = isConfirmed ? 'var(--green-dark)'   : 'var(--amber-dark)';
+    const label = isConfirmed ? 'Confirmed'           : 'Under offer';
+    const oppId = f.homeId === MY.id ? f.awayId : f.homeId;
+    const opp   = CLUBS.find(c => c.id === oppId);
+    const oppName = opp ? opp.name : 'Unknown club';
+    const venue = f.homeId === MY.id ? '🏠 Home' : '🚌 Away';
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${bg};border:1px solid ${border};border-radius:var(--radius-sm);margin-bottom:5px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${dot};flex-shrink:0"></div>
+      <div style="font-size:12px;color:${col}"><strong>${label}</strong> · ${oppName} · ${venue}${f.kickoff?' · '+f.kickoff:''}</div>
+    </div>`;
+  });
+
+  detail.innerHTML = html;
+  detail.style.display = 'block';
+}
+
+function calPrevMonth() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNextMonth() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
 }
 
 function toggleClubEdit() {
@@ -2704,6 +2902,7 @@ async function loadAvailability() {
     const rows = await res.json();
     AVAILABILITY = Array.isArray(rows) ? rows : [];
     console.log(`Loaded ${AVAILABILITY.length} availability slots`);
+    renderCalendar();
     // Attach availability to clubs for search/browse
     CLUBS.forEach(c => {
       const avail = AVAILABILITY.filter(a => a.club_id === c.id);
