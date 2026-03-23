@@ -566,12 +566,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
       <div class="form-field">
         <label class="form-label">Venue</label>
         <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr 1fr">
-          <button class="seg-btn" id="nr-venue-home" onclick="selectNrVenue(this,'home')" style="line-height:1.3;padding:8px 4px">
-            🏠 Home<br><span id="nr-home-ground" style="font-size:10px;font-weight:500;opacity:0.75">—</span>
-          </button>
-          <button class="seg-btn" onclick="selectNrVenue(this,'away')" style="line-height:1.3;padding:8px 4px">
-            🚌 Away<br><span style="font-size:10px;font-weight:500;opacity:0.75">Opp's ground</span>
-          </button>
+          <button class="seg-btn" id="nr-venue-home" onclick="selectNrVenue(this,'home')" style="padding:8px 4px">🏠 Home</button>
+          <button class="seg-btn" onclick="selectNrVenue(this,'away')" style="padding:8px 4px">🚌 Away</button>
           <button class="seg-btn selected" onclick="selectNrVenue(this,'either')" style="padding:8px 4px">&#128260; Either</button>
           <button class="seg-btn" onclick="selectNrVenue(this,'neutral')" style="padding:8px 4px">⚖️ Neutral</button>
         </div>
@@ -586,15 +582,16 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
           <button class="kickoff-pill any-pill selected" onclick="toggleNrKickoff(this,'any')">Any time</button>
         </div>
         <div class="kickoff-custom-wrap" style="margin-top:8px">
-          <input type="time" class="kickoff-custom-input" id="nr-kickoff-custom-input" onchange="addCustomKickoff('nr')" placeholder="Other time…">
+          <input type="time" class="kickoff-custom-input" id="nr-kickoff-custom-input" onchange="addCustomKickoff('nr')" step="900" placeholder="Other time…">
           <span style="font-size:11px;color:var(--slate-light)">Other time</span>
         </div>
       </div>
 
       <div class="form-field" id="nr-dist-field">
         <label class="form-label">Max Travel Distance <span id="nr-dist-label" style="font-size:13px;font-weight:700;color:var(--green);float:right">50 miles</span></label>
-        <input type="range" min="0" max="100" step="5" value="50" oninput="updateNrDist(this.value)">
-        <div class="range-labels"><span>0 miles</span><span>Any distance</span></div>
+        <input type="range" min="5" max="100" step="5" value="50" id="nr-dist-slider" oninput="updateNrDist(this.value)">
+        <div class="range-labels"><span>5 miles</span><span>100 miles</span></div>
+        <button id="nr-dist-any-btn" onclick="toggleNrAnyDist()" style="margin-top:6px;width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--slate);cursor:pointer;transition:all 0.15s">🌍 Any distance</button>
       </div>
       <div class="form-field">
         <label class="form-label">Additional Notes <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
@@ -960,7 +957,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <div class="new-req-sub">Let other clubs know when you're free and what you're looking for</div>
       </div>
     </div>
-    <button class="btn-new-req" style="width:100%;margin-top:13px" onclick="openModal('newreq-modal');buildNrDateStrip();buildNrKickoffPills(null);document.getElementById('nr-home-ground').textContent=MY.ground||'Your ground';updateNrSubmitBtn()">+ Post Availability</button>
+    <button class="btn-new-req" style="width:100%;margin-top:13px" onclick="openModal('newreq-modal');buildNrDateStrip();buildNrKickoffPills(null);updateNrSubmitBtn()">+ Post Availability</button>
   </div>
 
   <!-- Sub-tab bar -->
@@ -2087,14 +2084,28 @@ function selectNrVenue(btn,val){
   const nw=document.getElementById('nr-neutral-wrap');
   nw.style.display=val==='neutral'?'flex':'none';
   nw.style.flexDirection='column';
-  // Update home ground label from MY
-  const hg=document.getElementById('nr-home-ground');
-  if(hg) hg.textContent=MY.ground||'Your ground';
+
 }
 
 function updateNrDist(v){
   nrDist=parseInt(v);
-  document.getElementById('nr-dist-label').textContent=v==='0'||v===0?'Any distance':v+' miles';
+  document.getElementById('nr-dist-label').textContent = v+' miles';
+  const btn = document.getElementById('nr-dist-any-btn');
+  if(btn){ btn.style.background='var(--bg)'; btn.style.color='var(--slate)'; btn.style.borderColor='var(--border)'; btn.style.borderStyle='dashed'; }
+}
+function toggleNrAnyDist(){
+  const btn = document.getElementById('nr-dist-any-btn');
+  const isAny = nrDist === 0;
+  if(isAny){
+    const slider = document.getElementById('nr-dist-slider');
+    nrDist = parseInt(slider.value);
+    document.getElementById('nr-dist-label').textContent = nrDist + ' miles';
+    btn.style.background='var(--bg)'; btn.style.color='var(--slate)'; btn.style.borderStyle='dashed'; btn.style.borderColor='var(--border)';
+  } else {
+    nrDist = 0;
+    document.getElementById('nr-dist-label').textContent = 'Any distance';
+    btn.style.background='var(--green-xlight)'; btn.style.color='var(--green-dark)'; btn.style.borderStyle='solid'; btn.style.borderColor='var(--green)';
+  }
 }
 function updateNrSubmitBtn(){
   const b=document.getElementById('nr-submit-btn');
