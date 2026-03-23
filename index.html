@@ -1034,7 +1034,10 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
   <!-- Club header -->
   <div class="profile-header">
     <div class="profile-top">
-      <div id="myclub-badge-wrap" style="width:54px;height:54px;flex-shrink:0"></div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-shrink:0">
+        <div id="myclub-badge-wrap" style="width:72px;height:72px;flex-shrink:0"></div>
+        <div id="myclub-league-badge-wrap" style="width:36px;height:36px;flex-shrink:0;display:none"></div>
+      </div>
       <div style="flex:1;min-width:0">
         <div id="myclub-name" style="font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--navy);line-height:1.2">—</div>
         <div class="profile-location" id="myclub-location"></div>
@@ -1049,39 +1052,43 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
   </div>
 
   <!-- Pre-season calendar -->
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-title">Pre-season Calendar</div>
-        <div class="card-subtitle" id="cal-month-label">—</div>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button onclick="calPrevMonth()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">‹</button>
-        <button onclick="calNextMonth()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">›</button>
+  <div class="info-section">
+    <div class="info-section-head" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleCalendarSection()">
+      <span>Pre-season Calendar</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="cal-month-label" style="font-size:12px;font-weight:600;color:var(--text-muted)">—</span>
+        <span id="cal-chevron" style="font-size:12px;color:var(--slate-light)">▲</span>
       </div>
     </div>
-    <div style="padding:12px 14px">
-      <!-- Day labels -->
-      <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px">
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">M</div>
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">W</div>
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">F</div>
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
-        <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+    <div id="cal-body">
+      <!-- Month nav -->
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:8px 14px 0">
+        <button onclick="event.stopPropagation();calPrevMonth()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">‹</button>
+        <button onclick="event.stopPropagation();calNextMonth()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">›</button>
       </div>
-      <!-- Calendar grid -->
-      <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+      <div style="padding:8px 14px 12px">
+        <!-- Day labels -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px">
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">M</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">W</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">F</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+        </div>
+        <!-- Calendar grid -->
+        <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+      </div>
+      <!-- Legend -->
+      <div style="display:flex;gap:14px;padding:10px 14px;border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>Open</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0"></div>Offer</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Confirmed</div>
+      </div>
+      <!-- Day detail panel -->
+      <div id="cal-day-detail" style="display:none;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg-soft)"></div>
     </div>
-    <!-- Legend -->
-    <div style="display:flex;gap:14px;padding:10px 14px;border-top:1px solid var(--border)">
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>Open</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0"></div>Offer</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Confirmed</div>
-    </div>
-    <!-- Day detail panel -->
-    <div id="cal-day-detail" style="display:none;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg-soft)"></div>
   </div>
 
   <!-- Club Details (collapsed) -->
@@ -2521,7 +2528,7 @@ function renderMyClub(club, userEmail) {
   if (!club) return;
   // Badge
   const badgeWrap = document.getElementById('myclub-badge-wrap');
-  if (badgeWrap) badgeWrap.innerHTML = badgeHtml(club, 54, 14);
+  if (badgeWrap) badgeWrap.innerHTML = badgeHtml(club, 72, 16);
   // Header
   document.getElementById('myclub-name').textContent = club.name || '—';
   document.getElementById('myclub-location').textContent = club.location ? '📍 ' + club.location : '';
@@ -2570,6 +2577,14 @@ function renderMyClub(club, userEmail) {
 // ═══════════════════════════════════════════
 let calYear  = new Date().getFullYear();
 let calMonth = new Date().getMonth();
+
+function toggleCalendarSection() {
+  const body    = document.getElementById('cal-body');
+  const chevron = document.getElementById('cal-chevron');
+  const isOpen  = body.style.display !== 'none';
+  body.style.display    = isOpen ? 'none' : 'block';
+  chevron.textContent   = isOpen ? '▼' : '▲';
+}
 
 function toggleClubDetailsSection() {
   const section  = document.getElementById('myclub-details-section');
