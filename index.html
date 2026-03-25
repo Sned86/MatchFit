@@ -450,61 +450,6 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
      MODALS
 ══════════════════════════════════════════ -->
 
-<!-- Register modal -->
-<div class="modal-backdrop" id="register-modal" onclick="closeModalOnBackdrop(event,'register-modal')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <div class="modal-title">Register your club</div>
-      <div class="modal-sub">Join MatchFit — free to sign up</div>
-      <button class="modal-close" onclick="closeModal('register-modal')">&#10005;</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-section-label" style="border-top:none;padding-top:0">Club Information</div>
-      <div class="form-field">
-        <label class="form-label">Club Name</label>
-        <input class="form-input" type="text" placeholder="e.g. Ashford United FC">
-      </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Town / City</label><input class="form-input" type="text" placeholder="e.g. Ashford"></div>
-        <div class="form-field"><label class="form-label">County</label><input class="form-input" type="text" placeholder="e.g. Kent"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label class="form-label">Step / Level</label>
-          <select class="form-select"><option value="">Select…</option><option>Step 1</option><option>Step 2</option><option>Step 3</option><option>Step 4</option><option>Step 5</option><option>Step 6</option><option>Step 7 &amp; below</option></select>
-        </div>
-        <div class="form-field"><label class="form-label">Ground Name</label><input class="form-input" type="text" placeholder="e.g. The Homeground"></div>
-      </div>
-      <div class="form-section-label">Availability</div>
-      <div class="form-field">
-        <label class="form-label">Can you host home friendlies?</label>
-        <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr">
-          <button class="seg-btn selected" onclick="selectSeg(this,'rh','yes')">Yes</button>
-          <button class="seg-btn" onclick="selectSeg(this,'rh','no')">No</button>
-          <button class="seg-btn" onclick="selectSeg(this,'rh','sometimes')">Sometimes</button>
-        </div>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Can you travel for away friendlies?</label>
-        <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr">
-          <button class="seg-btn selected" onclick="selectSeg(this,'ra','yes')">Yes</button>
-          <button class="seg-btn" onclick="selectSeg(this,'ra','no')">No</button>
-          <button class="seg-btn" onclick="selectSeg(this,'ra','sometimes')">Sometimes</button>
-        </div>
-      </div>
-      <div class="form-section-label">Contact Details</div>
-      <div class="form-field"><label class="form-label">Manager / Secretary Name</label><input class="form-input" type="text" placeholder="Full name"></div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="name@club.co.uk"></div>
-        <div class="form-field"><label class="form-label">Phone</label><input class="form-input" type="tel" placeholder="07700 000000"></div>
-      </div>
-      <div class="form-hint">Contact details only shared once a match is mutually confirmed.</div>
-      <button class="form-submit" onclick="submitRegister()">Register Club &rarr;</button>
-    </div>
-  </div>
-</div>
-
 <!-- Account Settings modal -->
 <div class="modal-backdrop" id="account-modal" onclick="closeModalOnBackdrop(event,'account-modal')">
   <div class="modal-sheet">
@@ -830,8 +775,18 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <div id="auth-pending-panel" style="display:none;flex-direction:column;gap:15px;text-align:center">
       <div style="font-size:40px">⏳</div>
       <div class="auth-title">Registration pending</div>
-      <div class="auth-sub" style="line-height:1.6">Your registration has been submitted and is awaiting approval. You'll be able to access MatchFit once it's been verified.</div>
+      <div class="auth-sub" style="line-height:1.6">Your registration has been submitted and is awaiting approval. You'll receive an email once it's been verified.</div>
       <div class="auth-info visible" id="pending-club-name"></div>
+      <button class="auth-submit" style="background:var(--slate)" onclick="submitSignOut()">Sign Out</button>
+    </div>
+
+    <!-- REJECTED PANEL -->
+    <div id="auth-rejected-panel" style="display:none;flex-direction:column;gap:15px;text-align:center">
+      <div style="font-size:40px">❌</div>
+      <div class="auth-title">Registration not approved</div>
+      <div class="auth-sub" style="line-height:1.6">Unfortunately your registration was not approved.</div>
+      <div class="auth-error visible" id="rejected-reason" style="text-align:left"></div>
+      <div class="auth-sub" style="font-size:12px">If you think this is an error, please contact us.</div>
       <button class="auth-submit" style="background:var(--slate)" onclick="submitSignOut()">Sign Out</button>
     </div>
 
@@ -2355,15 +2310,13 @@ function markAllRead(){
 let regSelectedClub = null;
 
 function showAuthPanel(panel) {
-  document.getElementById('auth-login-panel').style.display    = panel==='login'    ? 'flex' : 'none';
-  document.getElementById('auth-register-panel').style.display = panel==='register' ? 'flex' : 'none';
-  document.getElementById('auth-pending-panel').style.display  = panel==='pending'  ? 'flex' : 'none';
-  document.getElementById('auth-login-panel').style.flexDirection    = 'column';
-  document.getElementById('auth-register-panel').style.flexDirection = 'column';
-  document.getElementById('auth-pending-panel').style.flexDirection  = 'column';
+  ['login','register','pending','rejected'].forEach(p => {
+    const el = document.getElementById('auth-'+p+'-panel');
+    if(el) { el.style.display = panel===p ? 'flex' : 'none'; el.style.flexDirection = 'column'; }
+  });
   // clear errors
   ['login-error','register-error'].forEach(id=>{
-    const el=document.getElementById(id);el.textContent='';el.classList.remove('visible');
+    const el=document.getElementById(id);if(el){el.textContent='';el.classList.remove('visible');}
   });
 }
 
@@ -2796,7 +2749,7 @@ async function handleAuthSession(session) {
   // Look up user_clubs for this user via direct fetch
   let ucRows = null, ucErr = null;
   try {
-    const ucRes = await fetch(`${SUPABASE_URL}/rest/v1/user_clubs?user_id=eq.${userId}&select=club_id,status&limit=1`, {
+    const ucRes = await fetch(`${SUPABASE_URL}/rest/v1/user_clubs?user_id=eq.${userId}&select=club_id,status,rejection_reason&limit=1`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.access_token}` }
     });
     const ucData = await ucRes.json();
@@ -2824,9 +2777,13 @@ async function handleAuthSession(session) {
 
   if (ucRows.status === 'rejected') {
     document.getElementById('auth-wall').style.display = 'flex';
-    showAuthError('login', 'Your registration was not approved. Please contact support.');
-    showAuthPanel('login');
-    await sb.auth.signOut();
+    const reasonEl = document.getElementById('rejected-reason');
+    if (reasonEl) {
+      reasonEl.textContent = ucRows.rejection_reason
+        ? 'Reason: ' + ucRows.rejection_reason
+        : 'No reason was provided. Please contact us for more information.';
+    }
+    showAuthPanel('rejected');
     return;
   }
 
