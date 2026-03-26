@@ -2337,6 +2337,11 @@ function onRegClubSearch(q) {
   q = q.trim().toLowerCase();
   const results = document.getElementById('reg-club-results');
   if (!q) { results.classList.remove('visible'); results.innerHTML=''; return; }
+  if (!CLUBS.length) {
+    results.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--text-muted)">Club list not loaded — please refresh the page and try again.</div>';
+    results.classList.add('visible');
+    return;
+  }
   const matches = CLUBS.filter(c => c.name.toLowerCase().includes(q)).slice(0, 6);
   if (!matches.length) {
     results.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--text-muted)">No clubs found</div>';
@@ -3027,6 +3032,7 @@ async function initApp() {
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
+    if (!Array.isArray(clubRows)) { console.warn('Clubs fetch returned non-array:', clubRows); }
     CLUBS = Array.isArray(clubRows) ? clubRows.map(mapClub) : [];
     console.log(`Loaded ${CLUBS.length} clubs from Supabase`);
   } catch(err) {
