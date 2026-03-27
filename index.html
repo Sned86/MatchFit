@@ -2469,11 +2469,20 @@ async function submitSignOut() {
   }
   currentSession = null;
   sessionStorage.removeItem('mf_session');
-  // Reset app state
+  // Reset state (keep CLUBS — no need to reload them)
   MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
-  CLUBS = []; FIXTURES = [];
+  FIXTURES = []; AVAILABILITY = [];
+  comparing = []; shortlist = []; results = []; searched = false;
+  // Reset UI
+  const badgeWrap = document.getElementById('myclub-badge-wrap');
+  if(badgeWrap) badgeWrap.innerHTML = '';
+  document.getElementById('myclub-name').textContent = '—';
+  document.getElementById('myclub-location').textContent = '';
+  document.getElementById('myclub-league').textContent = '';
+  document.getElementById('account-email').value = '';
+  document.getElementById('account-club').value = '';
+  document.getElementById('account-modal-club').textContent = '—';
   document.getElementById('auth-wall').style.display = 'flex';
-  document.getElementById('header-club-btn').textContent = '';
   showAuthPanel('login');
 }
 
@@ -2744,16 +2753,6 @@ async function handleAuthSession(session) {
   FIXTURES = [];
   AVAILABILITY = [];
   comparing = []; shortlist = []; results = []; searched = false;
-  const badgeWrap = document.getElementById('myclub-badge-wrap');
-  if(badgeWrap) badgeWrap.innerHTML = '';
-  document.getElementById('myclub-name').textContent = '—';
-  document.getElementById('myclub-location').textContent = '';
-  document.getElementById('myclub-league').textContent = '';
-  document.getElementById('account-email').value = '';
-  document.getElementById('account-club').value = '';
-  document.getElementById('account-modal-club').textContent = '—';
-  renderMyFixtures();
-  renderCalendar();
 
   if (!userId) {
     document.getElementById('auth-wall').style.display = 'flex';
