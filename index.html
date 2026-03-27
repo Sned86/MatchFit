@@ -1993,16 +1993,65 @@ function selectOfferKickoff(btn,val){
   document.querySelectorAll('#offer-kickoff-group .kickoff-pill').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');offerKickoff=val;
 }
-function submitOffer(){
+async function submitOffer(){
   const needDate    = !offerContext || !offerContext.date;
   const needKickoff = !offerContext || !offerContext.kickoff;
   const needVenue   = !offerContext || !offerContext.venue;
   if(needDate    && !offerDate)   { toast('Please confirm the date first');      return; }
   if(needKickoff && !offerKickoff){ toast('Please confirm the kick-off time');   return; }
   if(needVenue   && !offerVenue)  { toast('Please confirm home or away');        return; }
-  closeModal('offer-modal');
-  closeResults();
-  toast(`Match offered to ${currentOfferClub.name} ✓`);
+
+  const btn = document.getElementById('offer-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        club_a_id:              MY.id,
+        club_b_id:              currentOfferClub.id,
+        proposed_date:          offerDate,
+        proposed_time:          offerKickoff ? offerKickoff + ':00' : null,
+        venue_type:             offerVenue,
+        notes:                  document.getElementById('offer-msg').value.trim() || null,
+        status:                 'offered',
+        ball_in_court_id:       currentOfferClub.id,
+        last_action_by_club_id: MY.id
+      })
+    });
+
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.message || 'Failed to send offer');
+    }
+
+    closeModal('offer-modal');
+    closeResults();
+    toast(`Match offered to ${currentOfferClub.name} ✓`);
+
+    // Reload fixtures and refresh UI
+    const fixRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
+    );
+    const fixRows = await fixRes.json();
+    FIXTURES = Array.isArray(fixRows) ? fixRows.map(mapFixture) : [];
+    renderMyFixtures();
+    renderCalendar();
+
+  } catch(err) {
+    toast('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Offer ⚽';
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2469,20 +2518,11 @@ async function submitSignOut() {
   }
   currentSession = null;
   sessionStorage.removeItem('mf_session');
-  // Reset state (keep CLUBS — no need to reload them)
+  // Reset app state
   MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
-  FIXTURES = []; AVAILABILITY = [];
-  comparing = []; shortlist = []; results = []; searched = false;
-  // Reset UI
-  const badgeWrap = document.getElementById('myclub-badge-wrap');
-  if(badgeWrap) badgeWrap.innerHTML = '';
-  document.getElementById('myclub-name').textContent = '—';
-  document.getElementById('myclub-location').textContent = '';
-  document.getElementById('myclub-league').textContent = '';
-  document.getElementById('account-email').value = '';
-  document.getElementById('account-club').value = '';
-  document.getElementById('account-modal-club').textContent = '—';
+  CLUBS = []; FIXTURES = [];
   document.getElementById('auth-wall').style.display = 'flex';
+  document.getElementById('header-club-btn').textContent = '';
   showAuthPanel('login');
 }
 
@@ -2745,14 +2785,9 @@ async function saveClubDetails() {
 }
 
 async function handleAuthSession(session) {
+  // Accept either a Supabase session object or raw token response
   const userId = session?.user?.id;
   const userEmail = session?.user?.email;
-
-  // Always reset app state before loading a new session
-  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
-  FIXTURES = [];
-  AVAILABILITY = [];
-  comparing = []; shortlist = []; results = []; searched = false;
 
   if (!userId) {
     document.getElementById('auth-wall').style.display = 'flex';
