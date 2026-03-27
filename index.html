@@ -2337,11 +2337,6 @@ function onRegClubSearch(q) {
   q = q.trim().toLowerCase();
   const results = document.getElementById('reg-club-results');
   if (!q) { results.classList.remove('visible'); results.innerHTML=''; return; }
-  if (!CLUBS.length) {
-    results.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--text-muted)">Club list not loaded — please refresh the page and try again.</div>';
-    results.classList.add('visible');
-    return;
-  }
   const matches = CLUBS.filter(c => c.name.toLowerCase().includes(q)).slice(0, 6);
   if (!matches.length) {
     results.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--text-muted)">No clubs found</div>';
@@ -2428,31 +2423,25 @@ async function submitRegister() {
     });
     signUpData = await signUpRes.json();
   } catch(e) {
-    console.error('Register error:', e); showAuthError('register', 'Error: ' + e.message);
+    console.error('Register error:', err); showAuthError('register', 'Error: ' + err.message);
     setAuthLoading('register-btn', false); return;
   }
 
   if (!signUpRes.ok || signUpData.error) {
-    const msg = signUpData.error_description || signUpData.msg || signUpData.message || '';
-    if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists')) {
-      showAuthError('register', 'An account with this email already exists. Please sign in instead.');
-    } else {
-      showAuthError('register', msg || 'Registration failed — please try again.');
-    }
+    showAuthError('register', signUpData.error_description || signUpData.message || 'Registration failed.');
     setAuthLoading('register-btn', false); return;
   }
 
   const userId = signUpData.user?.id;
   if (!userId) { showAuthError('register','Registration failed — please try again.'); setAuthLoading('register-btn', false); return; }
 
-  // 2. Insert user_clubs row with pending status
-  const authToken = signUpData.access_token || SUPABASE_KEY;
+  // 2. Insert user_clubs row with pending status via direct fetch
   const ucRes = await fetch(`${SUPABASE_URL}/rest/v1/user_clubs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${authToken}`
+      'Authorization': `Bearer ${signUpData.access_token || SUPABASE_KEY}`
     },
     body: JSON.stringify({ user_id: userId, club_id: regSelectedClub.id, status: 'pending' })
   });
@@ -2463,17 +2452,12 @@ async function submitRegister() {
   }
 
   setAuthLoading('register-btn', false);
-
-  // Store session if Supabase returned one (happens when email confirmation is off)
+  // Store session if returned and show pending screen
   if (signUpData.access_token) {
     currentSession = signUpData;
     sessionStorage.setItem('mf_session', JSON.stringify(signUpData));
   }
-
-  // Show pending screen directly after registration
-  document.getElementById('auth-wall').style.display = 'flex';
-  document.getElementById('pending-club-name').textContent = `Club requested: ${regSelectedClub.name}`;
-  showAuthPanel('pending');
+  await handleAuthSession(signUpData.access_token ? signUpData : null);
 }
 
 async function submitSignOut() {
@@ -2489,7 +2473,7 @@ async function submitSignOut() {
   MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
   CLUBS = []; FIXTURES = [];
   document.getElementById('auth-wall').style.display = 'flex';
-  // header cleared via auth wall display
+  document.getElementById('header-club-btn').textContent = '';
   showAuthPanel('login');
 }
 
@@ -2752,9 +2736,24 @@ async function saveClubDetails() {
 }
 
 async function handleAuthSession(session) {
-  // Accept either a Supabase session object or raw token response
   const userId = session?.user?.id;
   const userEmail = session?.user?.email;
+
+  // Always reset app state before loading a new session
+  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
+  FIXTURES = [];
+  AVAILABILITY = [];
+  comparing = []; shortlist = []; results = []; searched = false;
+  const badgeWrap = document.getElementById('myclub-badge-wrap');
+  if(badgeWrap) badgeWrap.innerHTML = '';
+  document.getElementById('myclub-name').textContent = '—';
+  document.getElementById('myclub-location').textContent = '';
+  document.getElementById('myclub-league').textContent = '';
+  document.getElementById('account-email').value = '';
+  document.getElementById('account-club').value = '';
+  document.getElementById('account-modal-club').textContent = '—';
+  renderMyFixtures();
+  renderCalendar();
 
   if (!userId) {
     document.getElementById('auth-wall').style.display = 'flex';
@@ -3032,7 +3031,6 @@ async function initApp() {
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
-    if (!Array.isArray(clubRows)) { console.warn('Clubs fetch returned non-array:', clubRows); }
     CLUBS = Array.isArray(clubRows) ? clubRows.map(mapClub) : [];
     console.log(`Loaded ${CLUBS.length} clubs from Supabase`);
   } catch(err) {
