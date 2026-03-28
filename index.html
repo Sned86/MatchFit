@@ -1536,6 +1536,7 @@ function renderResultsSheet(){
             
             <span class="tag tag-league">${c.league}</span>
           </div>
+          ${c.availableNotes ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-style:italic">💬 "${c.availableNotes}"</div>` : ''}
         </div>
       </div>
       <div class="result-stats-row">
@@ -2093,12 +2094,13 @@ function declineOffer(){
 function buildNrKickoffPills(isoDate) {
   const group = document.getElementById('nr-kickoff-group');
   if (!group) return;
-  const weekendTimes = ['12:00','13:00','14:00','15:00'];
+  const weekendTimes = ['11:00','12:00','13:00','14:00','15:00'];
   const weekdayTimes = ['18:30','19:00','19:30','19:45'];
-  let times = weekendTimes; // default
+  const allTimes     = ['11:00','12:00','13:00','14:00','15:00','18:30','19:00','19:30','19:45'];
+  let times = allTimes; // default: show all until a date is picked
   if (isoDate) {
     const d = new Date(isoDate + 'T12:00:00');
-    const dow = d.getDay();
+    const dow = d.getDay(); // 0=Sun, 6=Sat
     times = (dow === 0 || dow === 6) ? weekendTimes : weekdayTimes;
   }
   group.innerHTML = `<button class="kickoff-pill any-pill selected" onclick="toggleNrKickoff(this,'any')">Any time</button>` +
@@ -2900,6 +2902,7 @@ function mapClub(row) {
     venueAvail:    null,
     kickoffAvail:  null,
     availableDate: null,
+    availableNotes: null,
   };
 }
 
@@ -2942,10 +2945,12 @@ async function loadAvailability() {
         c.availableDate  = avail[0].date;
         c.venueAvail     = avail[0].venue;
         c.kickoffAvail   = avail[0].kickoff_pref ? avail[0].kickoff_pref[0] : null;
+        c.availableNotes = avail[0].notes || null;
       } else {
         c.availableDate  = null;
         c.venueAvail     = null;
         c.kickoffAvail   = null;
+        c.availableNotes = null;
       }
     });
   } catch(err) {
@@ -3028,8 +3033,8 @@ function renderMyFixtures() {
         const oppName = opp ? opp.name : 'Unknown club';
         let venueLabel;
         if(f.venue === 'neutral')       venueLabel = '⚖️ Neutral';
-        else if(f.venue === 'home_a')   venueLabel = isReceived ? '🏠 Home (we host)' : '🚌 Away (we travel)';
-        else                            venueLabel = isReceived ? '🚌 Away (we travel)' : '🏠 Home (we host)';
+        else if(f.venue === 'home_a')   venueLabel = isReceived ? '🚌 Away (we travel)' : '🏠 Home (we host)';
+        else                            venueLabel = isReceived ? '🏠 Home (we host)' : '🚌 Away (we travel)';
 
         const card = document.createElement('div');
         card.className = 'req-card';
@@ -3094,7 +3099,6 @@ function renderMyFixtures() {
       </div>`;
     } else {
       myConfirmed.forEach(f => {
-        const isHome  = f.venue === 'home_a' ? f.homeId === MY.id : f.awayId === MY.id;
         const oppId   = f.homeId === MY.id ? f.awayId : f.homeId;
         const opp     = CLUBS.find(c => c.id === oppId);
         const oppName = opp ? opp.name : 'Unknown club';
@@ -3129,21 +3133,41 @@ function renderMyFixtures() {
 
 async function acceptOffer(fixtureId) {
   try {
+    // 1. Confirm the fixture
     const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
       },
       body: JSON.stringify({ status: 'confirmed', ball_in_court_id: null })
     });
     if(!res.ok) throw new Error('Failed to accept offer');
+    const [confirmed] = await res.json();
+
+    // 2. Cancel the matching availability slot so it leaves the Open tab
+    if(confirmed?.proposed_date) {
+      await fetch(`${SUPABASE_URL}/rest/v1/availability?club_id=eq.${MY.id}&date=eq.${confirmed.proposed_date}&status=eq.open`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+        },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+    }
+
     toast('Fixture confirmed! ✓');
-    const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
-    );
+
+    // 3. Reload both fixtures and availability
+    const [fixRes, _] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }),
+      loadAvailability()
+    ]);
     FIXTURES = (await fixRes.json()).map(mapFixture);
     renderMyFixtures();
     renderCalendar();
