@@ -2027,7 +2027,7 @@ async function submitOffer(){
         club_b_id:              currentOfferClub.id,
         proposed_date:          offerDate,
         proposed_time:          offerKickoff ? offerKickoff + ':00' : null,
-        venue_type:             offerVenue==='home'?'home_a':offerVenue==='away'?'home_b':'neutral',
+        venue_type:             offerVenue==='home'?'home_b':offerVenue==='away'?'home_a':'neutral',
         notes:                  document.getElementById('offer-msg').value.trim() || null,
         status:                 'offered',
         ball_in_court_id:       currentOfferClub.id,
