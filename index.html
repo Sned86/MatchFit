@@ -1245,13 +1245,20 @@ function buildUpcomingDates(){
   });
   return found.sort((a,b)=>a-b);
 }
+// Convert a local Date object to YYYY-MM-DD using local time (not UTC)
+function toLocalISO(d){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 
 function renderDateStrip(containerId, selIso, onClickFn){
   const strip=document.getElementById(containerId);
   const dates=buildUpcomingDates();
   strip.innerHTML=`<div class="date-row" style="grid-template-columns:repeat(4,1fr)">` +
     dates.map(dt=>{
-      const iso=dt.toISOString().split('T')[0];
+      const iso=toLocalISO(dt);
       return `<button class="date-btn${selIso===iso?' selected':''}" onclick="${onClickFn}(this,'${iso}')">
         <div class="date-btn-day">${DAY_NAMES[dt.getDay()]}</div>
         <div class="date-btn-date">${dt.getDate()}</div>
@@ -1266,7 +1273,7 @@ function buildDateStrip(){
   const dates=buildUpcomingDates();
   strip.innerHTML=`<div class="date-row" style="grid-template-columns:repeat(4,1fr)">` +
     dates.map(dt=>{
-      const iso=dt.toISOString().split('T')[0];
+      const iso=toLocalISO(dt);
       const sel=selDates.includes(iso);
       return `<button class="date-btn${sel?' selected':''}" onclick="toggleDate(this,'${iso}')">
         <div class="date-btn-day">${DAY_NAMES[dt.getDay()]}</div>
@@ -1274,7 +1281,7 @@ function buildDateStrip(){
         <div class="date-btn-month">${MONTH_NAMES[dt.getMonth()]}</div>
       </button>`;
     }).join('') + `</div>`;
-  document.getElementById('custom-date-input').min=new Date().toISOString().split('T')[0];
+  document.getElementById('custom-date-input').min=toLocalISO(new Date());
 }
 
 function toggleDate(btn, iso){
@@ -1749,7 +1756,7 @@ function openOfferModal(clubId, ctxDate, ctxKickoff, ctxVenue){
   document.getElementById('offer-modal-title').textContent=`Offer a Match`;
   document.getElementById('offer-modal-sub').textContent=`Propose a fixture to ${currentOfferClub.name}`;
 
-  const venueMap = {home:'🏠 Home (we host)', away:'🚌 Away (we travel)', neutral:'⚖️ Neutral venue', either:'🔄 Home or Away'};
+  const venueMap = {home:'🚌 Away (we travel)', away:'🏠 Home (we host)', neutral:'⚖️ Neutral venue', either:'🔄 Home or Away'};
   const contextDate    = offerDate    ? fmtDate(offerDate)       : 'To be confirmed';
   const contextKickoff = offerKickoff ? offerKickoff              : 'To be confirmed';
   const contextVenue   = offerVenue   ? venueMap[offerVenue]      : 'To be confirmed';
@@ -1811,7 +1818,7 @@ function openOfferModal(clubId, ctxDate, ctxKickoff, ctxVenue){
 }
 
 function refreshBannerSummary(){
-  const venueMap = {home:'🏠 Home', away:'🚌 Away', neutral:'⚖️ Neutral'};
+  const venueMap = {home:'🚌 Away (we travel)', away:'🏠 Home (we host)', neutral:'⚖️ Neutral'};
   const open = 'color:var(--amber);font-style:italic';
   const set  = 'color:var(--navy)';
   const el = (id) => document.getElementById(id);
@@ -1854,7 +1861,7 @@ function buildOfferRequiredFields(){
         </button><div></div>
       </div>
       <div class="custom-date-wrap" id="offer-req-custom-wrap">
-        <input type="date" class="custom-date-input" id="offer-req-date-input" onchange="selectOfferReqCustomDate(this.value)" min="${new Date().toISOString().split('T')[0]}">
+        <input type="date" class="custom-date-input" id="offer-req-date-input" onchange="selectOfferReqCustomDate(this.value)" min="${toLocalISO(new Date())}">
       </div>`;
     wrap.appendChild(f);
     renderDateStrip('offer-req-date-strip', null, 'selectOfferReqDate');
@@ -2122,7 +2129,7 @@ function openNrCustomDate(){
   document.getElementById('nr-btn-custom').classList.add('selected');
   document.getElementById('nr-custom-date-wrap').classList.add('visible');
   document.getElementById('nr-custom-date-input').focus();nrDate=null;updateNrSubmitBtn();
-  document.getElementById('nr-custom-date-input').min=new Date().toISOString().split('T')[0];
+  document.getElementById('nr-custom-date-input').min=toLocalISO(new Date());
 }
 function selectNrCustomDate(iso){
   if(!iso)return;nrDate=iso;
@@ -3220,7 +3227,7 @@ function openEditAvailability(availId) {
       if(btn.getAttribute('onclick')?.includes(a.date)) btn.classList.add('selected');
     });
     // If date not in strip, show it in custom button
-    const stripDates = buildUpcomingDates().map(d => d.toISOString().split('T')[0]);
+    const stripDates = buildUpcomingDates().map(d => toLocalISO(d));
     if(!stripDates.includes(a.date)){
       const d = new Date(a.date+'T12:00:00');
       document.getElementById('nr-btn-custom').innerHTML =
