@@ -3035,6 +3035,15 @@ function renderMyFixtures() {
     } else {
       myOffers.forEach(f => {
         const isReceived = f.awayId === MY.id;
+        console.log('OFFER DEBUG', {
+          fixtureId: f.id,
+          homeId: f.homeId,
+          awayId: f.awayId,
+          myId: MY.id,
+          isReceived,
+          venue: f.venue,
+          status: f.status
+        });
         const oppId   = isReceived ? f.homeId : f.awayId;
         const opp     = CLUBS.find(c => c.id === oppId);
         const oppName = opp ? opp.name : 'Unknown club';
