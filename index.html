@@ -2062,7 +2062,32 @@ function submitCounter(){closeModal('counter-modal');toast('Counter offer sent t
 // ═══════════════════════════════════════════
 // MY AVAILABILITY (requests)
 // ═══════════════════════════════════════════
-
+function confirmMatch(){
+  document.getElementById('aug2-status').className='status-pill status-confirmed';
+  document.getElementById('aug2-status').textContent='Confirmed';
+  document.getElementById('aug2-detail').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="match-club-logo">FA</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy)">Folkestone Athletic FC</div>
+        <div style="font-size:12px;color:var(--green-dark);font-weight:600;margin-top:2px">✅ Fixture confirmed — both clubs notified</div>
+      </div>
+    </div>`;
+  // Add cancel button
+  const footer=document.createElement('div');footer.className='req-footer-row';
+  footer.innerHTML=`<button class="btn-cancel-game" onclick="openCancelModal('Sat 2 Aug · Away · 14:00 vs Folkestone Athletic')">✕ Cancel Fixture</button>`;
+  document.getElementById('aug2-detail').after(footer);
+  toast('Fixture confirmed with Folkestone Athletic');
+}
+function declineOffer(){
+  document.getElementById('aug2-status').className='status-pill status-searching';
+  document.getElementById('aug2-status').textContent='Searching';
+  document.getElementById('aug2-detail').innerHTML='';
+  const row=document.createElement('div');row.className='searching-row';
+  row.innerHTML='<div class="pulse-dot"></div>Offer declined — still searching for clubs…';
+  document.getElementById('aug2-detail').replaceWith(row);
+  toast('Offer declined');
+}
 
 // ── New availability request ──
 function buildNrKickoffPills(isoDate) {
@@ -2827,7 +2852,7 @@ async function handleAuthSession(session) {
     document.getElementById('account-modal-club').textContent = club.name;
     renderMyClub(club, userEmail);
     await loadAvailability();
-    // Reload fixtures with authenticated token so RLS allows club_b rows to be seen
+    // Reload fixtures with authenticated token so RLS returns rows for both club_a and club_b
     try {
       const fixRes = await fetch(
         `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
@@ -2986,37 +3011,31 @@ function renderMyFixtures() {
   const offersPanel = document.getElementById('subtab-offer');
   if(offersPanel) {
     offersPanel.innerHTML = '';
-
     const myOffers = FIXTURES.filter(f =>
       (f.homeId === MY.id || f.awayId === MY.id) && f.status === 'offered'
     );
-
     if(!myOffers.length) {
       offersPanel.innerHTML = `<div class="empty-state">
         <div class="empty-icon">📨</div>
         <div class="empty-title">No offers yet</div>
-        <div class="empty-sub">Match offers from other clubs will appear here. Fixtures under negotiation will also show in this tab.</div>
+        <div class="empty-sub">Match offers from other clubs will appear here.</div>
       </div>`;
     } else {
       myOffers.forEach(f => {
-        const isReceived = f.awayId === MY.id; // club_b receives the offer
+        const isReceived = f.awayId === MY.id;
         const oppId   = isReceived ? f.homeId : f.awayId;
         const opp     = CLUBS.find(c => c.id === oppId);
         const oppName = opp ? opp.name : 'Unknown club';
-
-        const venueMap = {home_a:'🏠 Home (we host)', home_b:'🚌 Away (we travel)', neutral:'⚖️ Neutral'};
-        // Flip venue label depending on perspective
         let venueLabel;
-        if(f.venue === 'neutral') venueLabel = '⚖️ Neutral';
-        else if(f.venue === 'home_a') venueLabel = isReceived ? '🏠 Home (we host)' : '🚌 Away (we travel)';
-        else venueLabel = isReceived ? '🚌 Away (we travel)' : '🏠 Home (we host)';
+        if(f.venue === 'neutral')       venueLabel = '⚖️ Neutral';
+        else if(f.venue === 'home_a')   venueLabel = isReceived ? '🏠 Home (we host)' : '🚌 Away (we travel)';
+        else                            venueLabel = isReceived ? '🚌 Away (we travel)' : '🏠 Home (we host)';
 
         const card = document.createElement('div');
         card.className = 'req-card';
         card.style.marginBottom = '10px';
 
         if(isReceived) {
-          // Team A — received an offer, can accept or decline
           card.innerHTML = `
             <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
               <div class="req-date">${fmtDateFull(f.date)}</div>
@@ -3036,7 +3055,6 @@ function renderMyFixtures() {
               </div>
             </div>`;
         } else {
-          // Team B — sent the offer, awaiting response
           card.innerHTML = `
             <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
               <div class="req-date">${fmtDateFull(f.date)}</div>
@@ -3060,6 +3078,53 @@ function renderMyFixtures() {
       });
     }
   }
+
+  // ── CONFIRMED TAB ──
+  const confirmedPanel = document.getElementById('subtab-confirmed');
+  if(confirmedPanel) {
+    confirmedPanel.innerHTML = '';
+    const myConfirmed = FIXTURES.filter(f =>
+      (f.homeId === MY.id || f.awayId === MY.id) && f.status === 'confirmed'
+    );
+    if(!myConfirmed.length) {
+      confirmedPanel.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <div class="empty-title">No confirmed fixtures</div>
+        <div class="empty-sub">Fixtures confirmed with other clubs will appear here.</div>
+      </div>`;
+    } else {
+      myConfirmed.forEach(f => {
+        const isHome  = f.venue === 'home_a' ? f.homeId === MY.id : f.awayId === MY.id;
+        const oppId   = f.homeId === MY.id ? f.awayId : f.homeId;
+        const opp     = CLUBS.find(c => c.id === oppId);
+        const oppName = opp ? opp.name : 'Unknown club';
+        let venueLabel;
+        if(f.venue === 'neutral')     venueLabel = '⚖️ Neutral venue';
+        else if(f.venue === 'home_a') venueLabel = f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
+        else                          venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
+
+        const card = document.createElement('div');
+        card.className = 'req-card';
+        card.style.marginBottom = '10px';
+        card.innerHTML = `
+          <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="req-date">${fmtDateFull(f.date)}</div>
+            <div class="status-pill status-confirmed">Confirmed</div>
+          </div>
+          <div style="padding:10px 12px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
+              ${opp ? badgeHtml(opp, 34, 8) : ''}
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
+                <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
+              </div>
+            </div>
+            <button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(f.date)} vs ${oppName}')">✕ Cancel Fixture</button>
+          </div>`;
+        confirmedPanel.appendChild(card);
+      });
+    }
+  }
 }
 
 async function acceptOffer(fixtureId) {
@@ -3075,7 +3140,6 @@ async function acceptOffer(fixtureId) {
     });
     if(!res.ok) throw new Error('Failed to accept offer');
     toast('Fixture confirmed! ✓');
-    // Reload fixtures
     const fixRes = await fetch(
       `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
