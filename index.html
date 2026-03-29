@@ -2046,7 +2046,7 @@ async function submitOffer(){
 
     // Reload fixtures and refresh UI
     const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
     );
     const fixRows = await fixRes.json();
@@ -2864,7 +2864,7 @@ async function handleAuthSession(session) {
     // Reload fixtures with authenticated token so RLS returns rows for both club_a and club_b
     try {
       const fixRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+        `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes&order=proposed_date.asc`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.access_token}` } }
       );
       const fixRows = await fixRes.json();
@@ -2922,6 +2922,7 @@ function mapFixture(row) {
     kickoff:  row.proposed_time ? row.proposed_time.slice(0,5) : null,
     status:   row.status,
     venue:    row.venue_type,
+    notes:    row.notes || null,
   };
 }
 
@@ -3059,6 +3060,7 @@ function renderMyFixtures() {
                 <div>
                   <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
                   <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
+                  ${f.notes ? `<div class="req-meta" style="margin-top:3px;font-style:italic">"${f.notes}"</div>` : ''}
                 </div>
               </div>
               <div style="display:flex;gap:7px">
@@ -3078,6 +3080,7 @@ function renderMyFixtures() {
                 <div>
                   <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
                   <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
+                  ${f.notes ? `<div class="req-meta" style="margin-top:3px;font-style:italic">"${f.notes}"</div>` : ''}
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:7px;margin-top:9px">
@@ -3128,6 +3131,7 @@ function renderMyFixtures() {
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
                 <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
+                ${f.notes ? `<div class="req-meta" style="margin-top:3px;font-style:italic">"${f.notes}"</div>` : ''}
               </div>
             </div>
             <button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(f.date)} vs ${oppName}')">✕ Cancel Fixture</button>
@@ -3171,7 +3175,7 @@ async function acceptOffer(fixtureId) {
 
     // 3. Reload both fixtures and availability
     const [fixRes, _] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes&order=proposed_date.asc`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }),
       loadAvailability()
     ]);
@@ -3197,7 +3201,7 @@ async function declineOffer(fixtureId) {
     if(!res.ok) throw new Error('Failed to decline offer');
     toast('Offer declined');
     const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
     );
     FIXTURES = (await fixRes.json()).map(mapFixture);
@@ -3295,7 +3299,7 @@ async function initApp() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const fixRows = await res.json();
