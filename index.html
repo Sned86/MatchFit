@@ -2112,7 +2112,7 @@ async function submitOffer(){
 
     // Reload fixtures and refresh UI
     const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
     );
     const fixRows = await fixRes.json();
@@ -2930,7 +2930,7 @@ async function handleAuthSession(session) {
     // Reload fixtures with authenticated token so RLS returns rows for both club_a and club_b
     try {
       const fixRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+        `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id&order=proposed_date.asc`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.access_token}` } }
       );
       const fixRows = await fixRes.json();
@@ -3282,7 +3282,7 @@ async function acceptOffer(fixtureId) {
 
     // 3. Reload both fixtures and availability
     const [fixRes, _] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id&order=proposed_date.asc`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }),
       loadAvailability()
     ]);
@@ -3554,7 +3554,7 @@ async function declineOffer(fixtureId) {
     if(!res.ok) throw new Error('Failed to decline offer');
     toast('Offer declined');
     const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
     );
     FIXTURES = (await fixRes.json()).map(mapFixture);
@@ -3652,7 +3652,7 @@ async function initApp() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const fixRows = await res.json();
