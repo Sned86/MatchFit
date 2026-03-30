@@ -3359,17 +3359,46 @@ function renderMyFixtures() {
         card.style.marginBottom = '10px';
 
         if(isReceived) {
+          // Check if any details differ from our original availability posting
+          const myAvailForDate = AVAILABILITY.find(a => a.club_id === MY.id && a.date === f.date && a.status === 'open');
+          const myOrigKickoff = myAvailForDate?.kickoff_pref?.[0] || null;
+          const myOrigVenue   = myAvailForDate?.venue || null;
+
+          // Detect differences
+          const kickoffDiffers = myOrigKickoff && f.kickoff && f.kickoff !== myOrigKickoff;
+          const venueDiffers   = myOrigVenue && myOrigVenue !== 'either' && (
+            (myOrigVenue === 'home' && f.venue !== 'home_b') ||
+            (myOrigVenue === 'away' && f.venue !== 'home_a')
+          );
+
+          const diffParts = [
+            kickoffDiffers ? `kick-off: <strong>${f.kickoff}</strong> (you posted ${myOrigKickoff})` : null,
+            venueDiffers   ? `venue differs from your posting` : null,
+          ].filter(Boolean);
+
+          const diffBanner = diffParts.length
+            ? `<div style="margin-bottom:9px;padding:8px 10px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-sm);font-size:11px;color:var(--amber-dark)">
+                ⚠️ Different to your availability: ${diffParts.join(' · ')}
+               </div>`
+            : '';
+
+          const notesHtml = f.notes
+            ? `<div class="req-meta" style="margin-top:4px;font-style:italic">"${f.notes}"</div>`
+            : '';
+
           card.innerHTML = `
             <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
               <div class="req-date">${fmtDateFull(f.date)}</div>
               <div class="status-pill status-shortlist">Offer received</div>
             </div>
             <div style="padding:10px 12px">
+              ${diffBanner}
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
                 ${opp ? badgeHtml(opp, 34, 8) : ''}
                 <div>
                   <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
                   <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
+                  ${notesHtml}
                 </div>
               </div>
               <div style="display:flex;gap:7px">
