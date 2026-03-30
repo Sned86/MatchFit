@@ -685,72 +685,6 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </div>
 
 
-<!-- Amendment modal -->
-<div class="modal-backdrop" id="amend-modal" onclick="closeModalOnBackdrop(event,'amend-modal')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <div class="modal-title">Propose Amendment</div>
-      <div class="modal-sub" id="amend-modal-sub">Suggest a change to the confirmed fixture</div>
-      <button class="modal-close" onclick="closeModal('amend-modal')">&#10005;</button>
-    </div>
-    <div class="modal-body">
-      <div id="amend-current-details" style="padding:11px 13px;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted)"></div>
-      <div class="form-field" id="amend-date-field">
-        <label class="form-label">Propose New Date <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <div class="date-strip" id="amend-date-strip"></div>
-        <div class="date-extra-row" style="margin-top:5px">
-          <button class="date-any-btn" id="amend-btn-custom" onclick="openAmendCustomDate()">
-            <div class="date-any-label">&#128467; Pick a Date</div>
-            <div class="date-any-sub">Choose from calendar</div>
-          </button>
-          <button class="date-any-btn" id="amend-btn-keep" onclick="clearAmendDate()" style="border-style:solid;background:var(--green-xlight);border-color:var(--green)">
-            <div class="date-any-label" style="color:var(--green-dark)">Keep current</div>
-            <div class="date-any-sub">No change to date</div>
-          </button>
-        </div>
-        <div class="custom-date-wrap" id="amend-custom-date-wrap">
-          <input type="date" class="custom-date-input" id="amend-custom-date-input" onchange="selectAmendCustomDate(this.value)">
-        </div>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Propose New Kick-off <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <div class="kickoff-group" id="amend-kickoff-group">
-          <button class="kickoff-pill any-pill selected" onclick="selectAmendKickoff(this,null)">Keep current</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'11:00')">11:00</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'12:00')">12:00</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'13:00')">13:00</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'14:00')">14:00</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'14:30')">14:30</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'15:00')">15:00</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'19:00')">19:00</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'19:30')">19:30</button>
-          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'19:45')">19:45</button>
-        </div>
-        <div class="kickoff-custom-wrap" style="margin-top:6px">
-          <input type="time" class="kickoff-custom-input" id="amend-kickoff-custom" step="900" onchange="selectAmendKickoffCustom(this.value)">
-          <span style="font-size:11px;color:var(--slate-light)">Other time</span>
-        </div>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Propose New Venue <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr 1fr" id="amend-venue-seg">
-          <button class="seg-btn selected" onclick="selectAmendVenue(this,null)" style="padding:8px 4px">Keep</button>
-          <button class="seg-btn" onclick="selectAmendVenue(this,'home_a')" style="padding:8px 4px" id="amend-venue-home_a">🏠 Home</button>
-          <button class="seg-btn" onclick="selectAmendVenue(this,'home_b')" style="padding:8px 4px" id="amend-venue-home_b">🚌 Away</button>
-          <button class="seg-btn" onclick="selectAmendVenue(this,'neutral')" style="padding:8px 4px">⚖️ Neutral</button>
-        </div>
-      </div>
-      <div class="form-field">
-        <label class="form-label">Message <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <textarea class="form-input" id="amend-msg" rows="2" placeholder="e.g. Can we move it back an hour?" style="resize:none;line-height:1.5"></textarea>
-      </div>
-      <div class="form-hint">The other club will be notified and can accept or decline your proposed changes.</div>
-      <button class="form-submit" id="amend-submit-btn" onclick="submitAmendment()">Send Amendment Proposal</button>
-    </div>
-  </div>
-</div>
-
 <div class="team-profile-overlay" id="team-profile-overlay" onclick="closeTeamProfileOnBackdrop(event)">
   <div class="team-profile-sheet">
     <div class="tp-handle"></div>
@@ -1175,6 +1109,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentSession = null;
 let MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null };
+const FIXTURES_SELECT = 'id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined';
 let CLUBS = [];
 let FIXTURES = [];
 let AVAILABILITY = [];
@@ -2112,7 +2047,7 @@ async function submitOffer(){
 
     // Reload fixtures and refresh UI
     const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
     );
     const fixRows = await fixRes.json();
@@ -2930,7 +2865,7 @@ async function handleAuthSession(session) {
     // Reload fixtures with authenticated token so RLS returns rows for both club_a and club_b
     try {
       const fixRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
+        `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${session.access_token}` } }
       );
       const fixRows = await fixRes.json();
@@ -2981,20 +2916,20 @@ function mapClub(row) {
 
 function mapFixture(row) {
   return {
-    id:            row.id,
-    homeId:        row.club_a_id,
-    awayId:        row.club_b_id,
-    date:          row.proposed_date,
-    kickoff:       row.proposed_time ? row.proposed_time.slice(0,5) : null,
-    status:        row.status,
-    venue:         row.venue_type,
-    notes:         row.notes || null,
-    amendedDate:   row.amended_date || null,
-    amendedKickoff:row.amended_time ? row.amended_time.slice(0,5) : null,
-    amendedVenue:  row.amended_venue || null,
-    amendedBy:     row.amended_by_club_id || null,
-    amendedNote:   row.amended_note || null,
-    amendDeclined: row.amendment_declined || false,
+    id:                row.id,
+    homeId:            row.club_a_id,
+    awayId:            row.club_b_id,
+    date:              row.proposed_date,
+    kickoff:           row.proposed_time ? row.proposed_time.slice(0,5) : null,
+    status:            row.status,
+    venue:             row.venue_type,
+    notes:             row.notes || null,
+    amendedDate:       row.amended_date || null,
+    amendedTime:       row.amended_time ? row.amended_time.slice(0,5) : null,
+    amendedVenue:      row.amended_venue || null,
+    amendedByClubId:   row.amended_by_club_id || null,
+    amendedNote:       row.amended_note || null,
+    amendmentDeclined: row.amendment_declined || false,
   };
 }
 
@@ -3064,8 +2999,8 @@ function renderMyFixtures() {
           f.awayId === MY.id && f.date === a.date && f.status === 'offered'
         );
         const offerBadge = incomingOffers.length
-          ? `<div onclick="switchToOffersTab()" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:20px;font-size:11px;font-weight:700;color:var(--amber-dark);cursor:pointer">
-               📨 ${incomingOffers.length} offer${incomingOffers.length>1?'s':''} received — tap to view
+          ? `<div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:20px;font-size:11px;font-weight:700;color:var(--amber-dark)">
+               📨 ${incomingOffers.length} offer${incomingOffers.length>1?'s':''} received
              </div>`
           : '';
 
@@ -3153,12 +3088,9 @@ function renderMyFixtures() {
                   <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
                 </div>
               </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
-                <div style="display:flex;align-items:center;gap:7px">
-                  <div class="pulse-dot"></div>
-                  <div style="font-size:11px;color:var(--text-muted)">Waiting for ${oppName} to respond</div>
-                </div>
-                <button onclick="withdrawOffer(${f.id})" style="padding:5px 10px;background:white;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--red);cursor:pointer;flex-shrink:0">Withdraw</button>
+              <div style="display:flex;align-items:center;gap:7px;margin-top:9px">
+                <div class="pulse-dot"></div>
+                <div style="font-size:11px;color:var(--text-muted)">Offer sent — waiting for ${oppName} to respond</div>
               </div>
             </div>`;
         }
@@ -3172,7 +3104,7 @@ function renderMyFixtures() {
   if(confirmedPanel) {
     confirmedPanel.innerHTML = '';
     const myConfirmed = FIXTURES.filter(f =>
-      (f.homeId === MY.id || f.awayId === MY.id) && (f.status === 'confirmed' || f.status === 'amended')
+      (f.homeId === MY.id || f.awayId === MY.id) && f.status === 'confirmed'
     );
     if(!myConfirmed.length) {
       confirmedPanel.innerHTML = `<div class="empty-state">
@@ -3185,48 +3117,10 @@ function renderMyFixtures() {
         const oppId   = f.homeId === MY.id ? f.awayId : f.homeId;
         const opp     = CLUBS.find(c => c.id === oppId);
         const oppName = opp ? opp.name : 'Unknown club';
-        const venueStr = (v) => {
-          if(v === 'neutral')  return '⚖️ Neutral venue';
-          if(v === 'home_a')   return f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
-          return f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
-        };
-        const venueLabel = venueStr(f.venue);
-        const isAmended    = f.status === 'amended';
-        const isDeclined   = f.status === 'confirmed' && f.amendDeclined && f.amendedBy === MY.id;
-        const iProposed    = isAmended && f.amendedBy === MY.id;
-        const theyProposed = isAmended && f.amendedBy !== MY.id;
-
-        let amendBanner = '';
-        if(f.amendDeclined && f.amendedBy === MY.id) {
-          // Show declined state to the proposer — amendment fields still set so we can show what was proposed
-          const newDate    = f.amendedDate    ? `📅 ${fmtDate(f.amendedDate)}`  : null;
-          const newKickoff = f.amendedKickoff ? `⏱ ${f.amendedKickoff}`         : null;
-          const newVenue   = f.amendedVenue   ? venueStr(f.amendedVenue)         : null;
-          const changes    = [newDate, newKickoff, newVenue].filter(Boolean).join(' · ');
-          amendBanner = `<div style="margin-bottom:9px;padding:8px 10px;background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius-sm);font-size:12px;color:var(--red-dark)">
-            ❌ <strong>${oppName} declined your amendment</strong><br>
-            <span style="opacity:0.8">You proposed: ${changes}</span>
-            ${f.amendedNote ? `<br><span style="opacity:0.8;font-style:italic">"${f.amendedNote}"</span>` : ''}
-            <div style="margin-top:7px"><button onclick="dismissDeclined(${f.id})" style="padding:4px 10px;background:white;border:1.5px solid #fca5a5;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--red-dark);cursor:pointer">Dismiss</button></div>
-          </div>`;
-        } else if(isAmended) {
-          const newDate    = f.amendedDate    ? `📅 ${fmtDate(f.amendedDate)}`  : null;
-          const newKickoff = f.amendedKickoff ? `⏱ ${f.amendedKickoff}`         : null;
-          const newVenue   = f.amendedVenue   ? venueStr(f.amendedVenue)         : null;
-          const changes    = [newDate, newKickoff, newVenue].filter(Boolean).join(' · ');
-          if(iProposed) {
-            amendBanner = `<div style="margin-bottom:9px;padding:8px 10px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:var(--radius-sm);font-size:12px;color:var(--blue-dark)">
-              ✏️ <strong>You proposed:</strong> ${changes}
-              ${f.amendedNote ? `<br><span style="opacity:0.8;font-style:italic">"${f.amendedNote}"</span>` : ''}
-              <br><span style="opacity:0.75">Waiting for ${oppName} to respond</span>
-            </div>`;
-          } else {
-            amendBanner = `<div style="margin-bottom:9px;padding:8px 10px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-sm);font-size:12px;color:var(--amber-dark)">
-              ✏️ <strong>${oppName} proposed:</strong> ${changes}
-              ${f.amendedNote ? `<br><span style="opacity:0.8;font-style:italic">"${f.amendedNote}"</span>` : ''}
-            </div>`;
-          }
-        }
+        let venueLabel;
+        if(f.venue === 'neutral')     venueLabel = '⚖️ Neutral venue';
+        else if(f.venue === 'home_a') venueLabel = f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
+        else                          venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
 
         const card = document.createElement('div');
         card.className = 'req-card';
@@ -3234,7 +3128,7 @@ function renderMyFixtures() {
         card.innerHTML = `
           <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
             <div class="req-date">${fmtDateFull(f.date)}</div>
-            <div class="status-pill ${isAmended ? 'status-shortlist' : isDeclined ? 'status-cancelled' : 'status-confirmed'}">${isAmended ? 'Amendment pending' : isDeclined ? 'Amendment declined' : 'Confirmed'}</div>
+            <div class="status-pill status-confirmed">Confirmed</div>
           </div>
           <div style="padding:10px 12px">
             <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
@@ -3242,29 +3136,15 @@ function renderMyFixtures() {
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
                 <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
-                ${f.notes ? `<div class="req-meta" style="margin-top:3px;font-style:italic">"${f.notes}"</div>` : ''}
               </div>
             </div>
-            ${amendBanner}
-            <div style="display:flex;gap:7px;flex-wrap:wrap">
-              ${theyProposed ? `
-                <button class="btn-confirm" onclick="acceptAmendment(${f.id})">✓ Accept changes</button>
-                <button class="btn-decline" onclick="declineAmendment(${f.id})">Decline</button>
-              ` : ''}
-              ${(!isAmended && !isDeclined) ? `
-                <button class="btn-see-free" onclick="openAmendModal(${f.id})" style="padding:7px 13px;font-size:12px">✏️ Propose Amendment</button>
-              ` : ''}
-              ${(!isAmended && !isDeclined) ? `
-                <button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(f.date)} vs ${oppName}')">✕ Cancel</button>
-              ` : ''}
-            </div>
+            <button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(f.date)} vs ${oppName}')">✕ Cancel Fixture</button>
           </div>`;
         confirmedPanel.appendChild(card);
       });
     }
   }
 }
-
 
 async function acceptOffer(fixtureId) {
   try {
@@ -3299,286 +3179,10 @@ async function acceptOffer(fixtureId) {
 
     // 3. Reload both fixtures and availability
     const [fixRes, _] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
+      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }),
       loadAvailability()
     ]);
-    FIXTURES = (await fixRes.json()).map(mapFixture);
-    renderMyFixtures();
-    renderCalendar();
-  } catch(err) {
-    toast('Error: ' + err.message);
-  }
-}
-
-// ═══════════════════════════════════════════
-// AMENDMENT FLOW
-// ═══════════════════════════════════════════
-let amendFixtureId = null;
-let amendDate      = null;
-let amendKickoff   = null;
-let amendVenue     = null;
-
-function openAmendModal(fixtureId) {
-  const f = FIXTURES.find(x => x.id === fixtureId);
-  if(!f) return;
-  amendFixtureId = fixtureId;
-  amendDate      = null;
-  amendKickoff   = null;
-  amendVenue     = null;
-
-  const oppId   = f.homeId === MY.id ? f.awayId : f.homeId;
-  const opp     = CLUBS.find(c => c.id === oppId);
-  const oppName = opp ? opp.name : 'Unknown club';
-
-  // Show current fixture details
-  const venueStr = (v) => {
-    if(v === 'neutral') return 'Neutral';
-    if(v === 'home_a')  return f.homeId === MY.id ? 'Home' : 'Away';
-    return f.awayId === MY.id ? 'Home' : 'Away';
-  };
-  document.getElementById('amend-modal-sub').textContent = `vs ${oppName}`;
-  document.getElementById('amend-current-details').innerHTML =
-    `<strong>Current:</strong> ${fmtDate(f.date)}${f.kickoff?' · '+f.kickoff:''} · ${venueStr(f.venue)}`;
-
-  // Reset form
-  renderDateStrip('amend-date-strip', null, 'selectAmendDate');
-  document.getElementById('amend-custom-date-wrap').classList.remove('visible');
-  document.getElementById('amend-custom-date-input').min = toLocalISO(new Date());
-  document.querySelectorAll('#amend-kickoff-group .kickoff-pill').forEach(b => b.classList.remove('selected'));
-  document.querySelector('#amend-kickoff-group .any-pill').classList.add('selected');
-  document.querySelectorAll('#amend-venue-seg .seg-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector('#amend-venue-seg .seg-btn').classList.add('selected');
-  document.getElementById('amend-msg').value = '';
-
-  // Label the venue buttons correctly from MY perspective
-  const homeLabel = f.homeId === MY.id ? '🏠 Home' : '🚌 Away';
-  const awayLabel = f.homeId === MY.id ? '🚌 Away' : '🏠 Home';
-  document.getElementById('amend-venue-home_a').textContent = homeLabel;
-  document.getElementById('amend-venue-home_b').textContent = awayLabel;
-
-  openModal('amend-modal');
-}
-
-function selectAmendDate(btn, iso) {
-  document.querySelectorAll('#amend-date-strip .date-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('amend-btn-custom').classList.remove('selected');
-  document.getElementById('amend-custom-date-wrap').classList.remove('visible');
-  document.getElementById('amend-btn-keep').classList.remove('selected');
-  btn.classList.add('selected');
-  amendDate = iso;
-}
-
-function clearAmendDate() {
-  document.querySelectorAll('#amend-date-strip .date-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('amend-btn-custom').classList.remove('selected');
-  document.getElementById('amend-custom-date-wrap').classList.remove('visible');
-  document.getElementById('amend-btn-keep').classList.add('selected');
-  amendDate = null;
-}
-
-function openAmendCustomDate() {
-  document.querySelectorAll('#amend-date-strip .date-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('amend-btn-keep').classList.remove('selected');
-  document.getElementById('amend-btn-custom').classList.add('selected');
-  document.getElementById('amend-custom-date-wrap').classList.add('visible');
-  document.getElementById('amend-custom-date-input').focus();
-  amendDate = null;
-}
-
-function selectAmendCustomDate(iso) {
-  if(!iso) return;
-  amendDate = iso;
-  const d = new Date(iso + 'T12:00:00');
-  document.getElementById('amend-btn-custom').innerHTML =
-    `<div class="date-any-label">${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}</div><div class="date-any-sub">Custom date</div>`;
-}
-
-function selectAmendKickoff(btn, val) {
-  document.querySelectorAll('#amend-kickoff-group .kickoff-pill').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  amendKickoff = val;
-}
-
-function selectAmendKickoffCustom(val) {
-  if(!val) return;
-  document.querySelectorAll('#amend-kickoff-group .kickoff-pill').forEach(b => b.classList.remove('selected'));
-  amendKickoff = val;
-}
-
-function selectAmendVenue(btn, val) {
-  document.querySelectorAll('#amend-venue-seg .seg-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  amendVenue = val;
-}
-
-async function submitAmendment() {
-  if(!amendDate && !amendKickoff && !amendVenue) {
-    toast('Please propose at least one change');
-    return;
-  }
-  const f = FIXTURES.find(x => x.id === amendFixtureId);
-  if(!f) return;
-  const btn = document.getElementById('amend-submit-btn');
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    const oppId = f.homeId === MY.id ? f.awayId : f.homeId;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${amendFixtureId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        status:               'amended',
-        amended_date:         amendDate   || null,
-        amended_time:         amendKickoff ? amendKickoff + ':00' : null,
-        amended_venue:        amendVenue  || null,
-        amended_by_club_id:   MY.id,
-        amended_note:         document.getElementById('amend-msg').value.trim() || null,
-        amendment_declined:   false,
-        ball_in_court_id:     oppId
-      })
-    });
-    if(!res.ok) throw new Error('Failed to send amendment');
-    closeModal('amend-modal');
-    toast('Amendment proposed ✓');
-    const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
-    );
-    FIXTURES = (await fixRes.json()).map(mapFixture);
-    renderMyFixtures();
-  } catch(err) {
-    toast('Error: ' + err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Send Amendment Proposal';
-  }
-}
-
-async function acceptAmendment(fixtureId) {
-  const f = FIXTURES.find(x => x.id === fixtureId);
-  if(!f) return;
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        status:             'confirmed',
-        proposed_date:      f.amendedDate   || f.date,
-        proposed_time:      f.amendedKickoff ? f.amendedKickoff + ':00' : (f.kickoff ? f.kickoff + ':00' : null),
-        venue_type:         f.amendedVenue  || f.venue,
-        amended_date:       null,
-        amended_time:       null,
-        amended_venue:      null,
-        amended_by_club_id: null,
-        amended_note:       null,
-        amendment_declined: false,
-        ball_in_court_id:   null
-      })
-    });
-    if(!res.ok) throw new Error('Failed to accept amendment');
-    toast('Amendment accepted — fixture updated ✓');
-    const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
-    );
-    FIXTURES = (await fixRes.json()).map(mapFixture);
-    renderMyFixtures();
-    renderCalendar();
-  } catch(err) {
-    toast('Error: ' + err.message);
-  }
-}
-
-async function declineAmendment(fixtureId) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        status:             'confirmed',
-        amendment_declined: true,
-        ball_in_court_id:   null
-      })
-    });
-    if(!res.ok) throw new Error('Failed to decline amendment');
-    toast('Amendment declined — original fixture stands');
-    const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
-    );
-    FIXTURES = (await fixRes.json()).map(mapFixture);
-    renderMyFixtures();
-    renderCalendar();
-  } catch(err) {
-    toast('Error: ' + err.message);
-  }
-}
-
-async function dismissDeclined(fixtureId) {
-  try {
-    await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        amendment_declined: false,
-        amended_date:       null,
-        amended_time:       null,
-        amended_venue:      null,
-        amended_by_club_id: null,
-        amended_note:       null
-      })
-    });
-    const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
-    );
-    FIXTURES = (await fixRes.json()).map(mapFixture);
-    renderMyFixtures();
-  } catch(err) {
-    toast('Error: ' + err.message);
-  }
-}
-
-function switchToOffersTab() {
-  const bar = document.querySelector('.subtab-bar');
-  if(bar) {
-    const btn = bar.querySelectorAll('.subtab-btn')[1];
-    switchSubtab(btn, 'subtab-offer');
-  }
-}
-
-async function withdrawOffer(fixtureId) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
-      },
-      body: JSON.stringify({ status: 'cancelled', ball_in_court_id: null })
-    });
-    if(!res.ok) throw new Error('Failed to withdraw offer');
-    toast('Offer withdrawn');
-    const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
-    );
     FIXTURES = (await fixRes.json()).map(mapFixture);
     renderMyFixtures();
     renderCalendar();
@@ -3601,7 +3205,7 @@ async function declineOffer(fixtureId) {
     if(!res.ok) throw new Error('Failed to decline offer');
     toast('Offer declined');
     const fixRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
+      `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
     );
     FIXTURES = (await fixRes.json()).map(mapFixture);
@@ -3695,18 +3299,6 @@ async function initApp() {
   } catch(err) {
     console.warn('Supabase clubs fetch failed:', err.message);
     showLoadError('Could not reach the database. Please refresh to try again.');
-  }
-
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/fixtures?select=id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined&order=proposed_date.asc`,
-      { headers: { 'apikey': SUPABASE_KEY } }
-    );
-    const fixRows = await res.json();
-    FIXTURES = Array.isArray(fixRows) ? fixRows.map(mapFixture) : [];
-    console.log(`Loaded ${FIXTURES.length} fixtures from Supabase`);
-  } catch(err) {
-    console.warn('Supabase fixtures fetch failed:', err.message);
   }
 
   await loadAvailability();
