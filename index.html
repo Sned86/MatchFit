@@ -685,6 +685,72 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </div>
 
 
+<!-- Amendment modal -->
+<div class="modal-backdrop" id="amend-modal" onclick="closeModalOnBackdrop(event,'amend-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Propose Amendment</div>
+      <div class="modal-sub" id="amend-modal-sub">Suggest a change to this confirmed fixture</div>
+      <button class="modal-close" onclick="closeModal('amend-modal')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div id="amend-current-details" style="padding:11px 13px;background:var(--green-xlight);border:1px solid var(--green-mid);border-radius:var(--radius-sm);font-size:12px;color:var(--green-dark);font-weight:600"></div>
+      <div class="form-field">
+        <label class="form-label">Change Date? <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(leave blank to keep)</span></label>
+        <div class="date-strip" id="amend-date-strip"></div>
+        <div class="date-extra-row" style="margin-top:5px">
+          <button class="date-any-btn" id="amend-btn-custom" onclick="openAmendCustomDate()">
+            <div class="date-any-label">&#128467; Pick a Date</div>
+            <div class="date-any-sub">Choose from calendar</div>
+          </button>
+          <button class="date-any-btn" id="amend-btn-keep-date" onclick="keepAmendDate()" style="border-style:solid">
+            <div class="date-any-label">Keep current</div>
+            <div class="date-any-sub" id="amend-keep-date-sub">—</div>
+          </button>
+        </div>
+        <div class="custom-date-wrap" id="amend-custom-date-wrap">
+          <input type="date" class="custom-date-input" id="amend-custom-date-input" onchange="selectAmendCustomDate(this.value)">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Change Kick-off? <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(leave blank to keep)</span></label>
+        <div class="kickoff-group" id="amend-kickoff-group">
+          <button class="kickoff-pill any-pill selected" onclick="selectAmendKickoff(this,'keep')">Keep current</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'10:00')">10:00</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'11:00')">11:00</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'13:00')">13:00</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'14:00')">14:00</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'14:30')">14:30</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'15:00')">15:00</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'15:30')">15:30</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'19:00')">19:00</button>
+          <button class="kickoff-pill" onclick="selectAmendKickoff(this,'19:30')">19:30</button>
+        </div>
+        <div class="kickoff-custom-wrap" style="margin-top:8px">
+          <input type="time" class="kickoff-custom-input" id="amend-kickoff-custom-input" step="900" onchange="selectAmendKickoff(null,this.value)">
+          <span style="font-size:11px;color:var(--slate-light)">Other time</span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Change Venue? <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(leave blank to keep)</span></label>
+        <div class="seg-ctrl" style="grid-template-columns:1fr 1fr 1fr 1fr" id="amend-venue-ctrl">
+          <button class="seg-btn selected" onclick="selectAmendVenue(this,'keep')" style="padding:8px 4px">Keep</button>
+          <button class="seg-btn" onclick="selectAmendVenue(this,'home')" style="padding:8px 4px" id="amend-venue-home-btn">🏠 Home</button>
+          <button class="seg-btn" onclick="selectAmendVenue(this,'away')" style="padding:8px 4px" id="amend-venue-away-btn">🚌 Away</button>
+          <button class="seg-btn" onclick="selectAmendVenue(this,'neutral')" style="padding:8px 4px">⚖️ Neutral</button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Message <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="form-input" id="amend-note" rows="2" placeholder="e.g. Can we push kick-off back an hour?" style="resize:none;line-height:1.5"></textarea>
+      </div>
+      <div class="form-hint">The other club will need to accept your amendment. The fixture stays confirmed in the meantime.</div>
+      <button class="form-submit" id="amend-submit-btn" onclick="submitAmendment()">Send Amendment →</button>
+    </div>
+  </div>
+</div>
+
 <div class="team-profile-overlay" id="team-profile-overlay" onclick="closeTeamProfileOnBackdrop(event)">
   <div class="team-profile-sheet">
     <div class="tp-handle"></div>
@@ -2064,6 +2130,243 @@ async function submitOffer(){
 }
 
 // ═══════════════════════════════════════════
+// AMENDMENT FLOW
+// ═══════════════════════════════════════════
+let amendFixtureId = null;
+let amendDate = null;   // null = keep current
+let amendKickoff = null; // null = keep current
+let amendVenue = null;  // null = keep current
+
+function openAmendModal(fixtureId) {
+  const f = FIXTURES.find(x => x.id === fixtureId);
+  if (!f) return;
+  amendFixtureId = fixtureId;
+  amendDate = null; amendKickoff = null; amendVenue = null;
+
+  const oppId = f.homeId === MY.id ? f.awayId : f.homeId;
+  const opp = CLUBS.find(c => c.id === oppId);
+
+  // Venue label from MY perspective
+  let myVenueLabel;
+  if (f.venue === 'neutral')     myVenueLabel = '⚖️ Neutral';
+  else if (f.venue === 'home_a') myVenueLabel = f.homeId === MY.id ? '🏠 Home' : '🚌 Away';
+  else                           myVenueLabel = f.awayId === MY.id ? '🏠 Home' : '🚌 Away';
+
+  document.getElementById('amend-modal-sub').textContent = `vs ${opp ? opp.name : 'opponent'}`;
+  document.getElementById('amend-current-details').innerHTML =
+    `<strong>Current:</strong> ${fmtDate(f.date)}${f.kickoff ? ' · ' + f.kickoff : ''} · ${myVenueLabel}`;
+  document.getElementById('amend-keep-date-sub').textContent = fmtDate(f.date);
+
+  // Reset date strip
+  renderDateStrip('amend-date-strip', null, 'selectAmendDate');
+  document.getElementById('amend-custom-date-input').min = toLocalISO(new Date());
+  document.getElementById('amend-custom-date-wrap').classList.remove('visible');
+  document.getElementById('amend-btn-custom').innerHTML =
+    '<div class="date-any-label">&#128467; Pick a Date</div><div class="date-any-sub">Choose from calendar</div>';
+  document.getElementById('amend-btn-custom').classList.remove('selected');
+  document.getElementById('amend-btn-keep-date').classList.add('selected');
+
+  // Reset kickoff
+  document.querySelectorAll('#amend-kickoff-group .kickoff-pill').forEach(b => b.classList.remove('selected'));
+  document.querySelector('#amend-kickoff-group .any-pill').classList.add('selected');
+
+  // Reset venue — label Home/Away buttons from MY perspective
+  const isHome = (f.venue === 'home_a' && f.homeId === MY.id) || (f.venue === 'home_b' && f.awayId === MY.id);
+  document.getElementById('amend-venue-home-btn').textContent = '🏠 Home';
+  document.getElementById('amend-venue-away-btn').textContent = '🚌 Away';
+  document.querySelectorAll('#amend-venue-ctrl .seg-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector('#amend-venue-ctrl .seg-btn').classList.add('selected'); // "Keep"
+
+  document.getElementById('amend-note').value = '';
+  closeModal('amend-modal'); // ensure clean state
+  openModal('amend-modal');
+}
+
+function selectAmendDate(btn, iso) {
+  document.querySelectorAll('#amend-date-strip .date-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('amend-btn-custom').classList.remove('selected');
+  document.getElementById('amend-btn-keep-date').classList.remove('selected');
+  document.getElementById('amend-custom-date-wrap').classList.remove('visible');
+  btn.classList.add('selected');
+  amendDate = iso;
+}
+function openAmendCustomDate() {
+  document.querySelectorAll('#amend-date-strip .date-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('amend-btn-keep-date').classList.remove('selected');
+  document.getElementById('amend-btn-custom').classList.add('selected');
+  document.getElementById('amend-custom-date-wrap').classList.add('visible');
+  document.getElementById('amend-custom-date-input').focus();
+  amendDate = null;
+}
+function selectAmendCustomDate(iso) {
+  if (!iso) return;
+  amendDate = iso;
+  const d = new Date(iso + 'T12:00:00');
+  document.getElementById('amend-btn-custom').innerHTML =
+    `<div class="date-any-label">${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}</div><div class="date-any-sub">Custom date</div>`;
+}
+function keepAmendDate() {
+  document.querySelectorAll('#amend-date-strip .date-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('amend-btn-custom').classList.remove('selected');
+  document.getElementById('amend-btn-keep-date').classList.add('selected');
+  document.getElementById('amend-custom-date-wrap').classList.remove('visible');
+  amendDate = null;
+}
+function selectAmendKickoff(btn, val) {
+  document.querySelectorAll('#amend-kickoff-group .kickoff-pill').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+  amendKickoff = (val === 'keep') ? null : val;
+}
+function selectAmendVenue(btn, val) {
+  document.querySelectorAll('#amend-venue-ctrl .seg-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  amendVenue = (val === 'keep') ? null : val;
+}
+
+async function submitAmendment() {
+  if (!amendDate && !amendKickoff && !amendVenue) {
+    toast('Please propose at least one change');
+    return;
+  }
+  const f = FIXTURES.find(x => x.id === amendFixtureId);
+  if (!f) return;
+
+  const btn = document.getElementById('amend-submit-btn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  // Resolve the actual new values (fall back to current if keeping)
+  const newDate   = amendDate    || f.date;
+  const newTime   = amendKickoff || (f.kickoff ? f.kickoff + ':00' : null);
+  // Convert venue from MY perspective to DB venue_type
+  let newVenueType = f.venue; // keep by default
+  if (amendVenue === 'home') {
+    newVenueType = (f.homeId === MY.id) ? 'home_a' : 'home_b';
+  } else if (amendVenue === 'away') {
+    newVenueType = (f.awayId === MY.id) ? 'home_b' : 'home_a';
+  } else if (amendVenue === 'neutral') {
+    newVenueType = 'neutral';
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${amendFixtureId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        amended_date:        newDate,
+        amended_time:        newTime,
+        amended_venue:       newVenueType,
+        amended_by_club_id:  MY.id,
+        amended_note:        document.getElementById('amend-note').value.trim() || null,
+        amendment_declined:  false
+      })
+    });
+    if (!res.ok) throw new Error('Failed to send amendment');
+    closeModal('amend-modal');
+    toast('Amendment proposed ✓');
+    const fixRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
+    );
+    FIXTURES = (await fixRes.json()).map(mapFixture);
+    renderMyFixtures();
+  } catch(err) {
+    toast('Error: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send Amendment →';
+  }
+}
+
+async function acceptAmendment(fixtureId) {
+  const f = FIXTURES.find(x => x.id === fixtureId);
+  if (!f) return;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+      },
+      body: JSON.stringify({
+        proposed_date:       f.amendedDate,
+        proposed_time:       f.amendedTime ? f.amendedTime + ':00' : null,
+        venue_type:          f.amendedVenue,
+        amended_date:        null,
+        amended_time:        null,
+        amended_venue:       null,
+        amended_by_club_id:  null,
+        amended_note:        null,
+        amendment_declined:  false
+      })
+    });
+    if (!res.ok) throw new Error('Failed to accept amendment');
+    toast('Amendment accepted ✓');
+    const fixRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
+    );
+    FIXTURES = (await fixRes.json()).map(mapFixture);
+    renderMyFixtures();
+    renderCalendar();
+  } catch(err) {
+    toast('Error: ' + err.message);
+  }
+}
+
+async function declineAmendment(fixtureId) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+      },
+      body: JSON.stringify({ amendment_declined: true })
+    });
+    toast('Amendment declined');
+    const fixRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
+    );
+    FIXTURES = (await fixRes.json()).map(mapFixture);
+    renderMyFixtures();
+  } catch(err) {
+    toast('Error: ' + err.message);
+  }
+}
+
+async function dismissDeclinedAmendment(fixtureId) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+      },
+      body: JSON.stringify({
+        amended_date: null, amended_time: null, amended_venue: null,
+        amended_by_club_id: null, amended_note: null, amendment_declined: false
+      })
+    });
+    const fixRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }
+    );
+    FIXTURES = (await fixRes.json()).map(mapFixture);
+    renderMyFixtures();
+  } catch(err) {
+    toast('Error: ' + err.message);
+  }
+}
+
+// ═══════════════════════════════════════════
 // COUNTER OFFER
 // ═══════════════════════════════════════════
 function submitCounter(){closeModal('counter-modal');toast('Counter offer sent to Folkestone Athletic');}
@@ -3117,11 +3420,70 @@ function renderMyFixtures() {
         const oppId   = f.homeId === MY.id ? f.awayId : f.homeId;
         const opp     = CLUBS.find(c => c.id === oppId);
         const oppName = opp ? opp.name : 'Unknown club';
-        let venueLabel;
-        if(f.venue === 'neutral')     venueLabel = '⚖️ Neutral venue';
-        else if(f.venue === 'home_a') venueLabel = f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
-        else                          venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
 
+        // Venue label from MY perspective using current (possibly amended) values
+        const venueType = f.venue;
+        let venueLabel;
+        if(venueType === 'neutral')     venueLabel = '⚖️ Neutral venue';
+        else if(venueType === 'home_a') venueLabel = f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
+        else                            venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
+
+        // Amendment banner
+        const iProposed  = f.amendedDate && f.amendedByClubId === MY.id;
+        const theyProposed = f.amendedDate && f.amendedByClubId !== MY.id && !f.amendmentDeclined;
+        const declined   = f.amendmentDeclined && f.amendedByClubId === MY.id;
+
+        let amendBanner = '';
+        if(iProposed) {
+          // Blue — I proposed, waiting for their response
+          const amendVenueLbl = !f.amendedVenue || f.amendedVenue === venueType ? null :
+            f.amendedVenue === 'neutral' ? '⚖️ Neutral' :
+            f.amendedVenue === 'home_a' ? (f.homeId === MY.id ? '🏠 Home' : '🚌 Away') :
+            (f.awayId === MY.id ? '🏠 Home' : '🚌 Away');
+          const parts = [
+            f.amendedDate && f.amendedDate !== f.date ? fmtDate(f.amendedDate) : null,
+            f.amendedTime && f.amendedTime !== f.kickoff ? f.amendedTime : null,
+            amendVenueLbl
+          ].filter(Boolean);
+          amendBanner = `<div style="margin-top:9px;padding:10px 12px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:var(--radius-sm)">
+            <div style="font-size:12px;font-weight:700;color:var(--blue-dark)">⏳ Amendment proposed — awaiting response</div>
+            <div style="font-size:11px;color:var(--blue-dark);margin-top:3px">You proposed: ${parts.join(' · ')}${f.amendedNote ? ' · "'+f.amendedNote+'"' : ''}</div>
+          </div>`;
+        } else if(theyProposed) {
+          // Amber — they proposed, I need to respond
+          const oppAmendVenueLbl = !f.amendedVenue || f.amendedVenue === venueType ? null :
+            f.amendedVenue === 'neutral' ? '⚖️ Neutral' :
+            f.amendedVenue === 'home_a' ? (f.homeId === MY.id ? '🏠 Home' : '🚌 Away') :
+            (f.awayId === MY.id ? '🏠 Home' : '🚌 Away');
+          const oppParts = [
+            f.amendedDate && f.amendedDate !== f.date ? fmtDate(f.amendedDate) : null,
+            f.amendedTime && f.amendedTime !== f.kickoff ? f.amendedTime : null,
+            oppAmendVenueLbl
+          ].filter(Boolean);
+          amendBanner = `<div style="margin-top:9px;padding:10px 12px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-sm)">
+            <div style="font-size:12px;font-weight:700;color:var(--amber-dark)">📝 ${oppName} proposed an amendment</div>
+            <div style="font-size:11px;color:var(--amber-dark);margin-top:3px">${oppParts.join(' · ')}${f.amendedNote ? ' · "'+f.amendedNote+'"' : ''}</div>
+            <div style="display:flex;gap:7px;margin-top:9px">
+              <button class="btn-confirm" style="padding:8px 14px;font-size:12px" onclick="acceptAmendment(${f.id})">✓ Accept</button>
+              <button class="btn-decline" style="padding:8px 14px;font-size:12px" onclick="declineAmendment(${f.id})">Decline</button>
+            </div>
+          </div>`;
+        } else if(declined) {
+          // Red — my amendment was declined
+          const decParts = [
+            f.amendedDate ? fmtDate(f.amendedDate) : null,
+            f.amendedTime || null,
+            f.amendedVenue === 'neutral' ? '⚖️ Neutral' : null
+          ].filter(Boolean);
+          amendBanner = `<div style="margin-top:9px;padding:10px 12px;background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius-sm)">
+            <div style="font-size:12px;font-weight:700;color:var(--red-dark)">❌ Amendment declined by ${oppName}</div>
+            ${decParts.length ? `<div style="font-size:11px;color:var(--red-dark);margin-top:3px">Your proposal: ${decParts.join(' · ')}</div>` : ''}
+            <button onclick="dismissDeclinedAmendment(${f.id})" style="margin-top:8px;padding:5px 12px;background:white;border:1.5px solid #fca5a5;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--red-dark);cursor:pointer">Dismiss</button>
+          </div>`;
+        }
+
+        // Only show Propose Amendment button if no amendment is currently pending/declined
+        const canPropose = !f.amendedDate;
         const card = document.createElement('div');
         card.className = 'req-card';
         card.style.marginBottom = '10px';
@@ -3138,7 +3500,11 @@ function renderMyFixtures() {
                 <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
               </div>
             </div>
-            <button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(f.date)} vs ${oppName}')">✕ Cancel Fixture</button>
+            ${amendBanner}
+            <div style="display:flex;gap:7px;margin-top:${amendBanner?'9':'0'}px">
+              ${canPropose ? `<button class="btn-counter" onclick="openAmendModal(${f.id})" style="flex:1;padding:8px 10px;font-size:12px">✏️ Propose Amendment</button>` : ''}
+              <button class="btn-cancel-game" onclick="openCancelModal('${fmtDate(f.date)} vs ${oppName}')" style="${canPropose?'':'flex:1;justify-content:center'}">✕ Cancel</button>
+            </div>
           </div>`;
         confirmedPanel.appendChild(card);
       });
