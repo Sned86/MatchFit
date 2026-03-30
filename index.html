@@ -3429,7 +3429,7 @@ function renderMyFixtures() {
         else                            venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
 
         // Amendment banner
-        const iProposed  = f.amendedDate && f.amendedByClubId === MY.id;
+        const iProposed  = f.amendedDate && f.amendedByClubId === MY.id && !f.amendmentDeclined;
         const theyProposed = f.amendedDate && f.amendedByClubId !== MY.id && !f.amendmentDeclined;
         const declined   = f.amendmentDeclined && f.amendedByClubId === MY.id;
 
@@ -3469,15 +3469,22 @@ function renderMyFixtures() {
             </div>
           </div>`;
         } else if(declined) {
-          // Red — my amendment was declined
-          const decParts = [
-            f.amendedDate ? fmtDate(f.amendedDate) : null,
-            f.amendedTime || null,
-            f.amendedVenue === 'neutral' ? '⚖️ Neutral' : null
-          ].filter(Boolean);
+          // Red — my amendment was declined, show original fixture details
+          const origVenueLabel = venueLabel; // already computed from current fixture values
+          const origDetails = [
+            fmtDate(f.date),
+            f.kickoff || null,
+            origVenueLabel
+          ].filter(Boolean).join(' · ');
+          // What I proposed (for context)
+          const decProposed = [
+            f.amendedDate && f.amendedDate !== f.date ? fmtDate(f.amendedDate) : null,
+            f.amendedTime && f.amendedTime !== f.kickoff ? f.amendedTime : null,
+          ].filter(Boolean).join(' · ');
           amendBanner = `<div style="margin-top:9px;padding:10px 12px;background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius-sm)">
             <div style="font-size:12px;font-weight:700;color:var(--red-dark)">❌ Amendment declined by ${oppName}</div>
-            ${decParts.length ? `<div style="font-size:11px;color:var(--red-dark);margin-top:3px">Your proposal: ${decParts.join(' · ')}</div>` : ''}
+            <div style="font-size:11px;color:var(--red-dark);margin-top:3px">The fixture remains: ${origDetails}</div>
+            ${decProposed ? `<div style="font-size:11px;color:var(--red-dark);margin-top:2px;opacity:0.75">Your proposal was: ${decProposed}</div>` : ''}
             <button onclick="dismissDeclinedAmendment(${f.id})" style="margin-top:8px;padding:5px 12px;background:white;border:1.5px solid #fca5a5;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--red-dark);cursor:pointer">Dismiss</button>
           </div>`;
         }
