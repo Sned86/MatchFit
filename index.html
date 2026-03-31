@@ -950,15 +950,6 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <div id="find-date-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
       </div>
       <div>
-        <label class="field-label">Search for a Specific Club <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <div class="team-search-wrap">
-          <span class="team-search-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;color:var(--slate-light)"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
-          <input type="text" class="team-search-input" id="team-search-input" placeholder="Start typing a club name…" oninput="onTeamSearch(this.value)" autocomplete="off">
-        </div>
-        <div class="team-search-results" id="team-search-results"></div>
-        <div id="team-selected-wrap"></div>
-      </div>
-      <div>
         <label class="field-label">Venue <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--slate-light)">(select one or more)</span></label>
         <div class="pill-group" id="venue-pills">
           <button class="pill-btn any-pill selected" onclick="toggleAnyVenue(this)">Any</button>
@@ -2933,8 +2924,98 @@ async function submitSignOut() {
   showAuthPanel('login');
 }
 
+// ═══════════════════════════════════════════
+// CLUB COLOUR HELPERS
+// ═══════════════════════════════════════════
+// Returns perceived luminance 0–1 for a hex colour
+function hexLuminance(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16)/255;
+  const g = parseInt(c.slice(2,4),16)/255;
+  const b = parseInt(c.slice(4,6),16)/255;
+  const toLinear = x => x <= 0.03928 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4);
+  return 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+}
+// Lighten a hex colour by mixing with white (amount 0–1)
+function lightenHex(hex, amount) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16);
+  const g = parseInt(c.slice(2,4),16);
+  const b = parseInt(c.slice(4,6),16);
+  const mix = v => Math.round(v + (255 - v) * amount);
+  return `#${mix(r).toString(16).padStart(2,'0')}${mix(g).toString(16).padStart(2,'0')}${mix(b).toString(16).padStart(2,'0')}`;
+}
+// Darken a hex colour by mixing with black (amount 0–1)
+function darkenHex(hex, amount) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16);
+  const g = parseInt(c.slice(2,4),16);
+  const b = parseInt(c.slice(4,6),16);
+  const mix = v => Math.round(v * (1 - amount));
+  return `#${mix(r).toString(16).padStart(2,'0')}${mix(g).toString(16).padStart(2,'0')}${mix(b).toString(16).padStart(2,'0')}`;
+}
+// Given a primary colour, return a full theme: bg gradient, border, text colours
+function clubColourTheme(hex) {
+  if (!hex) return null;
+  const lum = hexLuminance(hex);
+  const isDark = lum < 0.35;
+  // Gradient: primary → lightened tint
+  const gradFrom = isDark ? lightenHex(hex, 0.08) : darkenHex(hex, 0.08);
+  const gradTo   = isDark ? lightenHex(hex, 0.22) : lightenHex(hex, 0.55);
+  const border   = isDark ? lightenHex(hex, 0.30) : darkenHex(hex, 0.12);
+  const textPrimary    = isDark ? '#ffffff' : '#0f172a';
+  const textSecondary  = isDark ? 'rgba(255,255,255,0.75)' : '#475569';
+  const statBg         = isDark ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.7)';
+  const statBorder     = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
+  const statVal        = isDark ? '#ffffff' : '#0f172a';
+  const statKey        = isDark ? 'rgba(255,255,255,0.65)' : '#64748b';
+  const leagueBg       = isDark ? 'rgba(255,255,255,0.2)'  : 'rgba(0,0,0,0.12)';
+  const leagueText     = isDark ? '#ffffff' : '#0f172a';
+  const badgeBorder    = isDark ? lightenHex(hex, 0.35) : darkenHex(hex, 0.15);
+  return { gradFrom, gradTo, border, textPrimary, textSecondary,
+           statBg, statBorder, statVal, statKey, leagueBg, leagueText, badgeBorder };
+}
+
 function renderMyClub(club, userEmail) {
   if (!club) return;
+
+  // Apply club colour theme to profile header
+  const theme = clubColourTheme(club.primary_colour);
+  const header = document.querySelector('.profile-header');
+  if (header) {
+    if (theme) {
+      header.style.background    = `linear-gradient(135deg, ${theme.gradFrom}, ${theme.gradTo})`;
+      header.style.borderColor   = theme.border;
+    } else {
+      header.style.background    = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+      header.style.borderColor   = 'var(--green-mid)';
+    }
+  }
+  // Name, location, league text colours
+  const nameEl = document.getElementById('myclub-name');
+  const locEl  = document.getElementById('myclub-location');
+  const leagueEl = document.getElementById('myclub-league');
+  if (nameEl)   nameEl.style.color   = theme ? theme.textPrimary   : 'var(--navy)';
+  if (locEl)    locEl.style.color    = theme ? theme.textSecondary  : 'var(--text-muted)';
+  if (leagueEl) {
+    leagueEl.style.background = theme ? theme.leagueBg   : 'var(--green)';
+    leagueEl.style.color      = theme ? theme.leagueText : 'white';
+  }
+  // Stats row
+  const statsRow = document.querySelector('.profile-stats');
+  if (statsRow) {
+    statsRow.style.background = theme ? theme.statBorder : 'var(--green-mid)';
+    statsRow.querySelectorAll('.profile-stat').forEach(s => {
+      s.style.background = theme ? theme.statBg : 'white';
+    });
+    statsRow.querySelectorAll('.profile-stat-val').forEach(s => {
+      s.style.color = theme ? theme.statVal : 'var(--navy)';
+    });
+    statsRow.querySelectorAll('.profile-stat-key').forEach(s => {
+      s.style.color = theme ? theme.statKey : 'var(--text-muted)';
+    });
+  }
+
   // Badge
   const badgeWrap = document.getElementById('myclub-badge-wrap');
   if (badgeWrap) badgeWrap.innerHTML = badgeHtml(club, 72, 16);
@@ -3297,6 +3378,7 @@ function mapClub(row) {
     nickname:      row.nickname || '',
     home_colours:  row.home_colours || '',
     away_colours:  row.away_colours || '',
+    primary_colour: row.primary_colour || null,
     contact_name:  row.contact_name || '',
     contact_email: row.contact_email || '',
     contact_phone: row.contact_phone || '',
@@ -3786,7 +3868,7 @@ async function initApp() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url&order=name.asc`,
+      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,primary_colour,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url&order=name.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
