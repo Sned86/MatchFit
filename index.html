@@ -1075,7 +1075,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <div class="screen" id="screen-myclub">
 
   <!-- Club header -->
-  <div class="profile-header">
+  <div class="profile-header" id="myclub-profile-header">
     <div class="profile-top">
       <div style="display:flex;gap:10px;align-items:flex-end;flex-shrink:0">
         <div id="myclub-badge-wrap" style="width:72px;height:72px;flex-shrink:0"></div>
@@ -2917,7 +2917,7 @@ async function submitSignOut() {
   currentSession = null;
   sessionStorage.removeItem('mf_session');
   // Reset app state
-  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
+  MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'', primary_colour:null };
   CLUBS = []; FIXTURES = [];
   document.getElementById('auth-wall').style.display = 'flex';
   document.getElementById('header-club-btn').textContent = '';
@@ -2957,6 +2957,10 @@ function darkenHex(hex, amount) {
 // Given a primary colour, return a full theme: bg gradient, border, text colours
 function clubColourTheme(hex) {
   if (!hex) return null;
+  // Ensure it's a valid 6-digit hex
+  const clean = hex.replace('#','');
+  if (!/^[0-9a-fA-F]{6}$/.test(clean)) return null;
+  hex = '#' + clean;
   const lum = hexLuminance(hex);
   const isDark = lum < 0.35;
   // Gradient: primary → lightened tint
@@ -2981,7 +2985,7 @@ function renderMyClub(club, userEmail) {
 
   // Apply club colour theme to profile header
   const theme = clubColourTheme(club.primary_colour);
-  const header = document.querySelector('.profile-header');
+  const header = document.getElementById('myclub-profile-header');
   if (header) {
     if (theme) {
       header.style.background    = `linear-gradient(135deg, ${theme.gradFrom}, ${theme.gradTo})`;
@@ -3328,14 +3332,15 @@ async function handleAuthSession(session) {
   const club = CLUBS.find(c => c.id === ucRows.club_id);
   if (club) {
     MY = {
-      id:       club.id,
-      name:     club.name,
-      logo:     club.logo,
-      lat:      club.lat,
-      lng:      club.lng,
-      ground:   club.ground,
-      badge:    club.badge,
-      location: club.location,
+      id:             club.id,
+      name:           club.name,
+      logo:           club.logo,
+      lat:            club.lat,
+      lng:            club.lng,
+      ground:         club.ground,
+      badge:          club.badge,
+      location:       club.location,
+      primary_colour: club.primary_colour || null,
     };
     document.getElementById('account-modal-club').textContent = club.name;
     renderMyClub(club, userEmail);
