@@ -1074,9 +1074,9 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <!-- ══ MY CLUB ══ -->
 <div class="screen" id="screen-myclub">
 
-  <!-- Club header -->
+  <!-- Club header — coloured top section -->
   <div class="profile-header" id="myclub-profile-header">
-    <div class="profile-top">
+    <div class="profile-top" style="margin-bottom:0">
       <div style="display:flex;gap:10px;align-items:flex-end;flex-shrink:0">
         <div id="myclub-badge-wrap" style="width:72px;height:72px;flex-shrink:0"></div>
         <div id="myclub-league-badge-wrap" style="width:36px;height:36px;flex-shrink:0;display:none"></div>
@@ -1087,11 +1087,13 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <div class="profile-level" id="myclub-league"></div>
       </div>
     </div>
-    <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-confirmed">—</div><div class="profile-stat-key">Confirmed</div></div>
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Unconfirmed</div></div>
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-open-avail">—</div><div class="profile-stat-key">Open Slots</div></div>
-    </div>
+  </div>
+
+  <!-- Stats row — always default colour scheme -->
+  <div class="profile-stats" id="myclub-stats-row" style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden">
+    <div class="profile-stat"><div class="profile-stat-val" id="myclub-confirmed">—</div><div class="profile-stat-key">Confirmed</div></div>
+    <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Unconfirmed</div></div>
+    <div class="profile-stat"><div class="profile-stat-val" id="myclub-open-avail">—</div><div class="profile-stat-key">Open Slots</div></div>
   </div>
 
   <!-- Pre-season calendar -->
@@ -2975,49 +2977,33 @@ function clubColourTheme(hex) {
   const statKey        = isDark ? 'rgba(255,255,255,0.65)' : '#64748b';
   const leagueBg       = isDark ? 'rgba(255,255,255,0.2)'  : 'rgba(0,0,0,0.12)';
   const leagueText     = isDark ? '#ffffff' : '#0f172a';
-  const badgeBorder    = isDark ? lightenHex(hex, 0.35) : darkenHex(hex, 0.15);
-  return { gradFrom, gradTo, border, textPrimary, textSecondary,
-           statBg, statBorder, statVal, statKey, leagueBg, leagueText, badgeBorder };
+  return { gradFrom, gradTo, border, textPrimary, textSecondary, leagueBg, leagueText };
 }
 
 function renderMyClub(club, userEmail) {
   if (!club) return;
 
-  // Apply club colour theme to profile header
+  // Apply club colour theme to profile header (top section only)
   const theme = clubColourTheme(club.primary_colour);
   const header = document.getElementById('myclub-profile-header');
   if (header) {
     if (theme) {
-      header.style.background    = `linear-gradient(135deg, ${theme.gradFrom}, ${theme.gradTo})`;
-      header.style.borderColor   = theme.border;
+      header.style.background  = `linear-gradient(135deg, ${theme.gradFrom}, ${theme.gradTo})`;
+      header.style.borderColor = theme.border;
     } else {
-      header.style.background    = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
-      header.style.borderColor   = 'var(--green-mid)';
+      header.style.background  = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+      header.style.borderColor = 'var(--green-mid)';
     }
   }
   // Name, location, league text colours
-  const nameEl = document.getElementById('myclub-name');
-  const locEl  = document.getElementById('myclub-location');
+  const nameEl   = document.getElementById('myclub-name');
+  const locEl    = document.getElementById('myclub-location');
   const leagueEl = document.getElementById('myclub-league');
-  if (nameEl)   nameEl.style.color   = theme ? theme.textPrimary   : 'var(--navy)';
-  if (locEl)    locEl.style.color    = theme ? theme.textSecondary  : 'var(--text-muted)';
+  if (nameEl)   nameEl.style.color   = theme ? theme.textPrimary  : 'var(--navy)';
+  if (locEl)    locEl.style.color    = theme ? theme.textSecondary : 'var(--text-muted)';
   if (leagueEl) {
     leagueEl.style.background = theme ? theme.leagueBg   : 'var(--green)';
     leagueEl.style.color      = theme ? theme.leagueText : 'white';
-  }
-  // Stats row
-  const statsRow = document.querySelector('.profile-stats');
-  if (statsRow) {
-    statsRow.style.background = theme ? theme.statBorder : 'var(--green-mid)';
-    statsRow.querySelectorAll('.profile-stat').forEach(s => {
-      s.style.background = theme ? theme.statBg : 'white';
-    });
-    statsRow.querySelectorAll('.profile-stat-val').forEach(s => {
-      s.style.color = theme ? theme.statVal : 'var(--navy)';
-    });
-    statsRow.querySelectorAll('.profile-stat-key').forEach(s => {
-      s.style.color = theme ? theme.statKey : 'var(--text-muted)';
-    });
   }
 
   // Badge
