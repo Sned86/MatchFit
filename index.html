@@ -919,22 +919,35 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     </div>
     <div class="card-body">
       <div>
-        <label class="field-label">Date <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--slate-light)">(select one or more)</span></label>
-        <div class="date-strip" id="date-strip"></div>
-        <div class="date-extra-row" style="margin-top:4px">
-          <button class="date-any-btn selected" id="btn-any-date" onclick="selectAnyDate()">
-            <div class="date-any-label">&#128197; Any Date</div>
-            <div class="date-any-sub">Show all availability</div>
-          </button>
-          <button class="date-any-btn" id="btn-add-custom-date" onclick="openAddCustomDate()">
-            <div class="date-any-label">&#128467; + Custom Date</div>
-            <div class="date-any-sub">Add a specific date</div>
-          </button>
+        <label class="field-label">Date <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--slate-light)">(tap to select one or more)</span></label>
+        <!-- Any Date button -->
+        <button class="date-any-btn selected" id="btn-any-date" onclick="selectAnyDate()" style="width:100%;margin-bottom:8px">
+          <div class="date-any-label">Any Date</div>
+          <div class="date-any-sub">Show all availability</div>
+        </button>
+        <!-- Mini calendar -->
+        <div id="find-cal-wrap" style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden">
+          <!-- Month nav -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border)">
+            <button onclick="findCalPrev()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--slate)">‹</button>
+            <span id="find-cal-month-label" style="font-size:13px;font-weight:700;color:var(--navy)">—</span>
+            <button onclick="findCalNext()" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--slate)">›</button>
+          </div>
+          <!-- Day labels -->
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:6px 8px 2px">
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">M</div>
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">W</div>
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">T</div>
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-light);text-transform:uppercase">F</div>
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+            <div style="text-align:center;font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase">S</div>
+          </div>
+          <!-- Grid -->
+          <div id="find-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:2px 8px 8px"></div>
         </div>
-        <div class="custom-date-wrap" id="custom-date-wrap">
-          <input type="date" class="custom-date-input" id="custom-date-input" onchange="addCustomDate(this.value)">
-        </div>
-        <div id="custom-date-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+        <!-- Selected date chips -->
+        <div id="find-date-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
       </div>
       <div>
         <label class="field-label">Search for a Specific Club <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
@@ -1388,75 +1401,103 @@ function renderDateStrip(containerId, selIso, onClickFn){
 }
 
 // ── Find screen dates — multi-select ──
-function buildDateStrip(){
-  const strip=document.getElementById('date-strip');
-  const dates=buildUpcomingDates();
-  strip.innerHTML=`<div class="date-row" style="grid-template-columns:repeat(4,1fr)">` +
-    dates.map(dt=>{
-      const iso=toLocalISO(dt);
-      const sel=selDates.includes(iso);
-      return `<button class="date-btn${sel?' selected':''}" onclick="toggleDate(this,'${iso}')">
-        <div class="date-btn-day">${DAY_NAMES[dt.getDay()]}</div>
-        <div class="date-btn-date">${dt.getDate()}</div>
-        <div class="date-btn-month">${MONTH_NAMES[dt.getMonth()]}</div>
-      </button>`;
-    }).join('') + `</div>`;
-  document.getElementById('custom-date-input').min=toLocalISO(new Date());
+// ── Find screen calendar — month + multi-select ──
+let findCalYear  = new Date().getFullYear();
+let findCalMonth = new Date().getMonth();
+
+function buildFindCalendar() {
+  const today     = toLocalISO(new Date());
+  const firstDay  = new Date(findCalYear, findCalMonth, 1);
+  const startDow  = (firstDay.getDay() + 6) % 7; // Mon-based
+  const daysInMonth = new Date(findCalYear, findCalMonth + 1, 0).getDate();
+
+  document.getElementById('find-cal-month-label').textContent =
+    `${MONTH_NAMES[findCalMonth]} ${findCalYear}`;
+
+  let html = '';
+  for (let i = 0; i < startDow; i++) html += '<div></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${findCalYear}-${String(findCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isPast    = iso < today;
+    const isToday   = iso === today;
+    const isSel     = selDates.includes(iso);
+    const dow       = new Date(iso + 'T12:00:00').getDay();
+    const isWeekend = dow === 0 || dow === 6;
+
+    let bg = 'transparent', textCol = 'var(--navy)', border = '1.5px solid transparent', opacity = '1';
+    if (isPast)        { opacity = '0.3'; textCol = 'var(--slate-light)'; }
+    if (isWeekend && !isPast) textCol = 'var(--green-dark)';
+    if (isToday)       border = '1.5px solid var(--slate-light)';
+    if (isSel)         { bg = 'var(--green)'; textCol = 'white'; border = '1.5px solid var(--green)'; }
+
+    const click = isPast ? '' : `onclick="findCalToggleDate('${iso}')"`;
+    html += `<div ${click} style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+      border-radius:6px;background:${bg};border:${border};cursor:${isPast?'default':'pointer'};
+      opacity:${opacity};transition:background 0.1s">
+      <span style="font-size:12px;font-weight:${isToday?'800':'600'};color:${textCol}">${d}</span>
+    </div>`;
+  }
+  document.getElementById('find-cal-grid').innerHTML = html;
 }
 
-function toggleDate(btn, iso){
-  // Deselect "Any Date" when picking specifics
+function findCalToggleDate(iso) {
   document.getElementById('btn-any-date').classList.remove('selected');
-  if(btn.classList.contains('selected')){
-    btn.classList.remove('selected');
-    selDates=selDates.filter(x=>x!==iso);
+  if (selDates.includes(iso)) {
+    selDates = selDates.filter(x => x !== iso);
   } else {
-    btn.classList.add('selected');
     selDates.push(iso);
   }
-  if(selDates.length===0) document.getElementById('btn-any-date').classList.add('selected');
+  if (selDates.length === 0) document.getElementById('btn-any-date').classList.add('selected');
+  buildFindCalendar();
+  renderFindDateChips();
 }
 
-function selectAnyDate(){
-  // Clear all pill selections and custom chips
-  document.querySelectorAll('#date-strip .date-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('custom-date-wrap').classList.remove('visible');
-  document.getElementById('btn-add-custom-date').classList.remove('selected');
+function renderFindDateChips() {
+  const wrap = document.getElementById('find-date-chips');
+  if (!wrap) return;
+  wrap.innerHTML = selDates
+    .slice()
+    .sort()
+    .map(iso => {
+      const d = new Date(iso + 'T12:00:00');
+      const label = `${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}`;
+      return `<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--green);color:white;border-radius:20px;font-size:12px;font-weight:600">
+        ${label}
+        <span onclick="findCalRemoveDate('${iso}')" style="font-size:13px;line-height:1;opacity:0.8;cursor:pointer">×</span>
+      </div>`;
+    }).join('');
+}
+
+function findCalRemoveDate(iso) {
+  selDates = selDates.filter(x => x !== iso);
+  if (selDates.length === 0) document.getElementById('btn-any-date').classList.add('selected');
+  buildFindCalendar();
+  renderFindDateChips();
+}
+
+function findCalPrev() {
+  findCalMonth--;
+  if (findCalMonth < 0) { findCalMonth = 11; findCalYear--; }
+  buildFindCalendar();
+}
+
+function findCalNext() {
+  findCalMonth++;
+  if (findCalMonth > 11) { findCalMonth = 0; findCalYear++; }
+  buildFindCalendar();
+}
+
+function selectAnyDate() {
+  selDates = [];
   document.getElementById('btn-any-date').classList.add('selected');
-  document.getElementById('custom-date-chips').innerHTML='';
-  selDates=[];
+  buildFindCalendar();
+  renderFindDateChips();
 }
 
-function openAddCustomDate(){
-  document.getElementById('custom-date-wrap').classList.add('visible');
-  document.getElementById('btn-add-custom-date').classList.add('selected');
-  document.getElementById('custom-date-input').value='';
-  document.getElementById('custom-date-input').focus();
-}
+// Keep old name as alias so initApp call still works
+function buildDateStrip() { buildFindCalendar(); }
 
-function addCustomDate(iso){
-  if(!iso) return;
-  if(selDates.includes(iso)) return; // already added
-  selDates.push(iso);
-  document.getElementById('btn-any-date').classList.remove('selected');
-  // Add a removable chip
-  const d=new Date(iso+'T12:00:00');
-  const label=`${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}`;
-  const chip=document.createElement('div');
-  chip.style.cssText='display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--green);color:white;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer';
-  chip.dataset.iso=iso;
-  chip.innerHTML=`${label} <span onclick="removeCustomDate('${iso}')" style="font-size:13px;line-height:1;opacity:0.8">×</span>`;
-  document.getElementById('custom-date-chips').appendChild(chip);
-  // Reset the input for adding another
-  document.getElementById('custom-date-input').value='';
-}
-
-function removeCustomDate(iso){
-  selDates=selDates.filter(x=>x!==iso);
-  const chips=document.getElementById('custom-date-chips');
-  chips.querySelectorAll('[data-iso]').forEach(el=>{ if(el.dataset.iso===iso) el.remove(); });
-  if(selDates.length===0) document.getElementById('btn-any-date').classList.add('selected');
-}
 
 // ── Kickoff pills (Find) — multi-select ──
 function buildKickoffPills(){
