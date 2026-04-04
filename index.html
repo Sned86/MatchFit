@@ -875,10 +875,10 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </header>
 
 <nav class="nav">
-  <button class="nav-btn active" onclick="switchTab('find')" id="nav-find"><span class="nav-icon">🔍</span>Find</button>
+  <button class="nav-btn active" onclick="switchTab('myclub')" id="nav-myclub"><span class="nav-icon">⚽</span>My Club</button>
+  <button class="nav-btn" onclick="switchTab('find')" id="nav-find"><span class="nav-icon">🔍</span>Find</button>
   <button class="nav-btn" onclick="switchTab('requests')" id="nav-requests"><span class="nav-icon">📋</span>My Fixtures</button>
   <button class="nav-btn" onclick="switchTab('browse')" id="nav-browse"><span class="nav-icon">👥</span>Browse</button>
-  <button class="nav-btn" onclick="switchTab('myclub')" id="nav-myclub"><span class="nav-icon">⚽</span>My Club</button>
 </nav>
 
 <!-- Hidden screen anchor for notifications tab (bell icon still navigates here) -->
@@ -887,7 +887,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <main class="content">
 
 <!-- ══ FIND A FIXTURE ══ -->
-<div class="screen active" id="screen-find">
+<div class="screen" id="screen-find">
 
   <div class="card">
     <div class="card-header">
@@ -1050,7 +1050,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </div>
 
 <!-- ══ MY CLUB ══ -->
-<div class="screen" id="screen-myclub">
+<div class="screen active" id="screen-myclub">
 
   <!-- Club header -->
   <div class="profile-header">
