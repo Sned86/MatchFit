@@ -3246,6 +3246,7 @@ function mapClub(row) {
     location:      [row.location, row.county].filter(Boolean).join(', '),
     lat:           parseFloat(row.lat)  || 0,
     lng:           parseFloat(row.lng)  || 0,
+    postcode:      row.postcode || null,
     ground:        row.ground || '',
     badge:         row.badge_url || null,
     nickname:      row.nickname || '',
@@ -3769,17 +3770,57 @@ async function cancelAvailability(availId) {
   }
 }
 
+async function backfillMissingCoords() {
+  const missing = CLUBS.filter(c => (!c.lat || !c.lng) && c.postcode);
+  if (!missing.length) return;
+  console.log(`Resolving coordinates for ${missing.length} club(s)…`);
+  try {
+    const res = await fetch('https://api.postcodes.io/postcodes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postcodes: missing.map(c => c.postcode) })
+    });
+    const data = await res.json();
+    if (!data.result) return;
+    const updates = [];
+    data.result.forEach(r => {
+      if (!r.result) return;
+      const club = missing.find(c => c.postcode.replace(/\s/g,'').toUpperCase() === r.query.replace(/\s/g,'').toUpperCase());
+      if (!club) return;
+      club.lat = r.result.latitude;
+      club.lng = r.result.longitude;
+      updates.push({ id: club.id, lat: r.result.latitude, lng: r.result.longitude });
+    });
+    // Save resolved coords back to Supabase
+    await Promise.all(updates.map(u =>
+      fetch(`${SUPABASE_URL}/rest/v1/clubs?id=eq.${u.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+        },
+        body: JSON.stringify({ lat: u.lat, lng: u.lng })
+      })
+    ));
+    console.log(`Coordinates resolved and saved for ${updates.length} club(s)`);
+  } catch(err) {
+    console.warn('Postcode backfill failed:', err.message);
+  }
+}
+
 async function initApp() {
   showLoadingState('Loading clubs…');
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url&order=name.asc`,
+      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url,postcode&order=name.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
     CLUBS = Array.isArray(clubRows) ? clubRows.map(mapClub) : [];
     console.log(`Loaded ${CLUBS.length} clubs from Supabase`);
+    await backfillMissingCoords();
   } catch(err) {
     console.warn('Supabase clubs fetch failed:', err.message);
     showLoadError('Could not reach the database. Please refresh to try again.');
