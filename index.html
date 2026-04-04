@@ -2341,6 +2341,11 @@ async function declineAmendment(fixtureId) {
   }
 }
 
+function dismissCancellation(fixtureId) {
+  dismissedCancellations.add(fixtureId);
+  renderMyFixtures();
+}
+
 async function dismissDeclinedAmendment(fixtureId) {
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
@@ -2540,6 +2545,7 @@ async function submitNewRequest(){
 // CANCEL GAME
 // ═══════════════════════════════════════════
 let cancelFixtureId = null;
+const dismissedCancellations = new Set();
 function openCancelModal(fixtureId){
   const f = FIXTURES.find(x => x.id === fixtureId);
   if(!f) return;
@@ -3480,7 +3486,8 @@ function renderMyFixtures() {
   if(confirmedPanel) {
     confirmedPanel.innerHTML = '';
     const myConfirmed = FIXTURES.filter(f =>
-      (f.homeId === MY.id || f.awayId === MY.id) && f.status === 'confirmed'
+      (f.homeId === MY.id || f.awayId === MY.id) &&
+      (f.status === 'confirmed' || (f.status === 'cancelled' && f.cancelledByClubId && !dismissedCancellations.has(f.id)))
     );
     if(!myConfirmed.length) {
       confirmedPanel.innerHTML = `<div class="empty-state">
@@ -3501,7 +3508,36 @@ function renderMyFixtures() {
         else if(venueType === 'home_a') venueLabel = f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
         else                            venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
 
-        // Amendment banner
+        // ── Cancelled fixture card ──
+        if(f.status === 'cancelled') {
+          const iCancelled = f.cancelledByClubId === MY.id;
+          const cancellerName = iCancelled ? 'You' : oppName;
+          const reasonText = f.cancellationReason ? ` · ${f.cancellationReason}` : '';
+          const noteText = f.cancellationNote ? `<div style="font-size:11px;color:var(--red-dark);margin-top:3px;opacity:0.85">"${f.cancellationNote}"</div>` : '';
+          card.innerHTML = `
+            <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+              <div class="req-date">${fmtDateFull(f.date)}</div>
+              <div class="status-pill status-cancelled">Cancelled</div>
+            </div>
+            <div style="padding:10px 12px">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;opacity:0.5">
+                ${opp ? badgeHtml(opp, 34, 8) : ''}
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--navy)">${oppName}</div>
+                  <div class="req-meta" style="margin-top:2px">${venueLabel}${f.kickoff?' · '+f.kickoff:''}</div>
+                </div>
+              </div>
+              <div style="padding:10px 12px;background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius-sm)">
+                <div style="font-size:12px;font-weight:700;color:var(--red-dark)">❌ ${cancellerName} cancelled this fixture${reasonText}</div>
+                ${noteText}
+                <button onclick="dismissCancellation(${f.id})" style="margin-top:8px;padding:5px 12px;background:white;border:1.5px solid #fca5a5;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;color:var(--red-dark);cursor:pointer">Dismiss</button>
+              </div>
+            </div>`;
+          confirmedPanel.appendChild(card);
+          return;
+        }
+
+        // ── Confirmed fixture card ──
         const iProposed  = f.amendedDate && f.amendedByClubId === MY.id && !f.amendmentDeclined;
         const theyProposed = f.amendedDate && f.amendedByClubId !== MY.id && !f.amendmentDeclined;
         const declined   = f.amendmentDeclined && f.amendedByClubId === MY.id;
