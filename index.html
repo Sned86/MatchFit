@@ -3508,6 +3508,10 @@ function renderMyFixtures() {
         else if(venueType === 'home_a') venueLabel = f.homeId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
         else                            venueLabel = f.awayId === MY.id ? '🏠 Home (we host)' : '🚌 Away (we travel)';
 
+        const card = document.createElement('div');
+        card.className = 'req-card';
+        card.style.marginBottom = '10px';
+
         // ── Cancelled fixture card ──
         if(f.status === 'cancelled') {
           const iCancelled = f.cancelledByClubId === MY.id;
@@ -3600,9 +3604,6 @@ function renderMyFixtures() {
 
         // Only show Propose Amendment button if no amendment is currently pending/declined
         const canPropose = !f.amendedDate;
-        const card = document.createElement('div');
-        card.className = 'req-card';
-        card.style.marginBottom = '10px';
         card.innerHTML = `
           <div style="padding:9px 12px 4px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
             <div class="req-date">${fmtDateFull(f.date)}</div>
