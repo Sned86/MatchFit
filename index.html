@@ -1600,7 +1600,6 @@ function renderResultsSheet(){
   // Result cards
   results.forEach(c=>{
     const isMaybe=shortlist.includes(c.id);
-    // Check if MY club already has an active (offered) fixture to this club on their available date
     const existingOffer = c.availableDate && FIXTURES.find(f =>
       f.status === 'offered' &&
       f.homeId === MY.id &&
@@ -3742,7 +3741,11 @@ function openEditAvailability(availId) {
   openModal('newreq-modal');
   buildNrDateStrip();
   buildNrKickoffPills(a.date);
-  document.getElementById('nr-home-ground').textContent = MY.ground || 'Your ground';
+  // Store the id immediately so submitNewRequest knows to PATCH rather than POST,
+  // even if something inside the setTimeout below throws
+  const editBtn = document.getElementById('nr-submit-btn');
+  editBtn.dataset.editId = availId;
+  editBtn.textContent = 'Update Availability';
   // Set selected date
   setTimeout(() => {
     document.querySelectorAll('#nr-date-strip .date-btn').forEach(btn => {
@@ -3773,9 +3776,6 @@ function openEditAvailability(availId) {
     document.getElementById('nr-dist-label').textContent = (a.max_distance || 50) + ' miles';
     // Set notes
     document.getElementById('nr-notes').value = a.notes || '';
-    // Store the id so submitNewRequest knows to update rather than insert
-    document.getElementById('nr-submit-btn').dataset.editId = availId;
-    document.getElementById('nr-submit-btn').textContent = 'Update Availability';
     updateNrSubmitBtn();
   }, 50);
 }
