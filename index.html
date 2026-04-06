@@ -685,24 +685,6 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </div>
 
 
-<!-- Double-booking warning modal -->
-<div class="modal-backdrop" id="double-booking-modal" onclick="closeModalOnBackdrop(event,'double-booking-modal')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <div class="modal-title">⚠️ Already have a fixture</div>
-      <div class="modal-sub" id="double-booking-sub">You already have a confirmed fixture on this date</div>
-      <button class="modal-close" onclick="closeModal('double-booking-modal')">&#10005;</button>
-    </div>
-    <div class="modal-body">
-      <div id="double-booking-detail" style="padding:12px 14px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-sm);font-size:13px;color:var(--amber-dark);font-weight:600;line-height:1.5"></div>
-      <div style="font-size:13px;color:var(--text-muted);line-height:1.6">If you're sending out two squads on the same day, tap <strong>Confirm anyway</strong> to proceed. Otherwise go back and decline this offer.</div>
-      <button class="form-submit" id="double-booking-confirm-btn" onclick="proceedAcceptOffer()">Confirm anyway — two squads</button>
-      <button style="width:100%;padding:10px;background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--slate);cursor:pointer" onclick="closeModal('double-booking-modal')">Go back</button>
-    </div>
-  </div>
-</div>
-
 <!-- Amendment modal -->
 <div class="modal-backdrop" id="amend-modal" onclick="closeModalOnBackdrop(event,'amend-modal')">
   <div class="modal-sheet">
@@ -1618,7 +1600,7 @@ function renderResultsSheet(){
   // Result cards
   results.forEach(c=>{
     const isMaybe=shortlist.includes(c.id);
-    // Check if MY club already has an active (offered/confirmed) fixture with this club on their available date
+    // Check if MY club already has an active (offered) fixture to this club on their available date
     const existingOffer = c.availableDate && FIXTURES.find(f =>
       f.status === 'offered' &&
       f.homeId === MY.id &&
@@ -2103,6 +2085,27 @@ async function submitOffer(){
   if(needDate    && !offerDate)   { toast('Please confirm the date first');      return; }
   if(needKickoff && !offerKickoff){ toast('Please confirm the kick-off time');   return; }
   if(needVenue   && !offerVenue)  { toast('Please confirm home or away');        return; }
+
+  // Check for existing active outbound offers or confirmed fixtures on the same date
+  if(offerDate) {
+    const clashes = FIXTURES.filter(f =>
+      f.date === offerDate &&
+      (f.status === 'offered' || f.status === 'confirmed') &&
+      (f.homeId === MY.id || f.awayId === MY.id)
+    );
+    if(clashes.length) {
+      const clashLines = clashes.map(f => {
+        const oppId = f.homeId === MY.id ? f.awayId : f.homeId;
+        const opp   = CLUBS.find(c => c.id === oppId);
+        const label = f.status === 'confirmed' ? 'Confirmed' : 'Offer pending';
+        return `${opp ? opp.name : 'Unknown club'} (${label})`;
+      }).join('\n');
+      const proceed = window.confirm(
+        `You already have a fixture on ${fmtDate(offerDate)}:\n\n${clashLines}\n\nSend this offer anyway? (e.g. two squads)`
+      );
+      if(!proceed) return;
+    }
+  }
 
   const btn = document.getElementById('offer-submit-btn');
   btn.disabled = true;
@@ -3657,59 +3660,10 @@ function renderMyFixtures() {
   }
 }
 
-let pendingAcceptFixtureId = null;
-
 async function acceptOffer(fixtureId) {
-  const f = FIXTURES.find(x => x.id === fixtureId);
-  if (!f) return;
-
-  // Check for existing confirmed fixtures on the same date for MY club
-  const sameDate = FIXTURES.filter(x =>
-    x.id !== fixtureId &&
-    x.status === 'confirmed' &&
-    x.date === f.date &&
-    (x.homeId === MY.id || x.awayId === MY.id)
-  );
-
-  if (sameDate.length) {
-    // Show warning modal — list the clashing fixtures
-    const clashLines = sameDate.map(x => {
-      const oppId  = x.homeId === MY.id ? x.awayId : x.homeId;
-      const opp    = CLUBS.find(c => c.id === oppId);
-      const venue  = x.venue === 'home_a' ? (x.homeId === MY.id ? '🏠 Home' : '🚌 Away')
-                   : x.venue === 'home_b' ? (x.awayId === MY.id ? '🏠 Home' : '🚌 Away')
-                   : '⚖️ Neutral';
-      return `${opp ? opp.name : 'Unknown club'} · ${venue}${x.kickoff ? ' · ' + x.kickoff : ''}`;
-    }).join('<br>');
-
-    const newOppId  = f.homeId === MY.id ? f.awayId : f.homeId;
-    const newOpp    = CLUBS.find(c => c.id === newOppId);
-    document.getElementById('double-booking-sub').textContent =
-      `You already have ${sameDate.length} confirmed fixture${sameDate.length > 1 ? 's' : ''} on ${fmtDate(f.date)}`;
-    document.getElementById('double-booking-detail').innerHTML =
-      `<strong>Existing fixture${sameDate.length > 1 ? 's' : ''}:</strong><br>${clashLines}<br><br>` +
-      `<strong>This offer:</strong><br>${newOpp ? newOpp.name : 'Unknown club'}` +
-      `${f.kickoff ? ' · ' + f.kickoff : ''}`;
-
-    pendingAcceptFixtureId = fixtureId;
-    openModal('double-booking-modal');
-    return;
-  }
-
-  await proceedAcceptOffer(fixtureId);
-}
-
-async function proceedAcceptOffer(fixtureId) {
-  const id = fixtureId || pendingAcceptFixtureId;
-  pendingAcceptFixtureId = null;
-  closeModal('double-booking-modal');
-
-  const confirmBtn = document.getElementById('double-booking-confirm-btn');
-  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Confirming…'; }
-
   try {
     // 1. Confirm the fixture
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${id}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/fixtures?id=eq.${fixtureId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -3748,8 +3702,6 @@ async function proceedAcceptOffer(fixtureId) {
     renderCalendar();
   } catch(err) {
     toast('Error: ' + err.message);
-  } finally {
-    if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Confirm anyway — two squads'; }
   }
 }
 
