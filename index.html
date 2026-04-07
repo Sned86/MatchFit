@@ -2522,6 +2522,20 @@ async function submitNewRequest(){
 
   const btn = document.getElementById('nr-submit-btn');
   const editId = btn.dataset.editId || null;
+
+  // Warn if already posting open availability on this date (new posts only)
+  if(!editId) {
+    const clash = AVAILABILITY.find(a =>
+      a.club_id === MY.id && a.status === 'open' && a.date === nrDate
+    );
+    if(clash) {
+      const proceed = window.confirm(
+        `You already have an open availability slot on ${fmtDate(nrDate)}.\n\nPost another one anyway? (e.g. different venue or kick-off preference)`
+      );
+      if(!proceed) return;
+    }
+  }
+
   btn.disabled=true; btn.textContent= editId ? 'Updating…' : 'Posting…';
 
   try {
