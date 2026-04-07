@@ -2720,11 +2720,30 @@ function openTeamProfile(clubId){
 
     <div class="tp-avail-section">
       <div class="tp-avail-head">📅 Current Availability</div>
-      <div class="tp-avail-slot">
-        <div style="padding:4px 0">
-          <div class="tp-avail-date" style="font-size:13px;color:var(--text-muted)">No availability posted yet</div>
-        </div>
-      </div>
+      ${(() => {
+        const slots = AVAILABILITY.filter(a => a.club_id === c.id && a.status === 'open');
+        if (!slots.length) return `
+          <div class="tp-avail-slot">
+            <div style="padding:4px 0">
+              <div class="tp-avail-date" style="font-size:13px;color:var(--text-muted)">No availability posted yet</div>
+            </div>
+          </div>`;
+        const venueMap = {home:'🏠 Home', away:'🚌 Away', either:'🔄 Home or Away', neutral:'⚖️ Neutral'};
+        return slots.map(a => {
+          const kickLabel  = a.kickoff_pref?.length ? a.kickoff_pref.join(' or ') : 'Any time';
+          const venueLabel = venueMap[a.venue] || a.venue;
+          return `<div class="tp-avail-slot">
+            <div style="flex:1;min-width:0">
+              <div class="tp-avail-date">${fmtDateFull(a.date)}</div>
+              <div class="tp-avail-meta">${venueLabel} · ${kickLabel}</div>
+              ${a.notes ? `<div class="tp-avail-meta" style="font-style:italic;margin-top:2px">"${a.notes}"</div>` : ''}
+            </div>
+            <div class="tp-avail-actions">
+              <button class="btn-offer-slot" onclick="closeTeamProfile();openOfferModal(${c.id},'${a.date}',${a.kickoff_pref?.[0]?`'${a.kickoff_pref[0]}'`:'null'},${a.venue==='either'?'null':`'${a.venue}'`})">Offer →</button>
+            </div>
+          </div>`;
+        }).join('');
+      })()}
     </div>
 
     <div class="info-section" style="margin-bottom:12px">
