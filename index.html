@@ -1071,7 +1071,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
   <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden">
     <div class="profile-stats">
       <div class="profile-stat"><div class="profile-stat-val" id="myclub-open-avail">—</div><div class="profile-stat-key">Open Slots</div></div>
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Unconfirmed</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Under Offer</div></div>
       <div class="profile-stat"><div class="profile-stat-val" id="myclub-confirmed">—</div><div class="profile-stat-key">Confirmed</div></div>
     </div>
   </div>
@@ -1257,20 +1257,28 @@ function openFreeOnDateModal(isoDate){
     </div>`;
   } else {
     body.innerHTML = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">${matches.length} club${matches.length!==1?'s':''} available</div>` +
-      matches.map(c => `
-        <div class="browse-club-card" style="margin-bottom:10px" onclick="closeModal('free-on-date-modal');openOfferModal(${c.id})">
+      matches.map(c => {
+        const alreadyOffered = FIXTURES.find(f =>
+          f.status === 'offered' && f.homeId === MY.id && f.awayId === c.id && f.date === c.availableDate
+        );
+        const offerBtn = alreadyOffered
+          ? `<button class="btn-offer-slot" disabled style="white-space:nowrap;flex-shrink:0;background:var(--amber-light);color:var(--amber-dark);cursor:not-allowed;opacity:0.8">📨 Offer sent</button>`
+          : `<button class="btn-offer-slot" style="white-space:nowrap;flex-shrink:0" onclick="event.stopPropagation();closeModal('free-on-date-modal');openOfferModal(${c.id})">Offer →</button>`;
+        const cardClick = alreadyOffered ? '' : `onclick="closeModal('free-on-date-modal');openOfferModal(${c.id})"`;
+        return `
+        <div class="browse-club-card" style="margin-bottom:10px" ${cardClick}>
           ${badgeHtml(c, 42, 10)}
           <div class="browse-club-info">
             <div class="browse-club-name">${c.name}</div>
             <div class="browse-club-meta">📍 ${c.location} · ${c.distance} mi away</div>
             <div class="browse-club-tags">
-              
               ${c.kickoffAvail ? `<span class="tag" style="background:#f1f5f9;color:var(--slate)">⏱ ${c.kickoffAvail}</span>` : ''}
               ${c.venueAvail ? `<span class="tag" style="background:#f1f5f9;color:var(--slate)">${c.venueAvail==='home'?'🏠 Home only':c.venueAvail==='away'?'🚌 Away only':'🔄 H/A'}</span>` : ''}
             </div>
           </div>
-          <button class="btn-offer-slot" style="white-space:nowrap;flex-shrink:0" onclick="event.stopPropagation();closeModal('free-on-date-modal');openOfferModal(${c.id})">Offer →</button>
-        </div>`).join('');
+          ${offerBtn}
+        </div>`;
+      }).join('');
   }
   openModal('free-on-date-modal');
 }
@@ -2736,6 +2744,12 @@ function openTeamProfile(clubId){
         return slots.map(a => {
           const kickLabel  = a.kickoff_pref?.length ? a.kickoff_pref.join(' or ') : 'Any time';
           const venueLabel = venueMap[a.venue] || a.venue;
+          const alreadyOffered = FIXTURES.find(f =>
+            f.status === 'offered' && f.homeId === MY.id && f.awayId === c.id && f.date === a.date
+          );
+          const offerBtn = alreadyOffered
+            ? `<button class="btn-offer-slot" disabled style="background:var(--amber-light);color:var(--amber-dark);cursor:not-allowed;opacity:0.8">📨 Offer sent</button>`
+            : `<button class="btn-offer-slot" onclick="closeTeamProfile();openOfferModal(${c.id},'${a.date}',${a.kickoff_pref?.[0]?`'${a.kickoff_pref[0]}'`:'null'},${a.venue==='either'?'null':`'${a.venue}'`})">Offer →</button>`;
           return `<div class="tp-avail-slot">
             <div style="flex:1;min-width:0">
               <div class="tp-avail-date">${fmtDateFull(a.date)}</div>
@@ -2743,7 +2757,7 @@ function openTeamProfile(clubId){
               ${a.notes ? `<div class="tp-avail-meta" style="font-style:italic;margin-top:2px">"${a.notes}"</div>` : ''}
             </div>
             <div class="tp-avail-actions">
-              <button class="btn-offer-slot" onclick="closeTeamProfile();openOfferModal(${c.id},'${a.date}',${a.kickoff_pref?.[0]?`'${a.kickoff_pref[0]}'`:'null'},${a.venue==='either'?'null':`'${a.venue}'`})">Offer →</button>
+              ${offerBtn}
             </div>
           </div>`;
         }).join('');
@@ -2760,7 +2774,12 @@ function openTeamProfile(clubId){
       </div>
     </div>
 
-    <button class="tp-propose-btn" onclick="closeTeamProfile();openOfferModal(${c.id},null,null,null)">⚽ Propose a Match to ${c.name}</button>
+    ${(() => {
+      const anyOfferOut = FIXTURES.find(f => f.status === 'offered' && f.homeId === MY.id && f.awayId === c.id);
+      return anyOfferOut
+        ? `<button class="tp-propose-btn" disabled style="background:var(--amber-light);color:var(--amber-dark);cursor:not-allowed;border:1.5px solid #fcd34d">📨 Offer already sent</button>`
+        : `<button class="tp-propose-btn" onclick="closeTeamProfile();openOfferModal(${c.id},null,null,null)">⚽ Propose a Match to ${c.name}</button>`;
+    })()}
   `;
   document.getElementById('team-profile-overlay').classList.add('open');
   document.body.style.overflow='hidden';
