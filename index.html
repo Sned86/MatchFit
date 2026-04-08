@@ -875,10 +875,10 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </header>
 
 <nav class="nav">
-  <button class="nav-btn active" onclick="switchTab('myclub')" id="nav-myclub"><span class="nav-icon">⚽</span>My Club</button>
-  <button class="nav-btn" onclick="switchTab('find')" id="nav-find"><span class="nav-icon">🔍</span>Find</button>
+  <button class="nav-btn active" onclick="switchTab('find')" id="nav-find"><span class="nav-icon">🔍</span>Find</button>
   <button class="nav-btn" onclick="switchTab('requests')" id="nav-requests"><span class="nav-icon">📋</span>My Fixtures</button>
   <button class="nav-btn" onclick="switchTab('browse')" id="nav-browse"><span class="nav-icon">👥</span>Browse</button>
+  <button class="nav-btn" onclick="switchTab('myclub')" id="nav-myclub"><span class="nav-icon">⚽</span>My Club</button>
 </nav>
 
 <!-- Hidden screen anchor for notifications tab (bell icon still navigates here) -->
@@ -887,7 +887,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 <main class="content">
 
 <!-- ══ FIND A FIXTURE ══ -->
-<div class="screen" id="screen-find">
+<div class="screen active" id="screen-find">
 
   <div class="card">
     <div class="card-header">
@@ -1050,7 +1050,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 </div>
 
 <!-- ══ MY CLUB ══ -->
-<div class="screen active" id="screen-myclub">
+<div class="screen" id="screen-myclub">
 
   <!-- Club header -->
   <div class="profile-header">
@@ -1065,10 +1065,14 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <div class="profile-level" id="myclub-league"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Stats row (separate card) -->
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden">
     <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-confirmed">—</div><div class="profile-stat-key">Confirmed</div></div>
-      <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Unconfirmed</div></div>
       <div class="profile-stat"><div class="profile-stat-val" id="myclub-open-avail">—</div><div class="profile-stat-key">Open Slots</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-unconfirmed">—</div><div class="profile-stat-key">Unconfirmed</div></div>
+      <div class="profile-stat"><div class="profile-stat-val" id="myclub-confirmed">—</div><div class="profile-stat-key">Confirmed</div></div>
     </div>
   </div>
 
@@ -2961,7 +2965,7 @@ function renderMyClub(club, userEmail) {
   // Stats
   const myFixtures = FIXTURES.filter(f => f.homeId === club.id || f.awayId === club.id);
   const confirmed   = myFixtures.filter(f => f.status === 'confirmed').length;
-  const unconfirmed = myFixtures.filter(f => f.status !== 'confirmed').length;
+  const unconfirmed = myFixtures.filter(f => f.status === 'offered').length;
   const openSlots   = AVAILABILITY.filter(a => a.club_id === club.id && a.status === 'open').length;
   document.getElementById('myclub-confirmed').textContent   = confirmed;
   document.getElementById('myclub-unconfirmed').textContent = unconfirmed;
@@ -3290,7 +3294,6 @@ async function handleAuthSession(session) {
   }
 
   document.getElementById('auth-wall').style.display = 'none';
-  switchTab('myclub');
 }
 
 // ═══════════════════════════════════════════
