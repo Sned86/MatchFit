@@ -3310,6 +3310,7 @@ function mapClub(row) {
     lng:           parseFloat(row.lng)  || 0,
     ground:        row.ground || '',
     badge:         row.badge_url || null,
+    postcode:      row.postcode || null,
     nickname:      row.nickname || '',
     home_colours:  row.home_colours || '',
     away_colours:  row.away_colours || '',
@@ -3832,12 +3833,61 @@ async function cancelAvailability(availId) {
   }
 }
 
+// ═══════════════════════════════════════════
+// POSTCODE BACKFILL
+// ═══════════════════════════════════════════
+async function backfillMissingCoords() {
+  const missing = CLUBS.filter(c => (!c.lat || c.lat === 0) && (!c.lng || c.lng === 0) && c.postcode);
+  if (!missing.length) { console.log('No clubs need coordinate backfill'); return; }
+  console.log(`Backfilling coords for ${missing.length} clubs…`);
+  const CHUNK = 100;
+  for (let i = 0; i < missing.length; i += CHUNK) {
+    const chunk = missing.slice(i, i + CHUNK);
+    try {
+      const res = await fetch('https://api.postcodes.io/postcodes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postcodes: chunk.map(c => c.postcode) })
+      });
+      if (!res.ok) { console.warn('postcodes.io error', res.status); continue; }
+      const data = await res.json();
+      const updates = [];
+      data.result.forEach(item => {
+        if (item.result) {
+          const lat = item.result.latitude;
+          const lng = item.result.longitude;
+          const club = chunk.find(c => c.postcode === item.query);
+          if (club && lat && lng) {
+            club.lat = lat;
+            club.lng = lng;
+            updates.push({ id: club.id, lat, lng });
+          }
+        }
+      });
+      updates.forEach(u => {
+        fetch(`${SUPABASE_URL}/rest/v1/clubs?id=eq.${u.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ lat: u.lat, lng: u.lng })
+        }).catch(e => console.warn('Coord save failed for club', u.id, e.message));
+      });
+      console.log(`Backfilled ${updates.length} clubs in chunk`);
+    } catch(err) {
+      console.warn('postcodes.io batch failed:', err.message);
+    }
+  }
+}
+
 async function initApp() {
   showLoadingState('Loading clubs…');
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url&order=name.asc`,
+      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url,postcode&order=name.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
@@ -3848,6 +3898,7 @@ async function initApp() {
     showLoadError('Could not reach the database. Please refresh to try again.');
   }
 
+  await backfillMissingCoords();
   await loadAvailability();
 
   // Build dynamic league filters from loaded club data
