@@ -2953,6 +2953,17 @@ async function submitSignOut() {
   showAuthPanel('login');
 }
 
+function updateMyClubStats() {
+  if (!MY.id) return;
+  const myFixtures  = FIXTURES.filter(f => f.homeId === MY.id || f.awayId === MY.id);
+  const confirmed   = myFixtures.filter(f => f.status === 'confirmed').length;
+  const unconfirmed = myFixtures.filter(f => f.status === 'offered').length;
+  const openSlots   = AVAILABILITY.filter(a => a.club_id === MY.id && a.status === 'open').length;
+  document.getElementById('myclub-confirmed').textContent   = confirmed;
+  document.getElementById('myclub-unconfirmed').textContent = unconfirmed;
+  document.getElementById('myclub-open-avail').textContent  = openSlots;
+}
+
 function renderMyClub(club, userEmail) {
   if (!club) return;
   // Badge
@@ -2963,13 +2974,7 @@ function renderMyClub(club, userEmail) {
   document.getElementById('myclub-location').textContent = club.location ? '📍 ' + club.location : '';
   document.getElementById('myclub-league').textContent = club.league || '';
   // Stats
-  const myFixtures = FIXTURES.filter(f => f.homeId === club.id || f.awayId === club.id);
-  const confirmed   = myFixtures.filter(f => f.status === 'confirmed').length;
-  const unconfirmed = myFixtures.filter(f => f.status === 'offered').length;
-  const openSlots   = AVAILABILITY.filter(a => a.club_id === club.id && a.status === 'open').length;
-  document.getElementById('myclub-confirmed').textContent   = confirmed;
-  document.getElementById('myclub-unconfirmed').textContent = unconfirmed;
-  document.getElementById('myclub-open-avail').textContent  = openSlots;
+  updateMyClubStats();
   // Details grid
   document.getElementById('myclub-ground').textContent          = club.ground || '—';
   document.getElementById('myclub-league-detail').textContent   = club.league || '—';
@@ -3375,6 +3380,7 @@ async function loadAvailability() {
     AVAILABILITY = Array.isArray(rows) ? rows : [];
     console.log(`Loaded ${AVAILABILITY.length} availability slots`);
     renderCalendar();
+    updateMyClubStats();
     // Attach availability to clubs for search/browse
     CLUBS.forEach(c => {
       const avail = AVAILABILITY.filter(a => a.club_id === c.id);
@@ -3696,6 +3702,7 @@ function renderMyFixtures() {
       });
     }
   }
+  updateMyClubStats();
 }
 
 async function acceptOffer(fixtureId) {
