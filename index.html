@@ -2774,12 +2774,7 @@ function openTeamProfile(clubId){
       </div>
     </div>
 
-    ${(() => {
-      const anyOfferOut = FIXTURES.find(f => f.status === 'offered' && f.homeId === MY.id && f.awayId === c.id);
-      return anyOfferOut
-        ? `<button class="tp-propose-btn" disabled style="background:var(--amber-light);color:var(--amber-dark);cursor:not-allowed;border:1.5px solid #fcd34d">📨 Offer already sent</button>`
-        : `<button class="tp-propose-btn" onclick="closeTeamProfile();openOfferModal(${c.id},null,null,null)">⚽ Propose a Match to ${c.name}</button>`;
-    })()}
+    <button class="tp-propose-btn" onclick="closeTeamProfile();openOfferModal(${c.id},null,null,null)">⚽ Propose a Match to ${c.name}</button>
   `;
   document.getElementById('team-profile-overlay').classList.add('open');
   document.body.style.overflow='hidden';
