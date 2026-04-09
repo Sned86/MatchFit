@@ -2786,17 +2786,40 @@ function renderBrowse(){
 function openTeamProfile(clubId){
   const c=CLUBS.find(x=>x.id===clubId);if(!c)return;
   const dist=haversine(MY.lat,MY.lng,c.lat,c.lng);
+
+  // Compute banner colours — same logic as My Club header
+  const _p = isValidHex(c.primary_colour)   ? c.primary_colour.trim()   : null;
+  const _s = isValidHex(c.secondary_colour) ? c.secondary_colour.trim() : null;
+  let tpBannerBg, tpBannerBorder;
+  if (_p && _s) {
+    tpBannerBg     = `linear-gradient(135deg, ${_p} 0%, ${_s} 100%)`;
+    tpBannerBorder = 'rgba(0,0,0,0.15)';
+  } else if (_p) {
+    tpBannerBg     = `linear-gradient(135deg, ${_p} 0%, ${_p}bb 100%)`;
+    tpBannerBorder = 'rgba(0,0,0,0.15)';
+  } else {
+    tpBannerBg     = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+    tpBannerBorder = 'var(--green-mid)';
+  }
+  const _textCol  = contrastColour(_p || '#f0fdf4');
+  const _mutedCol = _textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
+  const _pillBg   = _p ? (_textCol === '#ffffff' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.10)') : '';
+  const _pillBorder = _p ? `1px solid ${_textCol === '#ffffff' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}` : '';
+
   document.getElementById('tp-title').textContent=c.name;
   document.getElementById('tp-body').innerHTML=`
-    <div class="tp-profile-banner">
+    <div class="tp-profile-banner" style="background:${tpBannerBg};border-color:${tpBannerBorder}">
       <div class="tp-profile-top">
         ${badgeHtml(c, 54, 14)}
         <div>
-          <div class="tp-name">${c.name}</div>
-          <div class="tp-location">📍 ${c.location}</div>
-          ${c.league ? `<div style="margin-top:6px"><span class="tp-level">${c.league}</span></div>` : ''}
+          <div class="tp-name" style="color:${_textCol}">${c.name}</div>
+          <div class="tp-location" style="color:${_mutedCol}">📍 ${c.location}</div>
+          ${c.league ? `<div style="margin-top:6px"><span class="tp-level" style="background:${_pillBg};color:${_textCol};border:${_pillBorder}">${c.league}</span></div>` : ''}
         </div>
       </div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px">
       <div class="tp-stats">
         <div class="tp-stat"><div class="tp-stat-val">${dist}</div><div class="tp-stat-key">Miles away</div></div>
         <div class="tp-stat"><div class="tp-stat-val">${travel(dist)}</div><div class="tp-stat-key">Travel</div></div>
