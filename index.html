@@ -1245,11 +1245,11 @@ function applyClubHeaderColours(club) {
   const s = isValidHex(club.secondary_colour)  ? club.secondary_colour.trim()  : null;
   if (p) {
     header.style.background   = p;
-    header.style.borderColor  = '#000';
+    header.style.border       = `1.5px solid ${s || '#000'}`;
     header.style.borderLeft   = s ? `6px solid ${s}` : '1.5px solid #000';
   } else {
     header.style.background   = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
-    header.style.borderColor  = '#000';
+    header.style.border       = '1.5px solid #000';
     header.style.borderLeft   = '1.5px solid #000';
   }
   const base     = p || '#f0fdf4';
@@ -2771,19 +2771,25 @@ function renderBrowse(){
   const el=document.getElementById('browse-clubs-list');
   if(!clubs.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No clubs match</div><div class="empty-sub">Try adjusting the filters above.</div></div>`;return;}
   el.innerHTML=`<div class="browse-section-head">${clubs.length} club${clubs.length!==1?'s':''} — sorted by distance</div>`+
-    clubs.map(c=>`
-      <div class="browse-club-card" onclick="openTeamProfile(${c.id})">
-        ${badgeHtml(c, 42, 10)}
+    clubs.map(c=>{
+      const _p = isValidHex(c.primary_colour)   ? c.primary_colour.trim()   : null;
+      const _s = isValidHex(c.secondary_colour) ? c.secondary_colour.trim() : null;
+      const cardBorder     = _s ? `1.5px solid ${_s}` : '1.5px solid var(--border)';
+      const cardBorderLeft = _p && _s ? `6px solid ${_p}` : (cardBorder);
+      const badgeBorder    = _s ? `1.5px solid ${_s}` : '1.5px solid var(--green-mid)';
+      return `
+      <div class="browse-club-card" style="margin-bottom:14px;border:${cardBorder};border-left:${cardBorderLeft}" onclick="openTeamProfile(${c.id})">
+        ${badgeHtml(c, 42, 10, badgeBorder)}
         <div class="browse-club-info">
           <div class="browse-club-name">${c.name}</div>
           <div class="browse-club-meta">📍 ${c.location} · ${c.distance} mi away</div>
           <div class="browse-club-tags">
-            
             <span class="tag tag-league">${c.league}</span>
           </div>
         </div>
         <div class="browse-avail">${c.availableDate?'Available':'—'}</div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -2797,6 +2803,7 @@ function openTeamProfile(clubId){
   const _p = isValidHex(c.primary_colour)   ? c.primary_colour.trim()   : null;
   const _s = isValidHex(c.secondary_colour) ? c.secondary_colour.trim() : null;
   const tpBannerBg         = _p || 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+  const tpBannerBorder     = _s || '#000';
   const tpBannerBorderLeft = _p && _s ? `6px solid ${_s}` : '1.5px solid #000';
   const _textCol   = contrastColour(_p || '#f0fdf4');
   const _mutedCol  = _textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
@@ -2806,7 +2813,7 @@ function openTeamProfile(clubId){
 
   document.getElementById('tp-title').textContent=c.name;
   document.getElementById('tp-body').innerHTML=`
-    <div class="tp-profile-banner" style="background:${tpBannerBg};border-left:${tpBannerBorderLeft}">
+    <div class="tp-profile-banner" style="background:${tpBannerBg};border-color:${tpBannerBorder};border-left:${tpBannerBorderLeft}">
       <div class="tp-profile-top">
         ${badgeHtml(c, 54, 14, _badgeBorder)}
         <div>
