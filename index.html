@@ -2774,20 +2774,26 @@ function renderBrowse(){
     clubs.map(c=>{
       const _p = isValidHex(c.primary_colour)   ? c.primary_colour.trim()   : null;
       const _s = isValidHex(c.secondary_colour) ? c.secondary_colour.trim() : null;
+      const cardBg         = _p ? _p : 'var(--bg)';
       const cardBorder     = _s ? `1.5px solid ${_s}` : '1.5px solid var(--border)';
-      const cardBorderLeft = _p && _s ? `6px solid ${_p}` : (cardBorder);
+      const cardBorderLeft = _s ? `6px solid ${_s}` : cardBorder;
       const badgeBorder    = _s ? `1.5px solid ${_s}` : '1.5px solid var(--green-mid)';
+      const _textCol       = contrastColour(_p || '#ffffff');
+      const _mutedCol      = _textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
+      const _availCol      = _textCol === '#ffffff' ? 'rgba(255,255,255,0.85)' : 'var(--green)';
+      const _tagBg         = _p ? (_textCol === '#ffffff' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.08)') : '#f1f5f9';
+      const _tagCol        = _p ? _textCol : 'var(--slate)';
       return `
-      <div class="browse-club-card" style="margin-bottom:14px;border:${cardBorder};border-left:${cardBorderLeft}" onclick="openTeamProfile(${c.id})">
+      <div class="browse-club-card" style="margin-bottom:14px;background:${cardBg};border:${cardBorder};border-left:${cardBorderLeft}" onclick="openTeamProfile(${c.id})">
         ${badgeHtml(c, 42, 10, badgeBorder)}
         <div class="browse-club-info">
-          <div class="browse-club-name">${c.name}</div>
-          <div class="browse-club-meta">📍 ${c.location} · ${c.distance} mi away</div>
+          <div class="browse-club-name" style="color:${_textCol}">${c.name}</div>
+          <div class="browse-club-meta" style="color:${_mutedCol}">📍 ${c.location} · ${c.distance} mi away</div>
           <div class="browse-club-tags">
-            <span class="tag tag-league">${c.league}</span>
+            <span class="tag tag-league" style="background:${_tagBg};color:${_tagCol}">${c.league}</span>
           </div>
         </div>
-        <div class="browse-avail">${c.availableDate?'Available':'—'}</div>
+        <div class="browse-avail" style="color:${_availCol}">${c.availableDate?'Available':'—'}</div>
       </div>`;
     }).join('');
 }
