@@ -1243,15 +1243,17 @@ function applyClubHeaderColours(club) {
   if (!header) return;
   const p = isValidHex(club.primary_colour)    ? club.primary_colour.trim()    : null;
   const s = isValidHex(club.secondary_colour)  ? club.secondary_colour.trim()  : null;
-  if (p && s) {
-    header.style.background  = `linear-gradient(135deg, ${p} 0%, ${s} 100%)`;
-  } else if (p) {
-    header.style.background  = `linear-gradient(135deg, ${p} 0%, ${p}bb 100%)`;
+  if (p) {
+    header.style.background   = p;
+    header.style.borderColor  = '#000';
+    header.style.borderLeft   = s ? `6px solid ${s}` : '1.5px solid #000';
   } else {
-    header.style.background  = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+    header.style.background   = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+    header.style.borderColor  = '#000';
+    header.style.borderLeft   = '1.5px solid #000';
   }
-  const base    = p || '#f0fdf4';
-  const textCol = contrastColour(base);
+  const base     = p || '#f0fdf4';
+  const textCol  = contrastColour(base);
   const mutedCol = textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
   document.getElementById('myclub-name').style.color     = textCol;
   document.getElementById('myclub-location').style.color = mutedCol;
@@ -1264,6 +1266,12 @@ function applyClubHeaderColours(club) {
     leaguePill.style.background = '';
     leaguePill.style.color      = '';
     leaguePill.style.border     = '';
+  }
+  // Badge ring — secondary colour if available, else black
+  const badgeWrap = document.getElementById('myclub-badge-wrap');
+  if (badgeWrap) {
+    const badgeBorder = s ? `1.5px solid ${s}` : '1.5px solid #000';
+    badgeWrap.innerHTML = badgeHtml(club, 72, 16, badgeBorder);
   }
 }
 
@@ -2785,27 +2793,22 @@ function openTeamProfile(clubId){
   const c=CLUBS.find(x=>x.id===clubId);if(!c)return;
   const dist=haversine(MY.lat,MY.lng,c.lat,c.lng);
 
-  // Compute banner colours — same logic as My Club header
+  // Compute banner colours
   const _p = isValidHex(c.primary_colour)   ? c.primary_colour.trim()   : null;
   const _s = isValidHex(c.secondary_colour) ? c.secondary_colour.trim() : null;
-  let tpBannerBg;
-  if (_p && _s) {
-    tpBannerBg     = `linear-gradient(135deg, ${_p} 0%, ${_s} 100%)`;
-  } else if (_p) {
-    tpBannerBg     = `linear-gradient(135deg, ${_p} 0%, ${_p}bb 100%)`;
-  } else {
-    tpBannerBg     = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
-  }
-  const _textCol  = contrastColour(_p || '#f0fdf4');
-  const _mutedCol = _textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
-  const _pillBg   = _p ? (_textCol === '#ffffff' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.10)') : '';
+  const tpBannerBg         = _p || 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+  const tpBannerBorderLeft = _p && _s ? `6px solid ${_s}` : '1.5px solid #000';
+  const _textCol   = contrastColour(_p || '#f0fdf4');
+  const _mutedCol  = _textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
+  const _pillBg    = _p ? (_textCol === '#ffffff' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.10)') : '';
   const _pillBorder = _p ? `1px solid ${_textCol === '#ffffff' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}` : '';
+  const _badgeBorder = _s ? `1.5px solid ${_s}` : '1.5px solid #000';
 
   document.getElementById('tp-title').textContent=c.name;
   document.getElementById('tp-body').innerHTML=`
-    <div class="tp-profile-banner" style="background:${tpBannerBg}">
+    <div class="tp-profile-banner" style="background:${tpBannerBg};border-left:${tpBannerBorderLeft}">
       <div class="tp-profile-top">
-        ${badgeHtml(c, 54, 14, '1.5px solid #000')}
+        ${badgeHtml(c, 54, 14, _badgeBorder)}
         <div>
           <div class="tp-name" style="color:${_textCol}">${c.name}</div>
           <div class="tp-location" style="color:${_mutedCol}">📍 ${c.location}</div>
@@ -3072,9 +3075,6 @@ function updateMyClubStats() {
 
 function renderMyClub(club, userEmail) {
   if (!club) return;
-  // Badge
-  const badgeWrap = document.getElementById('myclub-badge-wrap');
-  if (badgeWrap) badgeWrap.innerHTML = badgeHtml(club, 72, 16, '1.5px solid #000');
   // Header
   document.getElementById('myclub-name').textContent = club.name || '—';
   document.getElementById('myclub-location').textContent = club.location ? '📍 ' + club.location : '';
