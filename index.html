@@ -1157,6 +1157,23 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
           <div class="form-field"><label class="form-label">Twitter / X</label><input class="form-input" id="edit-twitter" placeholder="@yourclub"></div>
           <div class="form-field"><label class="form-label">Instagram</label><input class="form-input" id="edit-instagram" placeholder="@yourclub"></div>
         </div>
+        <div class="form-section-label" style="border-top:none;padding-top:0;margin-top:2px">Club Colours <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--slate-light)">(hex codes, e.g. #d00000)</span></div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Primary Colour</label>
+            <div style="position:relative">
+              <input class="form-input" id="edit-primary-colour" placeholder="#rrggbb" maxlength="7" style="padding-left:38px" oninput="updateColourSwatch('primary')">
+              <div id="swatch-primary" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:4px;border:1px solid var(--border);background:#e2e8f0"></div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Secondary Colour</label>
+            <div style="position:relative">
+              <input class="form-input" id="edit-secondary-colour" placeholder="#rrggbb" maxlength="7" style="padding-left:38px" oninput="updateColourSwatch('secondary')">
+              <div id="swatch-secondary" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:4px;border:1px solid var(--border);background:#e2e8f0"></div>
+            </div>
+          </div>
+        </div>
         <div style="display:flex;gap:8px">
           <button class="form-submit" style="flex:1" onclick="saveClubDetails()">Save Changes</button>
           <button onclick="toggleClubEdit()" style="flex:1;padding:13px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--slate);cursor:pointer">Cancel</button>
@@ -1197,6 +1214,63 @@ let cancelReason='';
 // ═══════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════
+
+// ─── Colour / contrast helpers ──────────────────────────────────────────────
+function hexLuminance(hex) {
+  const h = hex.replace('#','');
+  const r = parseInt(h.slice(0,2),16)/255;
+  const g = parseInt(h.slice(2,4),16)/255;
+  const b = parseInt(h.slice(4,6),16)/255;
+  const lin = c => c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4);
+  return 0.2126*lin(r) + 0.7152*lin(g) + 0.0722*lin(b);
+}
+function contrastColour(hex) {
+  if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return '#0f172a';
+  return hexLuminance(hex) > 0.35 ? '#0f172a' : '#ffffff';
+}
+function isValidHex(v) {
+  return v && /^#[0-9a-fA-F]{6}$/.test(v.trim());
+}
+function updateColourSwatch(which) {
+  const input = document.getElementById('edit-' + which + '-colour');
+  const swatch = document.getElementById('swatch-' + which);
+  if (!input || !swatch) return;
+  const val = input.value.trim();
+  swatch.style.background = isValidHex(val) ? val : '#e2e8f0';
+}
+function applyClubHeaderColours(club) {
+  const header = document.querySelector('.profile-header');
+  if (!header) return;
+  const p = isValidHex(club.primary_colour)    ? club.primary_colour.trim()    : null;
+  const s = isValidHex(club.secondary_colour)  ? club.secondary_colour.trim()  : null;
+  if (p && s) {
+    header.style.background  = `linear-gradient(135deg, ${p} 0%, ${s} 100%)`;
+    header.style.borderColor = 'rgba(0,0,0,0.15)';
+  } else if (p) {
+    // Darken the single colour slightly for the end stop
+    header.style.background  = `linear-gradient(135deg, ${p} 0%, ${p}bb 100%)`;
+    header.style.borderColor = 'rgba(0,0,0,0.15)';
+  } else {
+    header.style.background  = 'linear-gradient(135deg,#f0fdf4,#dcfce7)';
+    header.style.borderColor = 'var(--green-mid)';
+  }
+  const base    = p || '#f0fdf4';
+  const textCol = contrastColour(base);
+  const mutedCol = textCol === '#ffffff' ? 'rgba(255,255,255,0.72)' : 'rgba(15,23,42,0.58)';
+  document.getElementById('myclub-name').style.color     = textCol;
+  document.getElementById('myclub-location').style.color = mutedCol;
+  const leaguePill = document.getElementById('myclub-league');
+  if (p) {
+    leaguePill.style.background = textCol === '#ffffff' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.10)';
+    leaguePill.style.color      = textCol;
+    leaguePill.style.border     = `1px solid ${textCol === '#ffffff' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`;
+  } else {
+    leaguePill.style.background = '';
+    leaguePill.style.color      = '';
+    leaguePill.style.border     = '';
+  }
+}
+
 function haversine(la1,lo1,la2,lo2){
   const R=3958.8,r=Math.PI/180,dL=(la2-la1)*r,dG=(lo2-lo1)*r;
   const a=Math.sin(dL/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dG/2)**2;
@@ -3010,7 +3084,13 @@ function renderMyClub(club, userEmail) {
   document.getElementById('edit-website').value        = club.website_url || '';
   document.getElementById('edit-facebook').value       = club.facebook_url || '';
   document.getElementById('edit-twitter').value        = club.twitter_url || '';
-  document.getElementById('edit-instagram').value      = club.instagram_url || '';
+  document.getElementById('edit-instagram').value       = club.instagram_url || '';
+  document.getElementById('edit-primary-colour').value  = club.primary_colour || '';
+  document.getElementById('edit-secondary-colour').value= club.secondary_colour || '';
+  updateColourSwatch('primary');
+  updateColourSwatch('secondary');
+  // Apply club colours to header
+  applyClubHeaderColours(club);
   // Account modal
   document.getElementById('account-modal-club').textContent = club.name || '—';
   document.getElementById('account-email').value = userEmail || '';
@@ -3199,7 +3279,9 @@ async function saveClubDetails() {
     website_url:    document.getElementById('edit-website').value.trim() || null,
     facebook_url:   document.getElementById('edit-facebook').value.trim() || null,
     twitter_url:    document.getElementById('edit-twitter').value.trim() || null,
-    instagram_url:  document.getElementById('edit-instagram').value.trim() || null,
+    instagram_url:    document.getElementById('edit-instagram').value.trim() || null,
+    primary_colour:   document.getElementById('edit-primary-colour').value.trim() || null,
+    secondary_colour: document.getElementById('edit-secondary-colour').value.trim() || null,
   };
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/clubs?id=eq.${MY.id}`, {
@@ -3344,7 +3426,9 @@ function mapClub(row) {
     website_url:   row.website_url || '',
     facebook_url:  row.facebook_url || '',
     twitter_url:   row.twitter_url || '',
-    instagram_url: row.instagram_url || '',
+    instagram_url:   row.instagram_url || '',
+    primary_colour:  row.primary_colour || null,
+    secondary_colour: row.secondary_colour || null,
     venueAvail:    null,
     kickoffAvail:  null,
     availableDate: null,
@@ -3913,7 +3997,7 @@ async function initApp() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url,postcode&order=name.asc`,
+      `${SUPABASE_URL}/rest/v1/clubs?active=eq.true&select=id,name,league,location,county,lat,lng,ground,badge_url,active,nickname,home_colours,away_colours,contact_name,contact_email,contact_phone,website_url,facebook_url,twitter_url,instagram_url,postcode,primary_colour,secondary_colour&order=name.asc`,
       { headers: { 'apikey': SUPABASE_KEY } }
     );
     const clubRows = await res.json();
