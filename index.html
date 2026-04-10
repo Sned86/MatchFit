@@ -1025,10 +1025,12 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     </div>
   </div>
   <div>
+    <label class="field-label">Filter by Step</label>
+    <div class="browse-filters" id="browse-step-filters"></div>
+  </div>
+  <div>
     <label class="field-label">Filter by League</label>
-    <div class="browse-filters" id="browse-league-filters">
-      <button class="browse-filter-btn active" onclick="setBrowseLeague(this,'all')">All Leagues</button>
-    </div>
+    <div class="browse-filters" id="browse-league-filters"></div>
   </div>
   <div id="browse-clubs-list"></div>
 </div>
@@ -1192,7 +1194,26 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
 const SUPABASE_URL = 'https://huokcisnlcaezqcroyon.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentSession = null;
+const LEAGUE_STEPS = {
+  'Isthmian League Premier Division': 7,
+  'Isthmian League North Division': 8,
+  'Isthmian League South Central Division': 8,
+  'Isthmian League South East Division': 8,
+  'Northern Premier League Premier Division': 7,
+  'Northern Premier League East Division': 8,
+  'Northern Premier League West Division': 8,
+  'Southern League Premier Central Division': 7,
+  'Southern League Premier South Division': 7,
+  'Southern League Central Division': 8,
+  'Southern League South Division': 8,
+  'National League': 6,
+  'National League North': 7,
+  'National League South': 7,
+  'Kent Invicta League': 8,
+  'Combined Counties League Premier Division North': 8,
+  'Combined Counties League Premier Division South': 8,
+  'Essex Senior League': 8,
+};
 let MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null };
 const FIXTURES_SELECT = 'id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined,cancelled_by_club_id,cancellation_reason,cancellation_note';
 let CLUBS = [];
@@ -1206,6 +1227,7 @@ let selDates=[], selVenues=[], selKickoffs=[], maxDist=50, selTeam=null;
 let comparing=[], shortlist=[], results=[], searched=false;
 let currentOfferClub=null, offerContext=null, offerDate=null, offerKickoff=null, offerVenue=null, offerNeutralGround='';
 let nrDate=null, nrVenue='either', nrKickoffs=[], nrDist=50;
+let browseStep='all';
 let browseLeague='all';
 let browseSearch='';
 let cancelReason='';
@@ -2739,39 +2761,77 @@ async function confirmCancellation(){
 // ═══════════════════════════════════════════
 // BROWSE TEAMS
 // ═══════════════════════════════════════════
-function buildLeagueFilters(){
-  const leagues = [...new Set(CLUBS.map(c=>c.league).filter(Boolean))].sort();
-  const container = document.getElementById('browse-league-filters');
-  // Remove any previously added dynamic buttons (keep "All Leagues")
-  container.querySelectorAll('.browse-filter-btn:not(:first-child)').forEach(b=>b.remove());
-  leagues.forEach(league=>{
+function renderStepFilters() {
+  const steps = [...new Set(CLUBS.map(c => c.step).filter(Boolean))].sort((a,b) => a-b);
+  const container = document.getElementById('browse-step-filters');
+  if (!container) return;
+  container.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'browse-filter-btn' + (browseStep === 'all' ? ' active' : '');
+  allBtn.textContent = 'All Steps';
+  allBtn.onclick = () => setBrowseStep('all');
+  container.appendChild(allBtn);
+  steps.forEach(s => {
     const btn = document.createElement('button');
-    btn.className = 'browse-filter-btn';
-    btn.textContent = league;
-    btn.onclick = () => setBrowseLeague(btn, league);
+    btn.className = 'browse-filter-btn' + (browseStep === s ? ' active' : '');
+    btn.textContent = 'Step ' + s;
+    btn.onclick = () => setBrowseStep(s);
     container.appendChild(btn);
   });
 }
+
+function renderLeagueFilters() {
+  const container = document.getElementById('browse-league-filters');
+  if (!container) return;
+  container.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'browse-filter-btn' + (browseLeague === 'all' ? ' active' : '');
+  allBtn.textContent = 'All Leagues';
+  allBtn.onclick = () => setBrowseLeague('all');
+  container.appendChild(allBtn);
+  const leagues = [...new Set(
+    CLUBS
+      .filter(c => browseStep === 'all' || c.step === browseStep)
+      .map(c => c.league)
+      .filter(Boolean)
+  )].sort();
+  leagues.forEach(league => {
+    const btn = document.createElement('button');
+    btn.className = 'browse-filter-btn' + (browseLeague === league ? ' active' : '');
+    btn.textContent = league;
+    btn.onclick = () => setBrowseLeague(league);
+    container.appendChild(btn);
+  });
+}
+
+function setBrowseStep(val) {
+  browseStep = val;
+  browseLeague = 'all';
+  renderStepFilters();
+  renderLeagueFilters();
+  renderBrowse();
+}
+
 function onBrowseSearch(q){
   browseSearch=q.trim().toLowerCase();
   renderBrowse();
 }
-function setBrowseLeague(btn,val){
-  document.querySelectorAll('#browse-league-filters .browse-filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');browseLeague=val;renderBrowse();
+
+function setBrowseLeague(val){
+  browseLeague=val;
+  renderLeagueFilters();
+  renderBrowse();
 }
 function renderBrowse(){
   let clubs=CLUBS.filter(c=>c.id!==MY.id).map(c=>({...c,distance:haversine(MY.lat,MY.lng,c.lat,c.lng)}));
   if(browseSearch){
     clubs=clubs.filter(c=>c.name.toLowerCase().includes(browseSearch));
   }
+  if(browseStep!=='all'){
+    clubs=clubs.filter(c=>c.step===browseStep);
+  }
   if(browseLeague!=='all'){
-    const lq=browseLeague.toLowerCase();
-    clubs=clubs.filter(c=>{
-      const cl=c.league.toLowerCase();
-      if(lq==='national league')return cl==='national league';
-      return cl.includes(lq);
-    });
+    clubs=clubs.filter(c=>c.league===browseLeague);
   }
   clubs.sort((a,b)=>a.distance-b.distance);
   const el=document.getElementById('browse-clubs-list');
@@ -2796,6 +2856,7 @@ function renderBrowse(){
           <div class="browse-club-name" style="color:${_textCol}">${c.name}</div>
           <div class="browse-club-meta" style="color:${_mutedCol}">📍 ${c.location} · ${c.distance} mi away</div>
           <div class="browse-club-tags">
+            ${c.step ? `<span class="tag tag-level" style="background:${_tagBg};color:${_tagCol}">Step ${c.step}</span>` : ''}
             <span class="tag tag-league" style="background:${_tagBg};color:${_tagCol}">${c.league}</span>
           </div>
         </div>
@@ -3466,6 +3527,7 @@ function mapClub(row) {
     instagram_url:   row.instagram_url || '',
     primary_colour:  row.primary_colour || null,
     secondary_colour: row.secondary_colour || null,
+    step:            LEAGUE_STEPS[row.league] || null,
     venueAvail:    null,
     kickoffAvail:  null,
     availableDate: null,
@@ -4049,7 +4111,8 @@ async function initApp() {
   await loadAvailability();
 
   // Build dynamic league filters from loaded club data
-  buildLeagueFilters();
+  renderStepFilters();
+  renderLeagueFilters();
 
   // Boot the UI
   buildDateStrip();
