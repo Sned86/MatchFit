@@ -919,15 +919,6 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <div id="custom-date-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
       </div>
       <div>
-        <label class="field-label">Search for a Specific Club <span style="color:var(--slate-light);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <div class="team-search-wrap">
-          <span class="team-search-icon">🔍</span>
-          <input type="text" class="team-search-input" id="team-search-input" placeholder="Start typing a club name…" oninput="onTeamSearch(this.value)" autocomplete="off">
-        </div>
-        <div class="team-search-results" id="team-search-results"></div>
-        <div id="team-selected-wrap"></div>
-      </div>
-      <div>
         <label class="field-label">Venue <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--slate-light)">(select one or more)</span></label>
         <div class="pill-group" id="venue-pills">
           <button class="pill-btn any-pill selected" onclick="toggleAnyVenue(this)">🔄 Any</button>
@@ -1025,6 +1016,13 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
   <div>
     <div class="page-heading">Browse Teams</div>
     <div style="font-size:13px;color:var(--text-muted);margin-top:2px">Find clubs to propose a match directly</div>
+  </div>
+  <div>
+    <label class="field-label">Search for a Club</label>
+    <div class="team-search-wrap">
+      <span class="team-search-icon">🔍</span>
+      <input type="text" class="team-search-input" id="browse-search-input" placeholder="Start typing a club name…" oninput="onBrowseSearch(this.value)" autocomplete="off">
+    </div>
   </div>
   <div>
     <label class="field-label">Filter by League</label>
@@ -1209,6 +1207,7 @@ let comparing=[], shortlist=[], results=[], searched=false;
 let currentOfferClub=null, offerContext=null, offerDate=null, offerKickoff=null, offerVenue=null, offerNeutralGround='';
 let nrDate=null, nrVenue='either', nrKickoffs=[], nrDist=50;
 let browseLeague='all';
+let browseSearch='';
 let cancelReason='';
 
 // ═══════════════════════════════════════════
@@ -1644,7 +1643,7 @@ function renderSelectedTeam(){
 // SEARCH & RESULTS POPUP
 // ═══════════════════════════════════════════
 function doSearch(){
-  const pool=selTeam?[selTeam]:CLUBS;
+  const pool=CLUBS;
   results=pool.map(c=>{
     const d=haversine(MY.lat,MY.lng,c.lat,c.lng);
     return{...c,distance:d,travelTime:travel(d)};
@@ -2753,12 +2752,19 @@ function buildLeagueFilters(){
     container.appendChild(btn);
   });
 }
+function onBrowseSearch(q){
+  browseSearch=q.trim().toLowerCase();
+  renderBrowse();
+}
 function setBrowseLeague(btn,val){
   document.querySelectorAll('#browse-league-filters .browse-filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');browseLeague=val;renderBrowse();
 }
 function renderBrowse(){
   let clubs=CLUBS.filter(c=>c.id!==MY.id).map(c=>({...c,distance:haversine(MY.lat,MY.lng,c.lat,c.lng)}));
+  if(browseSearch){
+    clubs=clubs.filter(c=>c.name.toLowerCase().includes(browseSearch));
+  }
   if(browseLeague!=='all'){
     const lq=browseLeague.toLowerCase();
     clubs=clubs.filter(c=>{
