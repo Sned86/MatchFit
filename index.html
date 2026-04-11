@@ -800,17 +800,17 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <input class="form-input" type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
       </div>
       <button class="auth-submit" id="login-btn" onclick="submitLogin()">Sign In</button>
-      <div class="auth-switch">Don't have an account? <a onclick="showAuthPanel('register')">Register your club</a></div>
+      <div class="auth-switch">Not signed up yet? <a onclick="showAuthPanel('register')">Claim your club's account</a></div>
     </div>
 
     <!-- REGISTER PANEL -->
     <div id="auth-register-panel" style="display:none;flex-direction:column;gap:15px">
-      <div class="auth-title">Register your club</div>
+      <div class="auth-title">Claim your club's account</div>
       <div class="auth-sub">Join MatchFit — free to sign up</div>
       <div class="auth-error" id="register-error"></div>
       <div class="form-field">
         <label class="form-label">Your Name</label>
-        <input class="form-input" type="text" id="reg-name" placeholder="Full name">
+        <input class="form-input" type="text" id="reg-name" placeholder="Name">
       </div>
       <div class="form-field">
         <label class="form-label">Email</label>
@@ -828,7 +828,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
         <label class="form-label">Your Club <span style="color:var(--red)">*</span></label>
         <div class="team-search-wrap">
           <span class="team-search-icon">🔍</span>
-          <input type="text" class="team-search-input" id="reg-club-search" placeholder="Search for your club…" oninput="onRegClubSearch(this.value)" autocomplete="off">
+          <input type="text" class="team-search-input" id="reg-club-search" placeholder="Start typing to search for your club…" oninput="onRegClubSearch(this.value)" autocomplete="off">
         </div>
         <div id="reg-club-results"></div>
         <div id="reg-club-selected">
@@ -1199,24 +1199,23 @@ const SUPABASE_URL = 'https://huokcisnlcaezqcroyon.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const LEAGUE_STEPS = {
-  'Isthmian League Premier Division': 7,
-  'Isthmian League North Division': 8,
-  'Isthmian League South Central Division': 8,
-  'Isthmian League South East Division': 8,
-  'Northern Premier League Premier Division': 7,
-  'Northern Premier League East Division': 8,
-  'Northern Premier League West Division': 8,
-  'Southern League Premier Central Division': 7,
-  'Southern League Premier South Division': 7,
-  'Southern League Central Division': 8,
-  'Southern League South Division': 8,
-  'National League': 6,
-  'National League North': 7,
-  'National League South': 7,
-  'Kent Invicta League': 8,
-  'Combined Counties League Premier Division North': 8,
-  'Combined Counties League Premier Division South': 8,
-  'Essex Senior League': 8,
+  'Western League - Division One': 6,
+  'Wessex League - Division One': 6,
+  'Hellenic League - Division One': 6,
+  'South West Peninsula League - East Division': 6,
+  'South West Peninsula League - West Division': 6,
+  'Wiltshire Senior League - Premier Division': 7,
+  'Wiltshire Senior League - Division One': 7,
+  'Somerset County League - Premier Division': 7,
+  'Somerset County League - Division One': 7,
+  'Somerset County League - Division Two': 7,
+  'Somerset County League - Division Three': 7,
+  'Gloucestershire County League - Division One': 7,
+  'Trowbridge & District League - Division One': 8,
+  'Trowbridge & District League - Division Two': 8,
+  'Mid-Somerset League - Premier Division': 8,
+  'Mid-Somerset League - Division One': 8,
+  'Mid-Somerset League - Division Two': 8,
 };
 let MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null };
 const FIXTURES_SELECT = 'id,club_a_id,club_b_id,proposed_date,proposed_time,venue_type,status,notes,amended_date,amended_time,amended_venue,amended_by_club_id,amended_note,amendment_declined,cancelled_by_club_id,cancellation_reason,cancellation_note';
