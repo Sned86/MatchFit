@@ -4072,6 +4072,10 @@ function openEditAvailability(availId) {
 }
 
 async function cancelAvailability(availId) {
+  const a = AVAILABILITY.find(x => x.id === availId);
+  const dateStr = a ? fmtDateFull(a.date) : 'this slot';
+  const confirmed = window.confirm(`Cancel your availability on ${dateStr}?\n\nThis will remove the slot and other clubs will no longer be able to find it.`);
+  if (!confirmed) return;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/availability?id=eq.${availId}`, {
       method: 'PATCH',
