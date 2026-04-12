@@ -1037,6 +1037,15 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <label class="field-label">Filter by League</label>
     <div class="browse-filters" id="browse-league-filters"></div>
   </div>
+  <div>
+    <label class="field-label">Sort by</label>
+    <div class="browse-filters" id="browse-sort-btns">
+      <button class="browse-filter-btn active" onclick="setBrowseSort('distance')">Distance</button>
+      <button class="browse-filter-btn" onclick="setBrowseSort('alpha')">A–Z</button>
+      <button class="browse-filter-btn" onclick="setBrowseSort('step')">Step</button>
+      <button class="browse-filter-btn" onclick="setBrowseSort('availability')">Availability first</button>
+    </div>
+  </div>
   <div id="browse-clubs-list"></div>
 </div>
 
@@ -1272,6 +1281,7 @@ let nrDate=null, nrVenue='either', nrKickoffs=[], nrDist=50;
 let browseStep='all';
 let browseLeague='all';
 let browseSearch='';
+let browseSort='distance'; // 'distance' | 'alpha' | 'step' | 'availability'
 let cancelReason='';
 
 // ═══════════════════════════════════════════
@@ -2685,7 +2695,7 @@ async function submitNewRequest(){
     );
     if(clash) {
       const proceed = window.confirm(
-        `You already have an open availability slot on ${fmtDate(nrDate)}.\n\nAre you sure you want to post another one?`
+        `You already have an open availability slot on ${fmtDate(nrDate)}.\n\nPost another one anyway? (e.g. different venue or kick-off preference)`
       );
       if(!proceed) return;
     }
@@ -2854,6 +2864,15 @@ function setBrowseStep(val) {
   renderBrowse();
 }
 
+function setBrowseSort(val){
+  browseSort=val;
+  document.querySelectorAll('#browse-sort-btns .browse-filter-btn').forEach(b=>b.classList.remove('active'));
+  const idx={'distance':0,'alpha':1,'step':2,'availability':3}[val];
+  const btns=document.querySelectorAll('#browse-sort-btns .browse-filter-btn');
+  if(btns[idx]) btns[idx].classList.add('active');
+  renderBrowse();
+}
+
 function onBrowseSearch(q){
   browseSearch=q.trim().toLowerCase();
   renderBrowse();
@@ -2875,10 +2894,25 @@ function renderBrowse(){
   if(browseLeague!=='all'){
     clubs=clubs.filter(c=>c.league===browseLeague);
   }
-  clubs.sort((a,b)=>a.distance-b.distance);
+  if(browseSort==='alpha'){
+    clubs.sort((a,b)=>a.name.localeCompare(b.name));
+  } else if(browseSort==='step'){
+    clubs.sort((a,b)=>{
+      const sa=a.step||999, sb=b.step||999;
+      return sa!==sb ? sa-sb : a.distance-b.distance;
+    });
+  } else if(browseSort==='availability'){
+    clubs.sort((a,b)=>{
+      const ha=a.availableDate?0:1, hb=b.availableDate?0:1;
+      return ha!==hb ? ha-hb : a.distance-b.distance;
+    });
+  } else {
+    clubs.sort((a,b)=>a.distance-b.distance);
+  }
+  const sortLabels={'distance':'sorted by distance','alpha':'A–Z','step':'sorted by step','availability':'availability first'};
   const el=document.getElementById('browse-clubs-list');
   if(!clubs.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon" style="display:flex;justify-content:center;color:var(--slate-light)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="34" height="34"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd"/></svg></div><div class="empty-title">No clubs match</div><div class="empty-sub">Try adjusting the filters above.</div></div>`;return;}
-  el.innerHTML=`<div class="browse-section-head">${clubs.length} club${clubs.length!==1?'s':''} — sorted by distance</div>`+
+  el.innerHTML=`<div class="browse-section-head">${clubs.length} club${clubs.length!==1?'s':''} — ${sortLabels[browseSort]}</div>`+
     clubs.map(c=>{
       const _p = isValidHex(c.primary_colour)   ? c.primary_colour.trim()   : null;
       const _s = isValidHex(c.secondary_colour) ? c.secondary_colour.trim() : null;
@@ -4074,7 +4108,7 @@ function openEditAvailability(availId) {
 async function cancelAvailability(availId) {
   const a = AVAILABILITY.find(x => x.id === availId);
   const dateStr = a ? fmtDateFull(a.date) : 'this slot';
-  const confirmed = window.confirm(`Are you sure you want to cancel your availability on ${dateStr}?\n\n`);
+  const confirmed = window.confirm(`Cancel your availability on ${dateStr}?\n\nThis will remove the slot and other clubs will no longer be able to find it.`);
   if (!confirmed) return;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/availability?id=eq.${availId}`, {
