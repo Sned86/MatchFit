@@ -3205,7 +3205,7 @@ function renderMyClub(club, userEmail) {
   if (!club) return;
   // Header
   document.getElementById('myclub-name').textContent = club.name || '—';
-  document.getElementById('myclub-location').textContent = club.location ? icon('pin',12) + ' ' + club.location : '';
+  document.getElementById('myclub-location').innerHTML = club.location ? icon('pin',12) + ' ' + club.location : '';
   document.getElementById('myclub-league').textContent = club.league || '';
   // Stats
   updateMyClubStats();
