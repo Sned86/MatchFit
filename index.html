@@ -2685,7 +2685,7 @@ async function submitNewRequest(){
     );
     if(clash) {
       const proceed = window.confirm(
-        `You already have an open availability slot on ${fmtDate(nrDate)}.\n\nPost another one anyway? (e.g. different venue or kick-off preference)`
+        `You already have an open availability slot on ${fmtDate(nrDate)}.\n\nAre you sure you want to post another one?`
       );
       if(!proceed) return;
     }
@@ -4074,7 +4074,7 @@ function openEditAvailability(availId) {
 async function cancelAvailability(availId) {
   const a = AVAILABILITY.find(x => x.id === availId);
   const dateStr = a ? fmtDateFull(a.date) : 'this slot';
-  const confirmed = window.confirm(`Cancel your availability on ${dateStr}?\n\nThis will remove the slot and other clubs will no longer be able to find it.`);
+  const confirmed = window.confirm(`Are you sure you want to cancel your availability on ${dateStr}?\n\n`);
   if (!confirmed) return;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/availability?id=eq.${availId}`, {
