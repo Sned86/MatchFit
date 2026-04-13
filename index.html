@@ -1055,12 +1055,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer
     <div class="page-heading">Notifications</div>
     <button style="font-size:12px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600" onclick="markAllRead()">Mark all read</button>
   </div>
-
-  <div class="empty-state">
-    <div class="empty-icon" style="display:flex;justify-content:center;color:var(--slate-light)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="34" height="34"><path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z" clip-rule="evenodd"/></svg></div>
-    <div class="empty-title">No notifications yet</div>
-    <div class="empty-sub">Match offers, confirmations and updates will appear here.</div>
-  </div>
+  <div id="notifications-list"></div>
 </div>
 
 <!-- ══ MY CLUB ══ -->
@@ -1270,6 +1265,8 @@ const FIXTURES_SELECT = 'id,club_a_id,club_b_id,proposed_date,proposed_time,venu
 let CLUBS = [];
 let FIXTURES = [];
 let AVAILABILITY = [];
+let NOTIFICATIONS = [];
+let currentSession = null;
 
 // ═══════════════════════════════════════════
 // STATE
@@ -1383,6 +1380,7 @@ function switchTab(name){
   const navBtn = document.getElementById('nav-'+name) || document.getElementById('nav-requests');
   navBtn.classList.add('active');
   if(name==='browse') renderBrowse();
+  if(name==='notifications') loadNotifications();
 }
 function switchSubtab(btn, panelId){
   btn.closest('.subtab-bar').querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
@@ -3039,10 +3037,164 @@ function closeTeamProfileOnBackdrop(e){if(e.target===document.getElementById('te
 // ═══════════════════════════════════════════
 // NOTIFICATIONS
 // ═══════════════════════════════════════════
-function markAllRead(){
-  document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
-  document.getElementById('notif-badge').style.display='none';
-  document.querySelector('.notif-dot').style.display='none';
+async function loadNotifications() {
+  if (!currentSession?.access_token || !MY.id) return;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/notifications?club_id=eq.${MY.id}&order=created_at.desc&limit=50`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+    );
+    if (!res.ok) return;
+    NOTIFICATIONS = await res.json();
+    renderNotifications();
+    updateNotifBadge();
+  } catch(err) {
+    console.warn('Notifications fetch failed:', err.message);
+  }
+}
+
+async function markAllRead() {
+  if (!currentSession?.access_token || !MY.id) return;
+  const hasUnread = NOTIFICATIONS.some(n => !n.read);
+  if (!hasUnread) return;
+  try {
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/notifications?club_id=eq.${MY.id}&read=eq.false`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${currentSession.access_token}`
+        },
+        body: JSON.stringify({ read: true })
+      }
+    );
+    NOTIFICATIONS = NOTIFICATIONS.map(n => ({ ...n, read: true }));
+    renderNotifications();
+    updateNotifBadge();
+  } catch(err) {
+    console.warn('Mark all read failed:', err.message);
+  }
+}
+
+async function markOneRead(notifId) {
+  if (!currentSession?.access_token) return;
+  const n = NOTIFICATIONS.find(x => x.id === notifId);
+  if (!n || n.read) return;
+  try {
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/notifications?id=eq.${notifId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${currentSession.access_token}`
+        },
+        body: JSON.stringify({ read: true })
+      }
+    );
+    n.read = true;
+    updateNotifBadge();
+  } catch(err) {
+    console.warn('Mark read failed:', err.message);
+  }
+}
+
+function updateNotifBadge() {
+  const unread = NOTIFICATIONS.filter(n => !n.read).length;
+  const dot = document.querySelector('.icon-btn .notif-dot');
+  if (dot) dot.style.display = unread ? 'block' : 'none';
+}
+
+const NOTIF_COPY = {
+  offer_received:    { icon: 'envelope',  iconBg: 'var(--blue-light)',   title: opp => `Match offer from ${opp}`,         sub: () => `They've offered you a fixture — tap to view and respond.`,  tab: 'requests', subtab: 'offer'     },
+  offer_accepted:    { icon: 'check',     iconBg: 'var(--green-xlight)', title: opp => `${opp} accepted your offer`,      sub: () => `Your fixture is now confirmed.`,                            tab: 'requests', subtab: 'confirmed' },
+  offer_declined:    { icon: 'xmark',     iconBg: 'var(--red-light)',    title: opp => `${opp} declined your offer`,      sub: () => `Your offer was not accepted.`,                              tab: 'requests', subtab: 'offer'     },
+  offer_withdrawn:   { icon: 'xmark',     iconBg: 'var(--red-light)',    title: opp => `${opp} withdrew their offer`,     sub: () => `The offer is no longer available.`,                         tab: 'requests', subtab: 'offer'     },
+  amendment_proposed:{ icon: 'swap',      iconBg: 'var(--amber-light)',  title: opp => `${opp} proposed an amendment`,    sub: () => `They'd like to change a confirmed fixture.`,                tab: 'requests', subtab: 'confirmed' },
+  amendment_accepted:{ icon: 'check',     iconBg: 'var(--green-xlight)', title: opp => `${opp} accepted your amendment`,  sub: () => `The fixture details have been updated.`,                   tab: 'requests', subtab: 'confirmed' },
+  amendment_declined:{ icon: 'xmark',     iconBg: 'var(--red-light)',    title: opp => `${opp} declined your amendment`,  sub: () => `The fixture stays as originally confirmed.`,                tab: 'requests', subtab: 'confirmed' },
+  fixture_cancelled: { icon: 'xmark',     iconBg: 'var(--red-light)',    title: opp => `${opp} cancelled your fixture`,   sub: () => `A confirmed fixture has been cancelled.`,                   tab: 'requests', subtab: 'confirmed' },
+};
+
+function renderNotifications() {
+  const el = document.getElementById('notifications-list');
+  if (!el) return;
+
+  if (!NOTIFICATIONS.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon" style="display:flex;justify-content:center;color:var(--slate-light)">${icon('bell', 34)}</div>
+      <div class="empty-title">No notifications yet</div>
+      <div class="empty-sub">Match offers, confirmations and updates will appear here.</div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = NOTIFICATIONS.map(n => {
+    const cfg = NOTIF_COPY[n.type];
+    if (!cfg) return '';
+
+    // Find the opposing club from the fixture
+    const fixture = FIXTURES.find(f => f.id === n.fixture_id);
+    let oppName = 'Another club';
+    if (fixture) {
+      const oppId = fixture.homeId === MY.id ? fixture.awayId : fixture.homeId;
+      const opp = CLUBS.find(c => c.id === oppId);
+      if (opp) oppName = opp.name;
+    }
+
+    const unreadBg     = !n.read ? 'background:var(--green-xlight);border-color:var(--green-mid);' : '';
+    const unreadDot    = !n.read ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px"></div>` : '';
+    const fixtureDetail = fixture
+      ? `<div class="notif-sub" style="margin-top:2px;font-weight:600;color:var(--navy)">${fmtDate(fixture.date)}${fixture.kickoff ? ' · ' + fixture.kickoff : ''}</div>`
+      : '';
+
+    return `<div class="notif-item${!n.read ? ' unread' : ''}" style="${unreadBg}margin-bottom:8px;cursor:pointer"
+        onclick="notifTap(${n.id},'${cfg.tab}','${cfg.subtab}')">
+      <div class="notif-icon" style="background:${cfg.iconBg};width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        ${icon(cfg.icon, 18)}
+      </div>
+      <div class="notif-body">
+        <div class="notif-title">${cfg.title(oppName)}</div>
+        <div class="notif-sub">${cfg.sub()}</div>
+        ${fixtureDetail}
+        <div class="notif-time">${formatNotifTime(n.created_at)}</div>
+      </div>
+      ${unreadDot}
+    </div>`;
+  }).join('');
+}
+
+function notifTap(notifId, tab, subtab) {
+  markOneRead(notifId);
+  switchTab(tab);
+  if (subtab) {
+    const bar = document.querySelector('.subtab-bar');
+    if (bar) {
+      const map = { open: 0, offer: 1, confirmed: 2 };
+      const idx = map[subtab];
+      if (idx !== undefined) {
+        const btn = bar.querySelectorAll('.subtab-btn')[idx];
+        if (btn) switchSubtab(btn, 'subtab-' + subtab);
+      }
+    }
+  }
+}
+
+function formatNotifTime(isoString) {
+  if (!isoString) return '';
+  const then = new Date(isoString);
+  const now  = new Date();
+  const diffMins = Math.floor((now - then) / 60000);
+  if (diffMins < 1)  return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24)  return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays < 7)  return `${diffDays}d ago`;
+  return fmtDate(isoString.split('T')[0]);
 }
 
 // ═══════════════════════════════════════════
@@ -3572,6 +3724,7 @@ async function handleAuthSession(session) {
       console.warn('Fixtures reload failed:', e.message);
     }
     renderMyFixtures();
+    await loadNotifications();
   }
 
   document.getElementById('auth-wall').style.display = 'none';
@@ -4038,7 +4191,7 @@ async function declineOffer(fixtureId) {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}`
       },
-      body: JSON.stringify({ status: 'cancelled', ball_in_court_id: null })
+      body: JSON.stringify({ status: 'cancelled', ball_in_court_id: null, cancelled_by_club_id: MY.id })
     });
     if(!res.ok) throw new Error('Failed to decline offer');
     toast('Offer declined');
