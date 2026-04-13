@@ -3167,8 +3167,21 @@ function renderNotifications() {
   }).join('');
 }
 
-function notifTap(notifId, tab, subtab) {
+async function notifTap(notifId, tab, subtab) {
   markOneRead(notifId);
+  // Reload fixtures and availability so the destination screen shows fresh data
+  try {
+    const [fixRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/fixtures?select=${FIXTURES_SELECT}&order=proposed_date.asc`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession?.access_token || SUPABASE_KEY}` } }),
+      loadAvailability()
+    ]);
+    FIXTURES = (await fixRes.json()).map(mapFixture);
+    renderMyFixtures();
+    updateMyClubStats();
+  } catch(e) {
+    console.warn('notifTap data reload failed:', e.message);
+  }
   switchTab(tab);
   if (subtab) {
     const bar = document.querySelector('.subtab-bar');
@@ -3180,6 +3193,53 @@ function notifTap(notifId, tab, subtab) {
         if (btn) switchSubtab(btn, 'subtab-' + subtab);
       }
     }
+  }
+}
+
+// ── Notification polling ─────────────────────────────────────
+let _notifPollTimer = null;
+
+function startNotifPolling() {
+  stopNotifPolling(); // clear any existing timer first
+  _notifPollTimer = setInterval(async () => {
+    if (!currentSession?.access_token || !MY.id) return;
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/notifications?club_id=eq.${MY.id}&order=created_at.desc&limit=50`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${currentSession.access_token}` } }
+      );
+      if (!res.ok) return;
+      const fresh = await res.json();
+      const prevUnread = NOTIFICATIONS.filter(n => !n.read).length;
+      NOTIFICATIONS = fresh;
+      const newUnread = NOTIFICATIONS.filter(n => !n.read).length;
+      updateNotifBadge();
+      // If we're already on the notifications screen, re-render it live
+      if (document.getElementById('screen-notifications')?.classList.contains('active')) {
+        renderNotifications();
+      }
+      // If unread count increased, flash the bell to draw attention
+      if (newUnread > prevUnread) {
+        const bellBtn = document.querySelector('.icon-btn');
+        if (bellBtn) {
+          bellBtn.style.background = 'var(--green-xlight)';
+          bellBtn.style.borderColor = 'var(--green)';
+          setTimeout(() => {
+            bellBtn.style.background = '';
+            bellBtn.style.borderColor = '';
+          }, 2000);
+        }
+      }
+    } catch(e) {
+      // silent — don't surface polling errors to the user
+    }
+  }, 30000); // every 30 seconds
+}
+
+function stopNotifPolling() {
+  if (_notifPollTimer) {
+    clearInterval(_notifPollTimer);
+    _notifPollTimer = null;
   }
 }
 
@@ -3360,6 +3420,7 @@ async function submitRegister() {
 }
 
 async function submitSignOut() {
+  stopNotifPolling();
   if (currentSession?.access_token) {
     await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
       method: 'POST',
@@ -3368,6 +3429,7 @@ async function submitSignOut() {
   }
   currentSession = null;
   sessionStorage.removeItem('mf_session');
+  NOTIFICATIONS = [];
   // Reset app state
   MY = { id:null, name:'', logo:'', lat:0, lng:0, ground:'', badge:null, location:'' };
   CLUBS = []; FIXTURES = [];
@@ -3725,6 +3787,7 @@ async function handleAuthSession(session) {
     }
     renderMyFixtures();
     await loadNotifications();
+    startNotifPolling();
   }
 
   document.getElementById('auth-wall').style.display = 'none';
