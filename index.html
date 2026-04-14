@@ -2698,6 +2698,23 @@ async function submitNewRequest(){
       );
       if(!proceed) return;
     }
+
+    // Warn if a confirmed or offered fixture already exists on this date
+    const fixtureClash = FIXTURES.find(f =>
+      (f.homeId === MY.id || f.awayId === MY.id) &&
+      f.date === nrDate &&
+      (f.status === 'confirmed' || f.status === 'offered')
+    );
+    if(fixtureClash) {
+      const oppId = fixtureClash.homeId === MY.id ? fixtureClash.awayId : fixtureClash.homeId;
+      const opp = CLUBS.find(c => c.id === oppId);
+      const oppName = opp ? opp.name : 'another club';
+      const statusLabel = fixtureClash.status === 'confirmed' ? 'a confirmed fixture' : 'an offer pending';
+      const proceed = window.confirm(
+        `You already have ${statusLabel} on ${fmtDate(nrDate)} (vs ${oppName}).\n\nPost availability anyway? (e.g. for a second squad)`
+      );
+      if(!proceed) return;
+    }
   }
 
   btn.disabled=true; btn.textContent= editId ? 'Updating…' : 'Posting…';
