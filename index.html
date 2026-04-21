@@ -5,81 +5,111 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Non-League Ground Directory</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body {
-      min-height: 100vh;
-      background: #1A1814;
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { min-height: 100vh; background: #1A1814; color: #fff; font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #1A1814; }
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-    /* ── Hero ── */
-    #hero {
-      position: relative; overflow: hidden;
-      padding: 60px 24px 50px; text-align: center;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+    /* ── Nav ── */
+    #site-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(26,24,20,0.94); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px;
     }
-    .hero-blob {
-      position: absolute; width: 400px; height: 400px;
-      border-radius: 50%; opacity: 0.08; filter: blur(80px); pointer-events: none;
-    }
-    .hero-inner { position: relative; z-index: 1; }
-    .hero-eyebrow {
-      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
-      text-transform: uppercase; color: rgba(255,255,255,0.4);
-      margin-bottom: 18px; padding: 5px 14px;
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-    }
-    h1.hero-title {
-      font-family: 'DM Sans', sans-serif;
-      font-size: clamp(36px, 6vw, 68px); font-weight: 900;
-      line-height: 1.05; margin-bottom: 16px; letter-spacing: -0.04em;
-    }
-    .hero-gradient-text {
-      background: linear-gradient(90deg, #E63946, #7B2D8B, #023E8A, #2D6A4F);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .hero-sub { font-size: 16px; color: rgba(255,255,255,0.5); max-width: 460px; margin: 0 auto 32px; line-height: 1.6; }
-    .stats-row { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
-    .stat-item { text-align: center; }
-    .stat-n { font-family: 'DM Sans', sans-serif; font-size: 28px; font-weight: 900; }
-    .stat-label { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
+    .nav-logo { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; letter-spacing: 0.01em; line-height: 1.25; flex-shrink: 0; border: none; background: none; text-align: left; }
+    .nav-logo span { display: block; font-size: 9px; font-weight: 400; font-style: italic; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; font-family: 'DM Sans', sans-serif; }
+    .nav-links { display: flex; gap: 2px; }
+    .nav-link { padding: 7px 13px; border-radius: 6px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.18s; border: none; background: none; font-family: 'DM Sans', sans-serif; letter-spacing: 0.01em; }
+    .nav-link:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+    .nav-link.active { color: #fff; background: rgba(255,255,255,0.1); }
+    .nav-cta { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; background: #fff; color: #1A1814; cursor: pointer; transition: all 0.18s; border: none; font-family: 'DM Sans', sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
+    .nav-cta:hover { background: rgba(255,255,255,0.88); }
 
-    /* ── Controls ── */
+    /* ── Views ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ══════════════════════ HOME ══════════════════════ */
+    #home-hero { position: relative; overflow: hidden; padding: 88px 24px 80px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .home-hero-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(90,40,20,0.38) 0%, transparent 70%); }
+    .home-pitch-lines { position: absolute; inset: 0; pointer-events: none; opacity: 0.03; background-image: repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(255,255,255,0.9) 80px), repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,255,255,0.9) 80px); }
+    .home-hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+    .home-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 28px; padding: 5px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
+    .home-eyebrow-dot { width: 5px; height: 5px; background: #E63946; border-radius: 50%; flex-shrink: 0; }
+    h1.home-title { font-family: 'Libre Baskerville', serif; font-size: clamp(38px, 7vw, 76px); font-weight: 700; line-height: 1.05; margin-bottom: 10px; letter-spacing: -0.02em; }
+    .home-title-italic { font-style: italic; color: rgba(255,255,255,0.5); }
+    .home-strapline { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: clamp(14px, 2vw, 17px); color: rgba(255,255,255,0.42); margin: 22px auto 40px; max-width: 500px; line-height: 1.75; }
+    .home-hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { padding: 14px 28px; background: #fff; color: #1A1814; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em; transition: all 0.2s; }
+    .btn-primary:hover { background: rgba(255,255,255,0.88); transform: translateY(-1px); }
+    .btn-ghost { padding: 14px 28px; background: transparent; color: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.38); color: #fff; }
+
+    /* Stats strip */
+    #home-stats { border-bottom: 1px solid rgba(255,255,255,0.06); padding: 28px 24px; display: flex; justify-content: center; }
+    .home-stat { text-align: center; padding: 0 36px; border-right: 1px solid rgba(255,255,255,0.07); }
+    .home-stat:last-child { border-right: none; }
+    .home-stat-n { font-family: 'Libre Baskerville', serif; font-size: 30px; font-weight: 700; line-height: 1; display: block; }
+    .home-stat-label { font-size: 11px; color: rgba(255,255,255,0.32); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; }
+
+    /* Home sections */
+    .home-section { padding: 64px 24px; max-width: 960px; margin: 0 auto; }
+    .home-section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
+    .home-section-title { font-family: 'Libre Baskerville', serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+    .home-section-title em { font-style: italic; color: rgba(255,255,255,0.45); }
+    .home-section-link { font-size: 13px; color: rgba(255,255,255,0.35); cursor: pointer; transition: color 0.18s; border: none; background: none; font-family: 'DM Sans', sans-serif; padding: 0; }
+    .home-section-link:hover { color: rgba(255,255,255,0.75); }
+
+    /* Featured grid */
+    #home-featured-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+    .home-feat-card { border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.25s, box-shadow 0.25s; }
+    .home-feat-card:hover { transform: translateY(-4px); }
+    .home-feat-inner { padding: 20px 18px 16px; }
+    .home-feat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .home-feat-badge { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+    .home-feat-badge-init { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; letter-spacing: -0.02em; }
+    .home-feat-step { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 2px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); text-transform: uppercase; }
+    .home-feat-name { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 700; line-height: 1.25; margin-bottom: 3px; }
+    .home-feat-sub { font-size: 11px; opacity: 0.6; }
+    .home-feat-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; align-items: center; }
+    .home-feat-score { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 700; line-height: 1; }
+    .home-feat-score-sub { font-size: 10px; opacity: 0.45; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+
+    /* Recent list */
+    #home-recent { display: flex; flex-direction: column; gap: 8px; }
+    .recent-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; transition: background 0.18s; }
+    .recent-row:hover { background: rgba(255,255,255,0.06); }
+    .recent-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .recent-name { font-size: 14px; font-weight: 700; flex: 1; }
+    .recent-meta { font-size: 12px; color: rgba(255,255,255,0.38); }
+    .recent-score { font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 700; }
+
+    /* CTA block */
+    #home-cta { margin: 0 24px 64px; max-width: 912px; margin-left: auto; margin-right: auto; border-radius: 14px; overflow: hidden; position: relative; background: linear-gradient(135deg, rgba(230,57,70,0.12) 0%, rgba(2,62,138,0.18) 100%); border: 1px solid rgba(255,255,255,0.07); padding: 52px 48px; }
+    .home-cta-title { font-family: 'Libre Baskerville', serif; font-size: clamp(22px, 4vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+    .home-cta-title em { font-style: italic; color: rgba(255,255,255,0.48); }
+    .home-cta-sub { font-size: 15px; color: rgba(255,255,255,0.45); max-width: 460px; line-height: 1.75; margin-bottom: 28px; }
+    .home-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* ══════════════════════ BROWSE ══════════════════════ */
+    #browse-hero { padding: 40px 24px 32px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .browse-title { font-family: 'Libre Baskerville', serif; font-size: clamp(24px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .browse-sub { font-size: 14px; color: rgba(255,255,255,0.38); }
     #controls { padding: 28px 24px 0; max-width: 900px; margin: 0 auto; }
     .controls-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; justify-content: center; }
-    #search-input {
-      flex: 1; min-width: 200px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none;
-      font-family: 'DM Sans', sans-serif; transition: border-color 0.2s;
-    }
+    #search-input { flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
     #search-input:focus { border-color: rgba(255,255,255,0.25); }
     #search-input::placeholder { color: rgba(255,255,255,0.3); }
     .step-filters { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-    .step-btn {
-      padding: 10px 16px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer;
-      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-      transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-    }
-    .step-btn.active { background: #fff; color: #0A0A0F; border-color: #fff; }
+    .step-btn { padding: 10px 16px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .step-btn.active { background: #fff; color: #1A1814; border-color: #fff; }
     .result-count { font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 20px; }
-
-    /* ── Section labels ── */
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 14px;
-    }
-
-    /* ── Featured strip ── */
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 14px; }
     #featured-section { padding: 0 24px; max-width: 900px; margin: 0 auto 28px; }
     #featured-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 16px; scrollbar-width: none; }
     #featured-strip::-webkit-scrollbar { display: none; }
@@ -87,14 +117,11 @@
     .featured-card:hover { transform: scale(1.03); }
     .featured-badge { width: 44px; height: 44px; object-fit: contain; margin-bottom: 8px; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     .featured-badge-initials { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .featured-name { font-size: 12px; font-weight: 700; font-family: 'DM Sans', sans-serif; }
+    .featured-name { font-size: 12px; font-weight: 700; }
     .featured-town { font-size: 11px; opacity: 0.7; margin-top: 2px; }
-
-    /* ── Club grid ── */
     #grid-section { padding: 0 24px 60px; max-width: 900px; margin: 0 auto; }
     #clubs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
     .club-card { border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.25s, box-shadow 0.25s; }
-    .club-card:hover { transform: translateY(-4px); }
     .card-stripe { height: 6px; }
     .card-body { padding: 20px 20px 16px; }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
@@ -105,72 +132,94 @@
     .card-name { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; line-height: 1.2; }
     .card-pills { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 14px; }
     .card-pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }
-    .step-badge {
-      font-size: 10px; font-weight: 800; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 2px;
-      background: rgba(255,255,255,0.15); text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.25); white-space: nowrap;
-    }
+    .step-badge { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 2px; background: rgba(255,255,255,0.15); text-transform: uppercase; border: 1px solid rgba(255,255,255,0.25); white-space: nowrap; }
     .card-meta { font-size: 12px; opacity: 0.8; margin-bottom: 12px; line-height: 1.6; }
     .card-meta-row { display: flex; align-items: center; gap: 6px; }
     .meta-icon { width: 13px; height: 13px; flex-shrink: 0; opacity: 0.8; stroke: currentColor; stroke-width: 2; fill: none; }
     .card-footer { display: flex; justify-content: space-between; align-items: center; }
     .star-row { display: flex; gap: 2px; align-items: center; }
     .star-row span { margin-left: 4px; font-size: 13px; opacity: 0.75; }
-
-    /* ── Loading / Error ── */
     #loading { text-align: center; padding: 60px 0; color: rgba(255,255,255,0.3); font-size: 14px; display: none; }
-    .spinner {
-      width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: rgba(255,255,255,0.5); border-radius: 50%;
-      animation: spin 0.7s linear infinite; margin: 0 auto 12px;
-    }
+    .spinner { width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.1); border-top-color: rgba(255,255,255,0.5); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #load-error {
-      display: none; text-align: center; padding: 40px 24px;
-      color: rgba(255,255,255,0.4); font-size: 14px; line-height: 1.6;
-    }
+    #load-error { display: none; text-align: center; padding: 40px 24px; color: rgba(255,255,255,0.4); font-size: 14px; line-height: 1.6; }
     #load-error strong { color: rgba(255,255,255,0.7); display: block; margin-bottom: 6px; }
-
-    /* ── No results ── */
     #no-results { display: none; text-align: center; color: rgba(255,255,255,0.3); padding: 60px 0; font-size: 15px; }
 
-    /* ── CTA Banner ── */
-    #cta-banner {
-      margin: 0 auto 60px; max-width: 852px;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 32px 28px;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
-    }
-    .cta-title { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-    .cta-sub { font-size: 14px; color: rgba(255,255,255,0.45); max-width: 400px; }
-    .cta-buttons { display: flex; gap: 10px; }
-    .btn-primary { padding: 12px 20px; background: #fff; color: #0A0A0F; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif; }
-    .btn-secondary { padding: 12px 20px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+    /* ══════════════════════ LEAGUES ══════════════════════ */
+    #leagues-inner { max-width: 960px; margin: 0 auto; padding: 0 24px 64px; }
+    .leagues-hero { padding: 48px 0 40px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 48px; }
+    .leagues-hero-title { font-family: 'Libre Baskerville', serif; font-size: clamp(26px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .leagues-hero-title em { font-style: italic; color: rgba(255,255,255,0.42); }
+    .leagues-hero-sub { font-size: 15px; color: rgba(255,255,255,0.38); max-width: 480px; line-height: 1.65; }
+    .step-group { margin-bottom: 44px; }
+    .step-group-header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .step-group-label { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; }
+    .step-group-desc { font-size: 13px; color: rgba(255,255,255,0.32); }
+    .step-group-count { font-size: 12px; color: rgba(255,255,255,0.22); margin-left: auto; }
+    .leagues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .league-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 18px 20px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 10px; }
+    .league-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.14); transform: translateY(-2px); }
+    .league-card-name { font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .league-card-meta { display: flex; justify-content: space-between; align-items: center; }
+    .league-card-region { font-size: 12px; color: rgba(255,255,255,0.38); }
+    .league-card-clubs { font-size: 12px; color: rgba(255,255,255,0.3); }
+    .league-card-bar { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+    .league-card-bar-fill { height: 100%; background: rgba(255,255,255,0.22); border-radius: 2px; transition: width 0.6s ease; }
 
-    /* ── Modal ── */
-    #modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 100;
-      background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
-      padding: 20px; backdrop-filter: blur(4px);
-    }
+    /* ══════════════════════ ABOUT ══════════════════════ */
+    #about-inner { max-width: 660px; margin: 0 auto; padding: 0 24px 80px; }
+    .about-hero { padding: 56px 0 48px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 52px; }
+    .about-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 16px; }
+    .about-hero-title { font-family: 'Libre Baskerville', serif; font-size: clamp(28px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; }
+    .about-hero-title em { font-style: italic; color: rgba(255,255,255,0.48); }
+    .about-lede { font-family: 'Libre Baskerville', serif; font-size: 18px; line-height: 1.8; color: rgba(255,255,255,0.58); font-style: italic; }
+    .about-section { margin-bottom: 48px; }
+    .about-h2 { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+    .about-body { font-size: 15px; line-height: 1.82; color: rgba(255,255,255,0.58); }
+    .about-body p + p { margin-top: 16px; }
+    .about-body strong { color: rgba(255,255,255,0.82); font-weight: 600; }
+    .about-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .about-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+    .about-list-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.22); flex-shrink: 0; margin-top: 9px; }
+    .about-ratings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .about-rating-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 16px; }
+    .about-rating-name { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+    .about-rating-desc { font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.55; }
+    .about-hr { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 48px 0; }
+
+    /* ══════════════════════ SUBMIT ══════════════════════ */
+    #submit-inner { max-width: 620px; margin: 0 auto; padding: 0 24px 80px; }
+    .submit-hero { padding: 56px 0 44px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 44px; }
+    .submit-hero-title { font-family: 'Libre Baskerville', serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .submit-hero-sub { font-size: 15px; color: rgba(255,255,255,0.42); line-height: 1.75; }
+    .submit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 36px; }
+    .submit-opt { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 22px 18px; cursor: pointer; transition: all 0.2s; }
+    .submit-opt:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.16); }
+    .submit-opt-icon { font-size: 22px; margin-bottom: 10px; }
+    .submit-opt-title { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+    .submit-opt-desc { font-size: 13px; color: rgba(255,255,255,0.42); line-height: 1.5; }
+    .submit-soon { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; padding: 32px 28px; text-align: center; }
+    .submit-soon-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.22); margin-bottom: 12px; }
+    .submit-soon-title { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+    .submit-soon-body { font-size: 14px; color: rgba(255,255,255,0.38); line-height: 1.72; max-width: 380px; margin: 0 auto; }
+    .submit-soon-body a { color: rgba(255,255,255,0.55); }
+
+    /* ══════════════════════ MODAL ══════════════════════ */
+    #modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.72); align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
     #modal-overlay.open { display: flex; }
     #modal-box { border-radius: 12px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; position: relative; }
     #modal-box::-webkit-scrollbar { width: 4px; }
     #modal-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
     .modal-stripe { height: 10px; border-radius: 12px 12px 0 0; }
     .modal-body { padding: 28px 28px 24px; }
-    #modal-close {
-      position: absolute; top: 20px; right: 20px;
-      background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px;
-      border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1;
-      display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif;
-    }
+    #modal-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; }
     .modal-header { display: flex; gap: 18px; align-items: center; margin-bottom: 20px; }
     .modal-badge { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
     .modal-badge-initials { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; flex-shrink: 0; letter-spacing: -0.02em; }
     .modal-header-text { flex: 1; min-width: 0; }
     .modal-eyebrow { margin-bottom: 4px; }
-    .modal-name { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 900; margin: 6px 0 2px; line-height: 1.1; }
+    .modal-name { font-family: 'Libre Baskerville', serif; font-size: 24px; font-weight: 700; margin: 6px 0 2px; line-height: 1.1; }
     .modal-sub { font-size: 14px; margin: 0; }
     .facts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
     .fact-box { background: rgba(0,0,0,0.12); border-radius: 6px; padding: 10px 12px; }
@@ -178,7 +227,7 @@
     .fact-value { font-size: 13px; font-weight: 600; }
     .ratings-block { background: rgba(0,0,0,0.12); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
     .ratings-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; margin-bottom: 12px; }
-    .overall-score { font-size: 24px; font-weight: 900; font-family: 'DM Sans', sans-serif; }
+    .overall-score { font-size: 24px; font-weight: 900; font-family: 'Libre Baskerville', serif; }
     .rating-bar-row { margin-bottom: 8px; }
     .rating-bar-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; opacity: 0.8; }
     .rating-bar-header span:last-child { font-weight: 700; }
@@ -187,73 +236,226 @@
     .tags-row { display: flex; flex-wrap: wrap; gap: 8px; }
     .tag { font-size: 12px; padding: 5px 10px; background: rgba(255,255,255,0.15); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
 
-    @media (max-width: 500px) {
-      .facts-grid { grid-template-columns: 1fr; }
-      .controls-row { flex-direction: column; }
+    @media (max-width: 600px) {
+      .facts-grid, .about-ratings-grid, .submit-grid { grid-template-columns: 1fr; }
+      .home-stat { padding: 0 18px; }
+      #home-cta { padding: 36px 24px; }
+      .nav-links { gap: 0; }
+      .nav-link { padding: 7px 9px; font-size: 12px; }
+    }
+    @media (max-width: 480px) {
+      #home-stats { flex-wrap: wrap; gap: 20px; justify-content: center; }
+      .home-stat { border-right: none !important; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── Hero ── -->
-<section id="hero">
-  <div id="hero-blobs"></div>
-  <div class="hero-inner">
-    <div class="hero-eyebrow">Non-League Football · England</div>
-    <h1 class="hero-title">
-      The Non-League<br>
-      <span class="hero-gradient-text">Ground Directory</span>
-    </h1>
-    <p class="hero-sub">Every club. Every colour. Every terrace. Community-powered ratings and ground information across non-league football.</p>
-    <div class="stats-row">
-      <div class="stat-item"><div class="stat-n" id="stat-clubs">—</div><div class="stat-label">Clubs Listed</div></div>
-      <div class="stat-item"><div class="stat-n" id="stat-leagues">—</div><div class="stat-label">Leagues Covered</div></div>
-      <div class="stat-item"><div class="stat-n" id="stat-ratings">—</div><div class="stat-label">Community Ratings</div></div>
+<!-- ── Nav ── -->
+<nav id="site-nav">
+  <button class="nav-logo" onclick="showView('home')">
+    The Non-League<br>Ground Directory
+    <span>Community-powered · England</span>
+  </button>
+  <div class="nav-links">
+    <button class="nav-link active" data-view="home"    onclick="showView('home')">Home</button>
+    <button class="nav-link"        data-view="browse"  onclick="showView('browse')">Browse</button>
+    <button class="nav-link"        data-view="leagues" onclick="showView('leagues')">Leagues</button>
+    <button class="nav-link"        data-view="about"   onclick="showView('about')">About</button>
+  </div>
+  <button class="nav-cta" onclick="showView('submit')">Submit</button>
+</nav>
+
+<!-- ══════════════════════════════════
+     HOME
+══════════════════════════════════ -->
+<div id="view-home" class="view active">
+
+  <section id="home-hero">
+    <div class="home-hero-bg"></div>
+    <div class="home-pitch-lines"></div>
+    <div class="home-hero-inner">
+      <div class="home-eyebrow"><span class="home-eyebrow-dot"></span>Non-League Football · England</div>
+      <h1 class="home-title">
+        Every ground.<br>
+        Every terrace.<br>
+        <span class="home-title-italic">Every story.</span>
+      </h1>
+      <p class="home-strapline">The community directory of non-league football grounds — from the National League to the county leagues. Honest ratings, local knowledge, and a love of the game.</p>
+      <div class="home-hero-actions">
+        <button class="btn-primary" onclick="showView('browse')">Browse all clubs</button>
+        <button class="btn-ghost"   onclick="showView('leagues')">Browse by league</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="home-stats">
+    <div class="home-stat"><span class="home-stat-n" id="home-stat-clubs">—</span><div class="home-stat-label">Clubs listed</div></div>
+    <div class="home-stat"><span class="home-stat-n" id="home-stat-leagues">—</span><div class="home-stat-label">Leagues covered</div></div>
+    <div class="home-stat"><span class="home-stat-n" id="home-stat-ratings">—</span><div class="home-stat-label">Community ratings</div></div>
+    <div class="home-stat"><span class="home-stat-n">6</span><div class="home-stat-label">Steps covered</div></div>
+  </div>
+
+  <div class="home-section">
+    <div class="home-section-header">
+      <h2 class="home-section-title">Highest rated <em>grounds</em></h2>
+      <button class="home-section-link" onclick="showView('browse')">See all →</button>
+    </div>
+    <div id="home-featured-grid"><div style="color:rgba(255,255,255,0.18);font-size:13px;padding:16px 0">Loading…</div></div>
+  </div>
+
+  <div class="home-section" style="padding-top:0">
+    <div class="home-section-header">
+      <h2 class="home-section-title">Most <em>reviewed</em></h2>
+      <button class="home-section-link" onclick="showView('browse')">Browse all →</button>
+    </div>
+    <div id="home-recent"><div style="color:rgba(255,255,255,0.18);font-size:13px;padding:16px 0">Loading…</div></div>
+  </div>
+
+  <div id="home-cta">
+    <h2 class="home-cta-title">Been to a ground<br><em>we haven't covered?</em></h2>
+    <p class="home-cta-sub">Help build the most complete non-league ground directory in England. Add a club, rate a ground you've visited, or suggest a correction — every contribution matters.</p>
+    <div class="home-cta-actions">
+      <button class="btn-primary" onclick="showView('submit')">Get involved</button>
+      <button class="btn-ghost"   onclick="showView('about')">Learn more</button>
     </div>
   </div>
-</section>
 
-<!-- ── Controls ── -->
-<div id="controls">
-  <div class="controls-row">
-    <input type="text" id="search-input" placeholder="Search clubs, towns, leagues…" />
-    <div class="step-filters" id="step-filters">
-      <button class="step-btn active" data-step="all">All</button>
-      <button class="step-btn" data-step="1">Step 1</button>
-      <button class="step-btn" data-step="2">Step 2</button>
-      <button class="step-btn" data-step="3">Step 3</button>
-      <button class="step-btn" data-step="4">Step 4</button>
-      <button class="step-btn" data-step="5">Step 5</button>
-      <button class="step-btn" data-step="6">Step 6</button>
+</div>
+
+<!-- ══════════════════════════════════
+     BROWSE
+══════════════════════════════════ -->
+<div id="view-browse" class="view">
+
+  <div id="browse-hero">
+    <div class="browse-title">Browse clubs</div>
+    <p class="browse-sub">Search by name, town, or league — or filter by step</p>
+  </div>
+
+  <div id="controls">
+    <div class="controls-row">
+      <input type="text" id="search-input" placeholder="Search clubs, towns, leagues…" />
+      <div class="step-filters" id="step-filters">
+        <button class="step-btn active" data-step="all">All</button>
+        <button class="step-btn" data-step="1">Step 1</button>
+        <button class="step-btn" data-step="2">Step 2</button>
+        <button class="step-btn" data-step="3">Step 3</button>
+        <button class="step-btn" data-step="4">Step 4</button>
+        <button class="step-btn" data-step="5">Step 5</button>
+        <button class="step-btn" data-step="6">Step 6</button>
+      </div>
     </div>
+    <div class="result-count" id="result-count"></div>
   </div>
-  <div class="result-count" id="result-count"></div>
-</div>
 
-<!-- ── Featured ── -->
-<div id="featured-section">
-  <div class="section-label">Featured Grounds</div>
-  <div id="featured-strip"></div>
-</div>
-
-<!-- ── Grid ── -->
-<div id="grid-section">
-  <div class="section-label">All Clubs</div>
-  <div id="loading"><div class="spinner"></div>Loading clubs…</div>
-  <div id="load-error"><strong>Couldn't load clubs</strong>Check the browser console for details.</div>
-  <div id="clubs-grid"></div>
-  <div id="no-results">No clubs match your search</div>
-</div>
-
-<!-- ── CTA ── -->
-<div id="cta-banner">
-  <div>
-    <div class="cta-title">Know a ground we've missed?</div>
-    <p class="cta-sub">Help build the most complete non-league ground directory — add a club, update details, or leave a rating.</p>
+  <div id="featured-section">
+    <div class="section-label">Featured Grounds</div>
+    <div id="featured-strip"></div>
   </div>
-  <div class="cta-buttons">
-    <button class="btn-primary">Add a Club</button>
-    <button class="btn-secondary">Leave a Rating</button>
+
+  <div id="grid-section">
+    <div class="section-label">All Clubs</div>
+    <div id="loading"><div class="spinner"></div>Loading clubs…</div>
+    <div id="load-error"><strong>Couldn't load clubs</strong>Check the browser console for details.</div>
+    <div id="clubs-grid"></div>
+    <div id="no-results">No clubs match your search</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     LEAGUES
+══════════════════════════════════ -->
+<div id="view-leagues" class="view">
+  <div id="leagues-inner">
+    <div class="leagues-hero">
+      <h1 class="leagues-hero-title">Browse by <em>league</em></h1>
+      <p class="leagues-hero-sub">Navigate the pyramid — from the National League down to the regional feeders. Select a league to see its clubs.</p>
+    </div>
+    <div id="leagues-content"><div style="color:rgba(255,255,255,0.18);font-size:13px;padding:16px 0">Loading…</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ABOUT
+══════════════════════════════════ -->
+<div id="view-about" class="view">
+  <div id="about-inner">
+    <div class="about-hero">
+      <div class="about-eyebrow">About this project</div>
+      <h1 class="about-hero-title">Built for the<br><em>away day faithful</em></h1>
+      <p class="about-lede">"Is there parking? What's the food like? Can you actually see from the terrace?" — the questions every groundhopper asks. We built the directory we always wished existed.</p>
+    </div>
+
+    <div class="about-section">
+      <h2 class="about-h2">What this is</h2>
+      <div class="about-body">
+        <p>The Non-League Ground Directory is a community-powered reference for football fans who want honest, practical information about grounds across the English non-league pyramid — from the National League (Step 1) down through the regional feeder leagues at Steps 5 and 6.</p>
+        <p>Each club listing combines <strong>hard facts</strong> — ground name, town, county, league — with <strong>community ratings</strong> across four categories, and tags submitted by fans who've actually visited.</p>
+      </div>
+    </div>
+
+    <hr class="about-hr">
+
+    <div class="about-section">
+      <h2 class="about-h2">How ratings work</h2>
+      <div class="about-body"><p>Every rating is submitted by a real person who has visited the ground. Ratings are scored out of 5 across four categories:</p></div>
+      <div class="about-ratings-grid">
+        <div class="about-rating-box"><div class="about-rating-name">📍 Location &amp; access</div><div class="about-rating-desc">Ease of getting there — parking, public transport, walk from the station.</div></div>
+        <div class="about-rating-box"><div class="about-rating-name">👋 Friendliness</div><div class="about-rating-desc">How welcome away supporters feel — stewards, home fans, club staff.</div></div>
+        <div class="about-rating-box"><div class="about-rating-name">🥧 Food &amp; drink</div><div class="about-rating-desc">Quality and range of catering — pies, drinks, real ale, anything on offer.</div></div>
+        <div class="about-rating-box"><div class="about-rating-name">🏗️ Facilities</div><div class="about-rating-desc">Terracing, cover, toilets, sightlines — the basics and beyond.</div></div>
+      </div>
+    </div>
+
+    <hr class="about-hr">
+
+    <div class="about-section">
+      <h2 class="about-h2">Who can contribute</h2>
+      <div class="about-body"><p>Anyone. The directory is community-powered — it gets better the more people use it and add to it. You can:</p></div>
+      <ul class="about-list">
+        <li><span class="about-list-dot"></span>Rate a ground you've visited</li>
+        <li><span class="about-list-dot"></span>Suggest tags for a ground (pie van, real ale bar, dog friendly…)</li>
+        <li><span class="about-list-dot"></span>Propose a correction to a club's static details</li>
+        <li><span class="about-list-dot"></span>Submit a club we've missed</li>
+      </ul>
+    </div>
+
+    <hr class="about-hr">
+
+    <div class="about-section">
+      <h2 class="about-h2">Scope</h2>
+      <div class="about-body">
+        <p>The directory covers clubs in the English non-league pyramid — Steps 1 through 6. This includes the National League, the Step 3 leagues (Isthmian, Northern Premier, Southern), and the regional feeders below.</p>
+        <p><strong>Wales is not currently in scope.</strong> Only one Welsh club participates in the English non-league pyramid and the geographic complexity isn't worth it for now.</p>
+        <p>New clubs are being added regularly. Community features — ratings submission, tag suggestions, edit proposals — are coming soon.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SUBMIT
+══════════════════════════════════ -->
+<div id="view-submit" class="view">
+  <div id="submit-inner">
+    <div class="submit-hero">
+      <h1 class="submit-hero-title">Get involved</h1>
+      <p class="submit-hero-sub">Help make this the most complete non-league ground directory in England. Every contribution — however small — makes it more useful for everyone.</p>
+    </div>
+    <div class="submit-grid">
+      <div class="submit-opt"><div class="submit-opt-icon">⭐</div><div class="submit-opt-title">Rate a ground</div><div class="submit-opt-desc">Been to a match? Rate across location, food, friendliness and facilities.</div></div>
+      <div class="submit-opt"><div class="submit-opt-icon">➕</div><div class="submit-opt-title">Add a club</div><div class="submit-opt-desc">Know a club we've missed? Submit the details and we'll get them listed.</div></div>
+      <div class="submit-opt"><div class="submit-opt-icon">✏️</div><div class="submit-opt-title">Suggest an edit</div><div class="submit-opt-desc">Spotted something wrong — a ground name, town, or league? Let us know.</div></div>
+      <div class="submit-opt"><div class="submit-opt-icon">🏷️</div><div class="submit-opt-title">Add a tag</div><div class="submit-opt-desc">Pie van, real ale bar, dog friendly — tag a ground's features.</div></div>
+    </div>
+    <div class="submit-soon">
+      <div class="submit-soon-label">Coming soon</div>
+      <div class="submit-soon-title">Community features in development</div>
+      <p class="submit-soon-body">User accounts, rating submission, tag suggestions and edit proposals are all being built. In the meantime, <a href="mailto:hello@nonleaguedirectory.co.uk">get in touch by email</a> and we'll add your contribution manually.</p>
+    </div>
   </div>
 </div>
 
@@ -266,378 +468,251 @@
 </div>
 
 <script>
-/* =====================================================================
-   CONFIGURATION
-   ===================================================================== */
+/* ── Config ── */
 const SUPABASE_URL      = 'https://huokcisnlcaezqcroyon.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8';
+const HEADERS = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
 
-const HEADERS = {
-  apikey:        SUPABASE_ANON_KEY,
-  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-};
+/* ── Router ── */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  const v = document.getElementById('view-' + name);
+  if (v) v.classList.add('active');
+  const b = document.querySelector(`.nav-link[data-view="${name}"]`);
+  if (b) b.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (name === 'leagues' && ALL_CLUBS.length) buildLeaguesView();
+}
 
-/* =====================================================================
-   DATA LOADING
-   ===================================================================== */
+/* ── Data ── */
 let ALL_CLUBS = [];
-
-/* ── Mock clubs (removed once real data is populated) ── */
 const MOCK_CLUBS = [
-  {
-    id: -1, name: 'Bamber Bridge FC', nickname: 'Brig',
-    league_id: 1, league_name: 'Northern Premier League Premier Division', step: 3, region: 'North West',
-    ground: 'Sir Tom Finney Stadium', town: 'Bamber Bridge', county: 'Lancashire',
-    founded: 1952, capacity: 3000,
-    colour_primary: '#CC0000', colour_secondary: '#FFFFFF',
-    colour_names: ['Red', 'White'], badge_url: null,
-    tags: ['Car park', 'Covered terrace', 'Bar on site'],
-    highlights: ['Scenic ground', 'Historic club'],
-    website: 'https://www.bamberbridgefc.co.uk',
-    avg_overall: 4.1, avg_location: 3.9, avg_friendliness: 4.6, avg_food: 3.8, avg_facilities: 4.0,
-    rating_count: 18,
-  },
-  {
-    id: -2, name: 'Dulwich Hamlet FC', nickname: 'The Hamlet',
-    league_id: 2, league_name: 'Isthmian League Premier Division', step: 3, region: 'South East',
-    ground: 'Champion Hill', town: 'Dulwich', county: 'Greater London',
-    founded: 1893, capacity: 3000,
-    colour_primary: '#FC03A5', colour_secondary: '#1C2B6B',
-    colour_names: ['Pink', 'Navy'], badge_url: null,
-    tags: ['Pie van', 'Real ale bar', 'Terracing', 'Dog friendly'],
-    highlights: ['Central location', 'Iconic ground', 'Vibrant matchday'],
-    website: 'https://www.dulwichhamletfc.co.uk',
-    avg_overall: 4.7, avg_location: 4.2, avg_friendliness: 4.9, avg_food: 4.6, avg_facilities: 4.3,
-    rating_count: 41,
-  },
+  { id:-1, name:'Bamber Bridge FC', nickname:'Brig', league_id:1, league_name:'Northern Premier League Premier Division', step:3, region:'North West', ground:'Sir Tom Finney Stadium', town:'Bamber Bridge', county:'Lancashire', founded:1952, capacity:3000, colour_primary:'#CC0000', colour_secondary:'#FFFFFF', colour_names:['Red','White'], badge_url:null, tags:['Car park','Covered terrace','Bar on site'], highlights:['Scenic ground','Historic club'], website:null, avg_overall:4.1, avg_location:3.9, avg_friendliness:4.6, avg_food:3.8, avg_facilities:4.0, rating_count:18 },
+  { id:-2, name:'Dulwich Hamlet FC', nickname:'The Hamlet', league_id:2, league_name:'Isthmian League Premier Division', step:3, region:'South East', ground:'Champion Hill', town:'Dulwich', county:'Greater London', founded:1893, capacity:3000, colour_primary:'#FC03A5', colour_secondary:'#1C2B6B', colour_names:['Pink','Navy'], badge_url:null, tags:['Pie van','Real ale bar','Terracing','Dog friendly'], highlights:['Central location','Iconic ground','Vibrant matchday'], website:null, avg_overall:4.7, avg_location:4.2, avg_friendliness:4.9, avg_food:4.6, avg_facilities:4.3, rating_count:41 },
 ];
 
 async function loadClubs() {
-  document.getElementById('loading').style.display    = 'block';
-  document.getElementById('load-error').style.display = 'none';
-
+  document.getElementById('loading').style.display = 'block';
   let live = [];
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clubs_with_ratings?select=*&order=name.asc`,
-      { headers: HEADERS }
-    );
-    if (!res.ok) throw new Error(`${res.status}`);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/clubs_with_ratings?select=*&order=name.asc`, { headers: HEADERS });
+    if (!res.ok) throw new Error(res.status);
     const raw = await res.json();
     live = raw.filter(c => c.name && c.step != null && c.league_id != null);
-  } catch (err) {
-    console.warn('Supabase fetch failed, showing mock data only:', err);
-  }
-
+  } catch(e) { console.warn('Supabase fetch failed:', e); }
   const liveNames = new Set(live.map(c => c.name.toLowerCase()));
-  const mocks = MOCK_CLUBS.filter(c => !liveNames.has(c.name.toLowerCase()));
-  ALL_CLUBS = [...live, ...mocks].sort((a, b) => a.name.localeCompare(b.name));
-
+  ALL_CLUBS = [...live, ...MOCK_CLUBS.filter(c => !liveNames.has(c.name.toLowerCase()))].sort((a,b) => a.name.localeCompare(b.name));
   document.getElementById('loading').style.display = 'none';
   updateStats();
-  buildFeatured();
+  buildFeaturedStrip();
   renderGrid();
+  buildHomeSections();
 }
 
-/* =====================================================================
-   LIVE STATS — counts derive from real data
-   ===================================================================== */
+/* ── Stats ── */
 function updateStats() {
-  const leagueSet   = new Set(ALL_CLUBS.map(c => c.league_id).filter(Boolean));
-  const totalRatings = ALL_CLUBS.reduce((sum, c) => sum + (parseInt(c.rating_count) || 0), 0);
-
-  document.getElementById('stat-clubs').textContent   = ALL_CLUBS.length || '—';
-  document.getElementById('stat-leagues').textContent = leagueSet.size   || '—';
-  document.getElementById('stat-ratings').textContent = totalRatings > 0
-    ? totalRatings.toLocaleString() : '—';
+  const leagues = new Set(ALL_CLUBS.map(c=>c.league_id).filter(Boolean));
+  const ratings = ALL_CLUBS.reduce((s,c)=>s+(parseInt(c.rating_count)||0),0);
+  document.getElementById('home-stat-clubs').textContent   = ALL_CLUBS.length || '—';
+  document.getElementById('home-stat-leagues').textContent = leagues.size || '—';
+  document.getElementById('home-stat-ratings').textContent = ratings > 0 ? ratings.toLocaleString() : '—';
 }
 
-/* =====================================================================
-   NORMALISE — maps a Supabase view row into the shape used by all UI
-   The clubs_with_ratings view provides league_name, step, region directly
-   ===================================================================== */
-function normalise(raw) {
-  return {
-    ...raw,
-    league:  raw.league_name || 'Unknown',
-    step:    raw.step,
-    region:  raw.region,
-    colours: {
-      primary:   raw.colour_primary   || '#444444',
-      secondary: raw.colour_secondary || '#ffffff',
-    },
-    colourNames: raw.colour_names || [],
-    badgeUrl: raw.badge_url || null,
-    highlights: raw.highlights || [],
-    rating:  raw.avg_overall,
-    ratings: {
-      location:     raw.avg_location,
-      friendliness: raw.avg_friendliness,
-      food:         raw.avg_food,
-      facilities:   raw.avg_facilities,
-    },
-  };
+/* ── Normalise ── */
+function N(raw) {
+  return { ...raw, league: raw.league_name||'Unknown', colours: { primary: raw.colour_primary||'#444', secondary: raw.colour_secondary||'#fff' }, badgeUrl: raw.badge_url||null, highlights: raw.highlights||[], rating: raw.avg_overall, ratings: { location: raw.avg_location, friendliness: raw.avg_friendliness, food: raw.avg_food, facilities: raw.avg_facilities } };
 }
 
-/* =====================================================================
-   HELPERS
-   ===================================================================== */
+/* ── Helpers ── */
 function isLight(hex) {
-  const c = (hex || '#444444').replace('#', '');
-  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
-  return (r*299 + g*587 + b*114) / 1000 > 155;
+  const h=(hex||'#444').replace('#','');
+  return (parseInt(h.slice(0,2),16)*299+parseInt(h.slice(2,4),16)*587+parseInt(h.slice(4,6),16)*114)/1000>155;
 }
-
-function starsHTML(value) {
-  if (value == null) return '<span style="opacity:0.4;font-size:12px">No ratings yet</span>';
-  let html = '<div class="star-row">';
-  for (let s = 1; s <= 5; s++) {
-    html += `<svg width="13" height="13" viewBox="0 0 20 20"
-      fill="${s <= Math.round(value) ? 'currentColor' : 'none'}"
-      stroke="currentColor" stroke-width="1.5">
-      <polygon points="10,2 12.5,7.5 18,8 14,12 15.5,18 10,15 4.5,18 6,12 2,8 7.5,7.5"/>
-    </svg>`;
-  }
-  html += `<span>${parseFloat(value).toFixed(1)}</span></div>`;
-  return html;
+function ini(name) { return name.split(' ').map(w=>w[0]).slice(0,3).join(''); }
+function starsHTML(v) {
+  if (v==null) return '<span style="opacity:0.4;font-size:12px">No ratings yet</span>';
+  let h='<div class="star-row">';
+  for(let s=1;s<=5;s++) h+=`<svg width="13" height="13" viewBox="0 0 20 20" fill="${s<=Math.round(v)?'currentColor':'none'}" stroke="currentColor" stroke-width="1.5"><polygon points="10,2 12.5,7.5 18,8 14,12 15.5,18 10,15 4.5,18 6,12 2,8 7.5,7.5"/></svg>`;
+  return h+`<span>${parseFloat(v).toFixed(1)}</span></div>`;
 }
-
-/* Generates pills from community scores — thresholds can be tuned */
 function ratingPills(c) {
-  const pills = [];
-  const { location, friendliness, food, facilities } = c.ratings;
-  if (location     >= 4.5) pills.push('Easy to get to');
-  else if (location >= 4.0) pills.push('Good location');
-  if (friendliness >= 4.5) pills.push('Brilliant atmosphere');
-  else if (friendliness >= 4.0) pills.push('Friendly welcome');
-  if (food         >= 4.5) pills.push('Great food & drink');
-  else if (food    >= 4.0) pills.push('Good food & drink');
-  if (facilities   >= 4.5) pills.push('Excellent facilities');
-  else if (facilities >= 4.0) pills.push('Good facilities');
-  return pills;
+  const p=[]; const {location,friendliness,food,facilities}=c.ratings;
+  if(location>=4.5) p.push('Easy to get to'); else if(location>=4.0) p.push('Good location');
+  if(friendliness>=4.5) p.push('Brilliant atmosphere'); else if(friendliness>=4.0) p.push('Friendly welcome');
+  if(food>=4.5) p.push('Great food & drink'); else if(food>=4.0) p.push('Good food & drink');
+  if(facilities>=4.5) p.push('Excellent facilities'); else if(facilities>=4.0) p.push('Good facilities');
+  return p;
 }
 
-
-/* =====================================================================
-   HERO BLOBS
-   ===================================================================== */
-function buildBlobs() {
-  const container = document.getElementById('hero-blobs');
-  container.innerHTML = '';
-  const positions = [
-    { top: '20px',  left: '-80px' },
-    { top: '-60px', left: '50%', transform: 'translateX(-50%)' },
-    { top: '20px',  right: '-80px' },
-  ];
-  ALL_CLUBS.slice(0, 3).forEach((raw, i) => {
-    const c = normalise(raw);
-    const d = document.createElement('div');
-    d.className = 'hero-blob';
-    d.style.background = c.colours.primary;
-    Object.assign(d.style, positions[i]);
-    container.appendChild(d);
-  });
-}
-
-/* =====================================================================
-   FEATURED STRIP
-   ===================================================================== */
-function buildFeatured() {
-  buildBlobs();
-  const strip = document.getElementById('featured-strip');
-  strip.innerHTML = '';
-  ALL_CLUBS.slice(0, 3).forEach(raw => {
-    const c  = normalise(raw);
-    const tc = isLight(c.colours.primary) ? '#111' : '#fff';
-    const div = document.createElement('div');
-    div.className = 'featured-card';
-    div.style.background = `linear-gradient(135deg, ${c.colours.primary}, ${c.colours.secondary})`;
-    div.style.color = tc;
-    div.innerHTML = `
-      ${c.badgeUrl
-        ? `<img src="${c.badgeUrl}" class="featured-badge" alt="${c.name} badge">`
-        : `<div class="featured-badge-initials" style="background:rgba(0,0,0,0.2);color:${tc}">${c.name.split(' ').map(w=>w[0]).slice(0,3).join('')}</div>`
-      }
-      <div class="featured-name">${c.name}</div>
-      <div class="featured-town">${c.town || ''}${c.county ? ', ' + c.county : ''}</div>`;
-    div.addEventListener('click', () => openModal(c));
-    strip.appendChild(div);
-  });
-}
-
-/* =====================================================================
-   CLUB GRID
-   ===================================================================== */
-let activeStep  = 'all';
-let searchQuery = '';
-
-function buildCard(raw) {
-  const c  = normalise(raw);
-  const tc = isLight(c.colours.primary) ? '#111' : '#fff';
-  const div = document.createElement('div');
-  div.className = 'club-card';
-  div.style.background = c.colours.primary;
-  div.style.color      = tc;
-  div.style.boxShadow  = `0 4px 16px ${c.colours.primary}33`;
-
-  const allPills = [...(c.highlights || []), ...ratingPills(c)];
-
-  div.innerHTML = `
-    <div class="card-stripe" style="background:linear-gradient(90deg,${c.colours.primary} 50%,${c.colours.secondary} 50%)"></div>
-    <div class="card-body">
-      <div class="card-header">
-        <div class="card-header-text">
-          <div class="card-name">${c.name}</div>
-        </div>
-        <div class="card-header-right">
-          ${c.badgeUrl
-            ? `<img src="${c.badgeUrl}" class="card-badge" alt="${c.name} badge">`
-            : `<div class="card-badge-initials" style="background:rgba(255,255,255,0.15);color:${tc}">${c.name.split(' ').map(w=>w[0]).slice(0,3).join('')}</div>`
-          }
-        </div>
+/* ── Home sections ── */
+function buildHomeSections() {
+  // Featured: top 4 by rating
+  const grid = document.getElementById('home-featured-grid');
+  const top = ALL_CLUBS.filter(c=>c.avg_overall!=null).sort((a,b)=>b.avg_overall-a.avg_overall).slice(0,4);
+  const toShow = top.length >= 2 ? top : ALL_CLUBS.slice(0,4);
+  grid.innerHTML = '';
+  toShow.forEach(raw => {
+    const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
+    const dimC=isLight(c.colours.primary)?'rgba(0,0,0,0.42)':'rgba(255,255,255,0.48)';
+    const card=document.createElement('div'); card.className='home-feat-card';
+    card.style.background=`linear-gradient(150deg,${c.colours.primary},color-mix(in srgb,${c.colours.primary} 55%,${c.colours.secondary} 45%))`;
+    card.style.color=tc; card.style.boxShadow=`0 6px 24px ${c.colours.primary}40`;
+    card.innerHTML=`<div class="home-feat-inner">
+      <div class="home-feat-top">
+        ${c.badgeUrl?`<img src="${c.badgeUrl}" class="home-feat-badge" alt="">`:`<div class="home-feat-badge-init" style="background:rgba(0,0,0,0.15);color:${tc}">${ini(c.name)}</div>`}
+        <div class="home-feat-step">Step ${c.step}</div>
       </div>
-      <div class="card-meta">
-        <div class="card-meta-row"><svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>${c.league}</div>
-        <div class="card-meta-row"><svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${c.town || ''}${c.county ? ', ' + c.county : ''}</div>
-      </div>
-      ${allPills.length ? `<div class="card-pills">${allPills.slice(0,3).map(p => `<span class="card-pill">${p}</span>`).join('')}</div>` : ''}
-      <div class="card-footer">
+      <div class="home-feat-name">${c.name}</div>
+      <div class="home-feat-sub">${c.ground||''}${c.town?' · '+c.town:''}</div>
+      <div class="home-feat-footer">
+        <div>
+          <div class="home-feat-score">${c.rating!=null?parseFloat(c.rating).toFixed(1):'—'}</div>
+          <div class="home-feat-score-sub" style="color:${dimC}">${c.rating_count?c.rating_count+' rating'+(c.rating_count!==1?'s':''):'No ratings yet'}</div>
+        </div>
         ${starsHTML(c.rating)}
-        <div class="step-badge">Step ${c.step}</div>
       </div>
     </div>`;
+    card.addEventListener('click',()=>openModal(c));
+    grid.appendChild(card);
+  });
 
-  div.addEventListener('mouseenter', () => {
-    div.style.transform = 'translateY(-4px)';
-    div.style.boxShadow = `0 16px 40px ${c.colours.primary}55`;
+  // Recent: most reviewed
+  const rec = document.getElementById('home-recent');
+  const byRatings = ALL_CLUBS.filter(c=>c.rating_count>=1).sort((a,b)=>b.rating_count-a.rating_count).slice(0,5);
+  const recShow = byRatings.length ? byRatings : ALL_CLUBS.slice(0,5);
+  rec.innerHTML='';
+  recShow.forEach(raw => {
+    const c=N(raw); const row=document.createElement('div'); row.className='recent-row';
+    row.innerHTML=`<div class="recent-dot" style="background:${c.colours.primary}"></div>
+      <div class="recent-name">${c.name}</div>
+      <div class="recent-meta">${c.town||''}${c.county?', '+c.county:''} · Step ${c.step}</div>
+      <div class="recent-score">${c.rating!=null?parseFloat(c.rating).toFixed(1):'—'}</div>`;
+    row.addEventListener('click',()=>openModal(c));
+    rec.appendChild(row);
   });
-  div.addEventListener('mouseleave', () => {
-    div.style.transform = 'translateY(0)';
-    div.style.boxShadow = `0 4px 16px ${c.colours.primary}33`;
-  });
-  div.addEventListener('click', () => openModal(c));
-  return div;
 }
 
+/* ── Browse: featured strip ── */
+function buildFeaturedStrip() {
+  const strip=document.getElementById('featured-strip'); strip.innerHTML='';
+  ALL_CLUBS.slice(0,3).forEach(raw=>{
+    const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
+    const div=document.createElement('div'); div.className='featured-card';
+    div.style.background=`linear-gradient(135deg,${c.colours.primary},${c.colours.secondary})`; div.style.color=tc;
+    div.innerHTML=`${c.badgeUrl?`<img src="${c.badgeUrl}" class="featured-badge" alt="">`:`<div class="featured-badge-initials" style="background:rgba(0,0,0,0.2);color:${tc}">${ini(c.name)}</div>`}<div class="featured-name">${c.name}</div><div class="featured-town">${c.town||''}${c.county?', '+c.county:''}</div>`;
+    div.addEventListener('click',()=>openModal(c)); strip.appendChild(div);
+  });
+}
+
+/* ── Browse: grid ── */
+let activeStep='all', searchQuery='';
+function buildCard(raw) {
+  const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
+  const div=document.createElement('div'); div.className='club-card';
+  div.style.background=c.colours.primary; div.style.color=tc; div.style.boxShadow=`0 4px 16px ${c.colours.primary}33`;
+  const pills=[...(c.highlights||[]),...ratingPills(c)];
+  div.innerHTML=`<div class="card-stripe" style="background:linear-gradient(90deg,${c.colours.primary} 50%,${c.colours.secondary} 50%)"></div>
+    <div class="card-body">
+      <div class="card-header">
+        <div class="card-header-text"><div class="card-name">${c.name}</div></div>
+        <div class="card-header-right">${c.badgeUrl?`<img src="${c.badgeUrl}" class="card-badge" alt="">`:`<div class="card-badge-initials" style="background:rgba(255,255,255,0.15);color:${tc}">${ini(c.name)}</div>`}</div>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-row"><svg class="meta-icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>${c.league}</div>
+        <div class="card-meta-row"><svg class="meta-icon" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${c.town||''}${c.county?', '+c.county:''}</div>
+      </div>
+      ${pills.length?`<div class="card-pills">${pills.slice(0,3).map(p=>`<span class="card-pill">${p}</span>`).join('')}</div>`:''}
+      <div class="card-footer">${starsHTML(c.rating)}<div class="step-badge">Step ${c.step}</div></div>
+    </div>`;
+  div.addEventListener('mouseenter',()=>{div.style.transform='translateY(-4px)';div.style.boxShadow=`0 16px 40px ${c.colours.primary}55`;});
+  div.addEventListener('mouseleave',()=>{div.style.transform='translateY(0)';div.style.boxShadow=`0 4px 16px ${c.colours.primary}33`;});
+  div.addEventListener('click',()=>openModal(c)); return div;
+}
 function renderGrid() {
-  const grid  = document.getElementById('clubs-grid');
-  const noRes = document.getElementById('no-results');
-  const count = document.getElementById('result-count');
-  grid.innerHTML = '';
-
-  const filtered = ALL_CLUBS.filter(raw => {
-    const c = normalise(raw);
-    const q = searchQuery.toLowerCase();
-    const matchSearch =
-      c.name.toLowerCase().includes(q) ||
-      (c.town   || '').toLowerCase().includes(q) ||
-      (c.county || '').toLowerCase().includes(q) ||
-      c.league.toLowerCase().includes(q);
-    const matchStep = activeStep === 'all' || String(c.step) === activeStep;
-    return matchSearch && matchStep;
+  const grid=document.getElementById('clubs-grid'), noRes=document.getElementById('no-results'), count=document.getElementById('result-count');
+  grid.innerHTML='';
+  const f=ALL_CLUBS.filter(raw=>{
+    const c=N(raw), q=searchQuery.toLowerCase();
+    return (c.name.toLowerCase().includes(q)||(c.town||'').toLowerCase().includes(q)||(c.county||'').toLowerCase().includes(q)||c.league.toLowerCase().includes(q))
+      &&(activeStep==='all'||String(c.step)===activeStep);
   });
+  count.textContent=`${f.length} club${f.length!==1?'s':''} shown`;
+  noRes.style.display=f.length===0?'block':'none';
+  f.forEach(raw=>grid.appendChild(buildCard(raw)));
+}
+document.getElementById('search-input').addEventListener('input',e=>{searchQuery=e.target.value;renderGrid();});
+document.getElementById('step-filters').addEventListener('click',e=>{
+  const btn=e.target.closest('.step-btn'); if(!btn) return;
+  document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  activeStep=btn.dataset.step; renderGrid();
+});
 
-  count.textContent       = `${filtered.length} club${filtered.length !== 1 ? 's' : ''} shown`;
-  noRes.style.display     = filtered.length === 0 ? 'block' : 'none';
-  filtered.forEach(raw => grid.appendChild(buildCard(raw)));
+/* ── Leagues view ── */
+let leaguesBuilt=false;
+function buildLeaguesView() {
+  if (leaguesBuilt) return; leaguesBuilt=true;
+  const stepData={};
+  ALL_CLUBS.forEach(raw=>{
+    const c=N(raw);
+    if(!stepData[c.step]) stepData[c.step]={};
+    if(!stepData[c.step][c.league]) stepData[c.step][c.league]={clubs:[],region:c.region};
+    stepData[c.step][c.league].clubs.push(c);
+  });
+  const stepMeta={1:{desc:'National League'},2:{desc:'National League North / South'},3:{desc:'Northern Premier · Isthmian · Southern Premier'},4:{desc:'Northern Premier · Isthmian · Southern Div One'},5:{desc:'Regional feeder leagues'},6:{desc:'County-level leagues'}};
+  const maxClubs=Math.max(...Object.values(stepData).flatMap(s=>Object.values(s).map(l=>l.clubs.length)),1);
+  const container=document.getElementById('leagues-content'); container.innerHTML='';
+  Object.keys(stepData).sort((a,b)=>a-b).forEach(step=>{
+    const leagues=stepData[step];
+    const total=Object.values(leagues).reduce((s,l)=>s+l.clubs.length,0);
+    const meta=stepMeta[step]||{desc:''};
+    const group=document.createElement('div'); group.className='step-group';
+    group.innerHTML=`<div class="step-group-header"><div class="step-group-label">Step ${step}</div><div class="step-group-desc">${meta.desc}</div><div class="step-group-count">${total} club${total!==1?'s':''}</div></div><div class="leagues-grid"></div>`;
+    const grid=group.querySelector('.leagues-grid');
+    Object.entries(leagues).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([lname,data])=>{
+      const pct=Math.round((data.clubs.length/maxClubs)*100);
+      const card=document.createElement('div'); card.className='league-card';
+      card.innerHTML=`<div class="league-card-name">${lname}</div><div class="league-card-meta"><div class="league-card-region">${data.region||''}</div><div class="league-card-clubs">${data.clubs.length} club${data.clubs.length!==1?'s':''}</div></div><div class="league-card-bar"><div class="league-card-bar-fill" style="width:${pct}%"></div></div>`;
+      card.addEventListener('click',()=>{ showView('browse'); searchQuery=lname; document.getElementById('search-input').value=lname; activeStep='all'; document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active')); document.querySelector('.step-btn[data-step="all"]').classList.add('active'); renderGrid(); });
+      grid.appendChild(card);
+    });
+    container.appendChild(group);
+  });
 }
 
-document.getElementById('search-input').addEventListener('input', e => {
-  searchQuery = e.target.value;
-  renderGrid();
-});
-
-document.getElementById('step-filters').addEventListener('click', e => {
-  const btn = e.target.closest('.step-btn');
-  if (!btn) return;
-  document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeStep = btn.dataset.step;
-  renderGrid();
-});
-
-/* =====================================================================
-   MODAL
-   ===================================================================== */
+/* ── Modal ── */
 function openModal(c) {
-  const tc   = isLight(c.colours.primary) ? '#111' : '#fff';
-  const dimC = isLight(c.colours.primary) ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.65)';
-
-  document.getElementById('modal-stripe').style.background =
-    `repeating-linear-gradient(90deg,${c.colours.primary} 0,${c.colours.primary} 30px,${c.colours.secondary} 30px,${c.colours.secondary} 60px)`;
-
-  const box = document.getElementById('modal-box');
-  box.style.background = c.colours.primary;
-  box.style.color      = tc;
-  box.style.boxShadow  = `0 24px 80px ${c.colours.primary}88`;
-
-  const ratingRows = [
-    ['Location / Access', c.ratings.location],
-    ['Friendliness',      c.ratings.friendliness],
-    ['Food & Drink',      c.ratings.food],
-    ['Facilities',        c.ratings.facilities],
-  ].map(([label, val]) => val != null ? `
-    <div class="rating-bar-row">
-      <div class="rating-bar-header"><span>${label}</span><span>${parseFloat(val).toFixed(1)}</span></div>
-      <div class="rating-bar-track"><div class="rating-bar-fill" style="width:${(val/5)*100}%"></div></div>
-    </div>` : '').join('');
-
-  const facts = [
-    ['Step',     `Step ${c.step}`],
-    ['League',   c.league],
-    ['Ground',   c.ground],
-    ['Town',     (c.town || '') + (c.county ? ', ' + c.county : '')],
-  ].map(([l, v]) => `
-    <div class="fact-box">
-      <div class="fact-label" style="color:${dimC}">${l}</div>
-      <div class="fact-value">${v || '—'}</div>
-    </div>`).join('');
-
-  const tags        = (c.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
-  const ratingCount = c.rating_count
-    ? `<div style="font-size:11px;opacity:0.5;margin-top:4px">${c.rating_count} rating${c.rating_count !== 1 ? 's' : ''}</div>`
-    : '';
-
-  document.getElementById('modal-body').innerHTML = `
+  const tc=isLight(c.colours.primary)?'#111':'#fff';
+  const dimC=isLight(c.colours.primary)?'rgba(0,0,0,0.55)':'rgba(255,255,255,0.65)';
+  document.getElementById('modal-stripe').style.background=`repeating-linear-gradient(90deg,${c.colours.primary} 0,${c.colours.primary} 30px,${c.colours.secondary} 30px,${c.colours.secondary} 60px)`;
+  const box=document.getElementById('modal-box'); box.style.background=c.colours.primary; box.style.color=tc; box.style.boxShadow=`0 24px 80px ${c.colours.primary}88`;
+  const ratingRows=[['Location / Access',c.ratings.location],['Friendliness',c.ratings.friendliness],['Food & Drink',c.ratings.food],['Facilities',c.ratings.facilities]].map(([l,v])=>v!=null?`<div class="rating-bar-row"><div class="rating-bar-header"><span>${l}</span><span>${parseFloat(v).toFixed(1)}</span></div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:${(v/5)*100}%"></div></div></div>`:'').join('');
+  const facts=[['Step',`Step ${c.step}`],['League',c.league],['Ground',c.ground],['Town',(c.town||'')+(c.county?', '+c.county:'')]].map(([l,v])=>`<div class="fact-box"><div class="fact-label" style="color:${dimC}">${l}</div><div class="fact-value">${v||'—'}</div></div>`).join('');
+  const tags=(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+  const rc=c.rating_count?`<div style="font-size:11px;opacity:0.5;margin-top:4px">${c.rating_count} rating${c.rating_count!==1?'s':''}</div>`:'';
+  document.getElementById('modal-body').innerHTML=`
     <button id="modal-close" style="color:${tc}" onclick="closeModal()">×</button>
     <div class="modal-header">
-      ${c.badgeUrl
-        ? `<img src="${c.badgeUrl}" class="modal-badge" alt="${c.name} badge">`
-        : `<div class="modal-badge-initials" style="background:rgba(0,0,0,0.15);color:${tc}">${c.name.split(' ').map(w=>w[0]).slice(0,3).join('')}</div>`
-      }
+      ${c.badgeUrl?`<img src="${c.badgeUrl}" class="modal-badge" alt="">`:`<div class="modal-badge-initials" style="background:rgba(0,0,0,0.15);color:${tc}">${ini(c.name)}</div>`}
       <div class="modal-header-text">
         <div class="modal-eyebrow"><span class="step-badge">Step ${c.step}</span></div>
         <h2 class="modal-name">${c.name}</h2>
-        <p class="modal-sub" style="color:${dimC}">${[c.nickname, c.founded ? 'Est. ' + c.founded : ''].filter(Boolean).join(' · ')}</p>
+        <p class="modal-sub" style="color:${dimC}">${[c.nickname,c.founded?'Est. '+c.founded:''].filter(Boolean).join(' · ')}</p>
       </div>
     </div>
     <div class="facts-grid">${facts}</div>
     <div class="ratings-block">
       <div class="ratings-title" style="color:${dimC}">Community Ratings</div>
-      ${c.rating != null
-        ? `<div class="overall-score">${parseFloat(c.rating).toFixed(1)}</div>
-           <div style="margin-bottom:14px">${starsHTML(c.rating)}${ratingCount}</div>
-           ${ratingRows}`
-        : `<div style="opacity:0.4;font-size:13px;padding:4px 0">No ratings yet — be the first!</div>`
-      }
+      ${c.rating!=null?`<div class="overall-score">${parseFloat(c.rating).toFixed(1)}</div><div style="margin-bottom:14px">${starsHTML(c.rating)}${rc}</div>${ratingRows}`:`<div style="opacity:0.4;font-size:13px;padding:4px 0">No ratings yet — be the first!</div>`}
     </div>
-    ${tags ? `<div class="tags-row">${tags}</div>` : ''}`;
-
+    ${tags?`<div class="tags-row">${tags}</div>`:''}`;
   document.getElementById('modal-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow=''; }
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
-});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-/* ── Kick off ── */
 loadClubs();
 </script>
 </body>
