@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Non-League Ground Directory</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -33,15 +33,13 @@
     .view.active { display: block; }
 
     /* ══════════════════════ HOME ══════════════════════ */
-    #home-hero { position: relative; overflow: hidden; padding: 44px 24px 40px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    #home-hero { position: relative; overflow: hidden; padding: 44px 24px 40px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .home-hero-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(90,40,20,0.38) 0%, transparent 70%); }
     .home-pitch-lines { position: absolute; inset: 0; pointer-events: none; opacity: 0.03; background-image: repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(255,255,255,0.9) 80px), repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,255,255,0.9) 80px); }
-    .home-hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
-    .home-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 16px; padding: 5px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
-    .home-eyebrow-dot { width: 5px; height: 5px; background: #E63946; border-radius: 50%; flex-shrink: 0; }
-    h1.home-title { font-family: 'Libre Baskerville', serif; font-size: clamp(24px, 4vw, 42px); font-weight: 700; line-height: 1.1; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .home-title-italic { font-style: italic; color: rgba(255,255,255,0.5); }
-    .home-strapline { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: clamp(13px, 1.5vw, 15px); color: rgba(255,255,255,0.42); margin: 12px auto 0; max-width: 480px; line-height: 1.7; }
+    .home-hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0; }
+    h1.home-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px, 4.5vw, 52px); font-weight: 800; line-height: 1.0; margin-bottom: 8px; letter-spacing: 0.01em; text-align: left; }
+    .home-title-italic { font-style: normal; color: rgba(255,255,255,0.38); }
+    .home-strapline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: clamp(14px, 1.6vw, 16px); color: rgba(255,255,255,0.42); margin: 12px 0 0; max-width: 480px; line-height: 1.7; }
     .btn-primary { padding: 14px 28px; background: #fff; color: #1A1814; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em; transition: all 0.2s; }
     .btn-primary:hover { background: rgba(255,255,255,0.88); transform: translateY(-1px); }
     .btn-ghost { padding: 14px 28px; background: transparent; color: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
@@ -51,14 +49,14 @@
     #home-stats { border-bottom: 1px solid rgba(255,255,255,0.06); padding: 28px 24px; display: flex; justify-content: center; }
     .home-stat { text-align: center; padding: 0 36px; border-right: 1px solid rgba(255,255,255,0.07); }
     .home-stat:last-child { border-right: none; }
-    .home-stat-n { font-family: 'Libre Baskerville', serif; font-size: 30px; font-weight: 700; line-height: 1; display: block; }
+    .home-stat-n { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 800; line-height: 1; display: block; letter-spacing: 0.01em; }
     .home-stat-label { font-size: 11px; color: rgba(255,255,255,0.32); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; }
 
     /* Home sections */
     .home-section { padding: 64px 24px; max-width: 960px; margin: 0 auto; }
     .home-section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
-    .home-section-title { font-family: 'Libre Baskerville', serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
-    .home-section-title em { font-style: italic; color: rgba(255,255,255,0.45); }
+    .home-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 700; letter-spacing: 0.01em; line-height: 1; }
+    .home-section-title em { font-style: normal; color: rgba(255,255,255,0.38); }
     .home-section-link { font-size: 13px; color: rgba(255,255,255,0.35); cursor: pointer; transition: color 0.18s; border: none; background: none; font-family: 'DM Sans', sans-serif; padding: 0; }
     .home-section-link:hover { color: rgba(255,255,255,0.75); }
 
@@ -66,15 +64,16 @@
     #home-featured-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
     .home-feat-card { border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.25s, box-shadow 0.25s; }
     .home-feat-card:hover { transform: translateY(-4px); }
-    .home-feat-inner { padding: 20px 18px 16px; }
-    .home-feat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-    .home-feat-badge { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
-    .home-feat-badge-init { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; letter-spacing: -0.02em; }
-    .home-feat-step { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 2px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); text-transform: uppercase; }
-    .home-feat-name { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 700; line-height: 1.25; margin-bottom: 3px; }
+    .home-feat-inner { padding: 16px 18px 14px; }
+    .home-feat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .home-feat-badge { width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+    .home-feat-badge-init { width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: -0.02em; flex-shrink: 0; overflow: hidden; }
+    .home-feat-header-text { flex: 1; min-width: 0; }
+    .home-feat-step { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 2px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+    .home-feat-name { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .home-feat-sub { font-size: 11px; opacity: 0.6; }
-    .home-feat-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; align-items: center; }
-    .home-feat-score { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 700; line-height: 1; }
+    .home-feat-footer { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; align-items: center; }
+    .home-feat-score { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; line-height: 1; letter-spacing: 0.03em; }
     .home-feat-score-sub { font-size: 10px; opacity: 0.45; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
 
     /* Recent list */
@@ -88,44 +87,65 @@
 
     /* CTA block */
     #home-cta { margin: 0 24px 64px; max-width: 912px; margin-left: auto; margin-right: auto; border-radius: 14px; overflow: hidden; position: relative; background: linear-gradient(135deg, rgba(230,57,70,0.12) 0%, rgba(2,62,138,0.18) 100%); border: 1px solid rgba(255,255,255,0.07); padding: 52px 48px; }
-    .home-cta-title { font-family: 'Libre Baskerville', serif; font-size: clamp(22px, 4vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+    .home-cta-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(22px, 4vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
     .home-cta-title em { font-style: italic; color: rgba(255,255,255,0.48); }
     .home-cta-sub { font-size: 15px; color: rgba(255,255,255,0.45); max-width: 460px; line-height: 1.75; margin-bottom: 28px; }
     .home-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
     /* ══════════════════════ BROWSE ══════════════════════ */
-    #browse-hero { padding: 40px 24px 32px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .browse-title { font-family: 'Libre Baskerville', serif; font-size: clamp(24px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    #browse-hero { padding: 36px 24px 28px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .browse-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(32px, 5vw, 52px); font-weight: 400; letter-spacing: 0.01em; margin-bottom: 6px; }
     .browse-sub { font-size: 14px; color: rgba(255,255,255,0.38); }
-    #controls { padding: 28px 24px 0; max-width: 900px; margin: 0 auto; }
-    .controls-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; justify-content: center; }
-    #search-input { flex: 1; min-width: 200px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
-    #search-input:focus { border-color: rgba(255,255,255,0.25); }
-    #search-input::placeholder { color: rgba(255,255,255,0.3); }
-    .step-filters { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-    .step-btn { padding: 10px 16px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
-    .step-btn.active { background: #fff; color: #1A1814; border-color: #fff; }
-    .result-count { font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 20px; }
+    #browse-body { display: flex; align-items: flex-start; max-width: 1140px; margin: 0 auto; padding: 0 24px 60px; }
+    #filter-sidebar { flex: 0 0 210px; padding: 28px 0 0; position: sticky; top: 92px; max-height: calc(100vh - 112px); overflow-y: auto; scrollbar-width: none; }
+    #filter-sidebar::-webkit-scrollbar { display: none; }
+    #search-wrap { margin-bottom: 20px; }
+    #search-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
+    #search-input:focus { border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.07); }
+    #search-input::placeholder { color: rgba(255,255,255,0.28); }
+    #active-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+    .filter-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 4px 8px 4px 10px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .filter-chip:hover { background: rgba(255,255,255,0.2); }
+    .filter-chip-x { font-size: 15px; line-height: 1; opacity: 0.6; margin-left: 1px; }
+    .filter-accordion { border-top: 1px solid rgba(255,255,255,0.07); }
+    .accordion-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: none; border: none; color: rgba(255,255,255,0.55); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.15s; }
+    .accordion-trigger:hover, .accordion-trigger.open { color: #fff; }
+    .accordion-arrow { font-size: 9px; opacity: 0.5; transition: transform 0.22s; flex-shrink: 0; }
+    .accordion-trigger.open .accordion-arrow { transform: rotate(180deg); opacity: 0.8; }
+    .accordion-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+    .accordion-body.open { max-height: 700px; }
+    .accordion-inner { padding-bottom: 10px; display: flex; flex-direction: column; gap: 1px; }
+    .filter-opt { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; transition: background 0.14s; font-size: 13px; color: rgba(255,255,255,0.55); user-select: none; }
+    .filter-opt:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
+    .filter-opt.active { color: #fff; font-weight: 600; }
+    .filter-opt-check { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid rgba(255,255,255,0.2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.14s; }
+    .filter-opt.active .filter-opt-check { background: #fff; border-color: #fff; }
+    .check-tick { display: none; }
+    .filter-opt.active .check-tick { display: block; }
+    .filter-opt-label { flex: 1; line-height: 1.35; }
+    .filter-opt-count { font-size: 11px; opacity: 0.3; }
+    .league-group-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.22); padding: 8px 8px 4px; }
+    #browse-divider { width: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0; align-self: stretch; margin: 28px 28px 0; }
+    #browse-main { flex: 1; min-width: 0; padding-top: 28px; }
+    .result-count { font-size: 12px; color: rgba(255,255,255,0.28); margin-bottom: 18px; letter-spacing: 0.02em; }
     .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 14px; }
-    #featured-section { padding: 0 24px; max-width: 900px; margin: 0 auto 28px; }
-    #featured-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 16px; scrollbar-width: none; }
-    #featured-strip::-webkit-scrollbar { display: none; }
-    .featured-card { flex: 0 0 auto; min-width: 200px; border-radius: 8px; padding: 14px 18px; cursor: pointer; transition: transform 0.2s; }
-    .featured-card:hover { transform: scale(1.03); }
-    .featured-badge { width: 44px; height: 44px; object-fit: contain; margin-bottom: 8px; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-    .featured-badge-initials { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .featured-name { font-size: 12px; font-weight: 700; }
-    .featured-town { font-size: 11px; opacity: 0.7; margin-top: 2px; }
-    #grid-section { padding: 0 24px 60px; max-width: 900px; margin: 0 auto; }
-    #clubs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    #featured-section { display: none; }
+    #grid-section { padding: 0; }
+    #clubs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    #load-error { display: none; padding: 32px 0; color: rgba(255,255,255,0.4); font-size: 14px; line-height: 1.6; }
+    #load-error strong { color: rgba(255,255,255,0.7); display: block; margin-bottom: 6px; }
+    #no-results { display: none; text-align: center; color: rgba(255,255,255,0.3); padding: 48px 0; font-size: 15px; }
+    .spinner { width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.1); border-top-color: rgba(255,255,255,0.5); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* ── Club cards ── */
     .club-card { border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.25s, box-shadow 0.25s; }
     .card-stripe { height: 6px; }
     .card-body { padding: 20px 20px 16px; }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .card-header-text { flex: 1; min-width: 0; }
     .card-header-right { flex-shrink: 0; margin-left: 10px; }
-    .card-badge { width: 48px; height: 48px; object-fit: contain; display: block; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); }
-    .card-badge-initials { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; letter-spacing: -0.02em; }
+    .card-badge { width: 48px; height: 48px; min-width: 48px; min-height: 48px; max-width: 48px; max-height: 48px; object-fit: contain; display: block; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); }
+    .card-badge-initials { width: 48px; height: 48px; min-width: 48px; min-height: 48px; max-width: 48px; max-height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; letter-spacing: -0.02em; flex-shrink: 0; overflow: hidden; }
     .card-name { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; line-height: 1.2; }
     .card-pills { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 14px; }
     .card-pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }
@@ -136,22 +156,21 @@
     .card-footer { display: flex; justify-content: space-between; align-items: center; }
     .star-row { display: flex; gap: 2px; align-items: center; }
     .star-row span { margin-left: 4px; font-size: 13px; opacity: 0.75; }
-    #loading { text-align: center; padding: 60px 0; color: rgba(255,255,255,0.3); font-size: 14px; display: none; }
-    .spinner { width: 28px; height: 28px; border: 2px solid rgba(255,255,255,0.1); border-top-color: rgba(255,255,255,0.5); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #load-error { display: none; text-align: center; padding: 40px 24px; color: rgba(255,255,255,0.4); font-size: 14px; line-height: 1.6; }
-    #load-error strong { color: rgba(255,255,255,0.7); display: block; margin-bottom: 6px; }
-    #no-results { display: none; text-align: center; color: rgba(255,255,255,0.3); padding: 60px 0; font-size: 15px; }
-
+    @media (max-width: 700px) {
+      #browse-body { flex-direction: column; padding: 0 16px 40px; }
+      #filter-sidebar { flex: none; width: 100%; position: static; max-height: none; padding-top: 20px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 4px; margin-bottom: 4px; }
+      #browse-divider { display: none; }
+      #browse-main { padding-top: 20px; }
+    }
     /* ══════════════════════ LEAGUES ══════════════════════ */
     #leagues-inner { max-width: 960px; margin: 0 auto; padding: 0 24px 64px; }
     .leagues-hero { padding: 48px 0 40px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 48px; }
-    .leagues-hero-title { font-family: 'Libre Baskerville', serif; font-size: clamp(26px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .leagues-hero-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(26px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
     .leagues-hero-title em { font-style: italic; color: rgba(255,255,255,0.42); }
     .leagues-hero-sub { font-size: 15px; color: rgba(255,255,255,0.38); max-width: 480px; line-height: 1.65; }
     .step-group { margin-bottom: 44px; }
     .step-group-header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .step-group-label { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; }
+    .step-group-label { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; }
     .step-group-desc { font-size: 13px; color: rgba(255,255,255,0.32); }
     .step-group-count { font-size: 12px; color: rgba(255,255,255,0.22); margin-left: auto; }
     .leagues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -168,11 +187,11 @@
     #about-inner { max-width: 660px; margin: 0 auto; padding: 0 24px 80px; }
     .about-hero { padding: 56px 0 48px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 52px; }
     .about-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 16px; }
-    .about-hero-title { font-family: 'Libre Baskerville', serif; font-size: clamp(28px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; }
+    .about-hero-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; }
     .about-hero-title em { font-style: italic; color: rgba(255,255,255,0.48); }
-    .about-lede { font-family: 'Libre Baskerville', serif; font-size: 18px; line-height: 1.8; color: rgba(255,255,255,0.58); font-style: italic; }
+    .about-lede { font-family: 'Barlow', sans-serif; font-size: 17px; line-height: 1.85; color: rgba(255,255,255,0.58); font-style: italic; }
     .about-section { margin-bottom: 48px; }
-    .about-h2 { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+    .about-h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
     .about-body { font-size: 15px; line-height: 1.82; color: rgba(255,255,255,0.58); }
     .about-body p + p { margin-top: 16px; }
     .about-body strong { color: rgba(255,255,255,0.82); font-weight: 600; }
@@ -188,7 +207,7 @@
     /* ══════════════════════ SUBMIT ══════════════════════ */
     #submit-inner { max-width: 620px; margin: 0 auto; padding: 0 24px 80px; }
     .submit-hero { padding: 56px 0 44px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 44px; }
-    .submit-hero-title { font-family: 'Libre Baskerville', serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .submit-hero-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
     .submit-hero-sub { font-size: 15px; color: rgba(255,255,255,0.42); line-height: 1.75; }
     .submit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 36px; }
     .submit-opt { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 22px 18px; cursor: pointer; transition: all 0.2s; }
@@ -198,7 +217,7 @@
     .submit-opt-desc { font-size: 13px; color: rgba(255,255,255,0.42); line-height: 1.5; }
     .submit-soon { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; padding: 32px 28px; text-align: center; }
     .submit-soon-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.22); margin-bottom: 12px; }
-    .submit-soon-title { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+    .submit-soon-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
     .submit-soon-body { font-size: 14px; color: rgba(255,255,255,0.38); line-height: 1.72; max-width: 380px; margin: 0 auto; }
     .submit-soon-body a { color: rgba(255,255,255,0.55); }
 
@@ -224,7 +243,7 @@
     .fact-value { font-size: 13px; font-weight: 600; }
     .ratings-block { background: rgba(0,0,0,0.12); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
     .ratings-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; margin-bottom: 12px; }
-    .overall-score { font-size: 24px; font-weight: 900; font-family: 'Libre Baskerville', serif; }
+    .overall-score { font-size: 24px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; }
     .rating-bar-row { margin-bottom: 8px; }
     .rating-bar-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; opacity: 0.8; }
     .rating-bar-header span:last-child { font-weight: 700; }
@@ -273,7 +292,6 @@
     <div class="home-hero-bg"></div>
     <div class="home-pitch-lines"></div>
     <div class="home-hero-inner">
-      <div class="home-eyebrow"><span class="home-eyebrow-dot"></span>Non-League Football · England</div>
       <h1 class="home-title">
         Every ground.<br>
         Every terrace.<br>
@@ -292,7 +310,7 @@
 
   <div class="home-section">
     <div class="home-section-header">
-      <h2 class="home-section-title">Highest rated <em>grounds</em></h2>
+      <h2 class="home-section-title">Highest Rated <em>Clubs</em></h2>
       <button class="home-section-link" onclick="showView('browse')">See all →</button>
     </div>
     <div id="home-featured-grid"><div style="color:rgba(255,255,255,0.18);font-size:13px;padding:16px 0">Loading…</div></div>
@@ -324,36 +342,45 @@
 
   <div id="browse-hero">
     <div class="browse-title">Browse clubs</div>
-    <p class="browse-sub">Search by name, town, or league — or filter by step</p>
+    <p class="browse-sub">Search and filter across the non-league pyramid</p>
   </div>
 
-  <div id="controls">
-    <div class="controls-row">
-      <input type="text" id="search-input" placeholder="Search clubs, towns, leagues…" />
-      <div class="step-filters" id="step-filters">
-        <button class="step-btn active" data-step="all">All</button>
-        <button class="step-btn" data-step="1">Step 1</button>
-        <button class="step-btn" data-step="2">Step 2</button>
-        <button class="step-btn" data-step="3">Step 3</button>
-        <button class="step-btn" data-step="4">Step 4</button>
-        <button class="step-btn" data-step="5">Step 5</button>
-        <button class="step-btn" data-step="6">Step 6</button>
+  <div id="browse-body">
+    <aside id="filter-sidebar">
+      <div id="search-wrap">
+        <input type="text" id="search-input" placeholder="Search clubs, towns…" />
+      </div>
+      <div id="active-chips"></div>
+      <div class="filter-accordion">
+        <button class="accordion-trigger open" data-accordion="step">
+          Step <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body open" id="accordion-body-step">
+          <div class="accordion-inner" id="step-filter-list"></div>
+        </div>
+      </div>
+      <div class="filter-accordion">
+        <button class="accordion-trigger" data-accordion="league">
+          League <span class="accordion-arrow">▼</span>
+        </button>
+        <div class="accordion-body" id="accordion-body-league">
+          <div class="accordion-inner" id="league-filter-list"></div>
+        </div>
+      </div>
+    </aside>
+
+    <div id="browse-divider"></div>
+
+    <div id="browse-main">
+      <div class="result-count" id="result-count"></div>
+      <div id="featured-section"></div>
+      <div id="grid-section">
+        <div id="loading"><div class="spinner"></div>Loading clubs…</div>
+        <div id="load-error"><strong>Couldn't load clubs</strong>Check the browser console for details.</div>
+        <div id="clubs-grid"></div>
+        <div id="no-results">No clubs match your search</div>
       </div>
     </div>
-    <div class="result-count" id="result-count"></div>
-  </div>
-
-  <div id="featured-section">
-    <div class="section-label">Featured Grounds</div>
-    <div id="featured-strip"></div>
-  </div>
-
-  <div id="grid-section">
-    <div class="section-label">All Clubs</div>
-    <div id="loading"><div class="spinner"></div>Loading clubs…</div>
-    <div id="load-error"><strong>Couldn't load clubs</strong>Check the browser console for details.</div>
-    <div id="clubs-grid"></div>
-    <div id="no-results">No clubs match your search</div>
   </div>
 
 </div>
@@ -498,8 +525,10 @@ async function loadClubs() {
   const liveNames = new Set(live.map(c => c.name.toLowerCase()));
   ALL_CLUBS = [...live, ...MOCK_CLUBS.filter(c => !liveNames.has(c.name.toLowerCase()))].sort((a,b) => a.name.localeCompare(b.name));
   document.getElementById('loading').style.display = 'none';
+  if (ALL_CLUBS.length === 0) document.getElementById('load-error').style.display = 'block';
   updateStats();
   buildFeaturedStrip();
+  buildFilterSidebar();
   renderGrid();
   buildHomeSections();
 }
@@ -553,12 +582,14 @@ function buildHomeSections() {
     card.style.background=`linear-gradient(150deg,${c.colours.primary},color-mix(in srgb,${c.colours.primary} 55%,${c.colours.secondary} 45%))`;
     card.style.color=tc; card.style.boxShadow=`0 6px 24px ${c.colours.primary}40`;
     card.innerHTML=`<div class="home-feat-inner">
-      <div class="home-feat-top">
+      <div class="home-feat-header">
         ${c.badgeUrl?`<img src="${c.badgeUrl}" class="home-feat-badge" alt="">`:`<div class="home-feat-badge-init" style="background:rgba(0,0,0,0.15);color:${tc}">${ini(c.name)}</div>`}
+        <div class="home-feat-header-text">
+          <div class="home-feat-name">${c.name}</div>
+          <div class="home-feat-sub">${c.ground||''}${c.town?' · '+c.town:''}</div>
+        </div>
         <div class="home-feat-step">Step ${c.step}</div>
       </div>
-      <div class="home-feat-name">${c.name}</div>
-      <div class="home-feat-sub">${c.ground||''}${c.town?' · '+c.town:''}</div>
       <div class="home-feat-footer">
         <div>
           <div class="home-feat-score">${c.rating!=null?parseFloat(c.rating).toFixed(1):'—'}</div>
@@ -587,20 +618,50 @@ function buildHomeSections() {
   });
 }
 
-/* ── Browse: featured strip ── */
-function buildFeaturedStrip() {
-  const strip=document.getElementById('featured-strip'); strip.innerHTML='';
-  ALL_CLUBS.slice(0,3).forEach(raw=>{
-    const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
-    const div=document.createElement('div'); div.className='featured-card';
-    div.style.background=`linear-gradient(135deg,${c.colours.primary},${c.colours.secondary})`; div.style.color=tc;
-    div.innerHTML=`${c.badgeUrl?`<img src="${c.badgeUrl}" class="featured-badge" alt="">`:`<div class="featured-badge-initials" style="background:rgba(0,0,0,0.2);color:${tc}">${ini(c.name)}</div>`}<div class="featured-name">${c.name}</div><div class="featured-town">${c.town||''}${c.county?', '+c.county:''}</div>`;
-    div.addEventListener('click',()=>openModal(c)); strip.appendChild(div);
+/* ── Browse: featured strip (no-op) ── */
+function buildFeaturedStrip() {}
+
+/* ── Browse: filter sidebar ── */
+let activeStep='all', activeLeague='all', searchQuery='';
+
+function buildFilterSidebar() {
+  const steps=[1,2,3,4,5,6];
+  const stepList=document.getElementById('step-filter-list');
+  stepList.innerHTML='';
+  steps.forEach(s=>{
+    const count=ALL_CLUBS.filter(c=>String(c.step)===String(s)).length;
+    if(!count) return;
+    const div=document.createElement('div');
+    div.className='filter-opt'+(activeStep===String(s)?' active':'');
+    div.dataset.step=String(s);
+    div.innerHTML=`<div class="filter-opt-check"><svg class="check-tick" width="8" height="8" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#1A1814" stroke-width="2" stroke-linecap="round"/></svg></div><span class="filter-opt-label">Step ${s}</span><span class="filter-opt-count">${count}</span>`;
+    div.addEventListener('click',()=>{ activeStep=activeStep===String(s)?'all':String(s); activeLeague='all'; buildFilterSidebar(); renderGrid(); });
+    stepList.appendChild(div);
   });
+  const leagueList=document.getElementById('league-filter-list');
+  leagueList.innerHTML='';
+  const byStep={};
+  ALL_CLUBS.forEach(raw=>{ const c=N(raw); if(!byStep[c.step]) byStep[c.step]=new Map(); if(!byStep[c.step].has(c.league)) byStep[c.step].set(c.league,0); byStep[c.step].set(c.league,byStep[c.step].get(c.league)+1); });
+  const stepsToShow=activeStep==='all'?Object.keys(byStep).sort((a,b)=>a-b):[activeStep];
+  stepsToShow.forEach(step=>{
+    if(!byStep[step]) return;
+    const label=document.createElement('div'); label.className='league-group-label'; label.textContent='Step '+step; leagueList.appendChild(label);
+    [...byStep[step].entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([lname,count])=>{
+      const div=document.createElement('div'); div.className='filter-opt'+(activeLeague===lname?' active':'');
+      div.innerHTML=`<div class="filter-opt-check"><svg class="check-tick" width="8" height="8" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#1A1814" stroke-width="2" stroke-linecap="round"/></svg></div><span class="filter-opt-label">${lname}</span><span class="filter-opt-count">${count}</span>`;
+      div.addEventListener('click',()=>{ activeLeague=activeLeague===lname?'all':lname; buildFilterSidebar(); renderGrid(); });
+      leagueList.appendChild(div);
+    });
+  });
+  const chips=document.getElementById('active-chips'); chips.innerHTML='';
+  if(activeStep!=='all'){ const chip=document.createElement('div'); chip.className='filter-chip'; chip.innerHTML=`Step ${activeStep} <span class="filter-chip-x">×</span>`; chip.addEventListener('click',()=>{ activeStep='all'; buildFilterSidebar(); renderGrid(); }); chips.appendChild(chip); }
+  if(activeLeague!=='all'){ const chip=document.createElement('div'); chip.className='filter-chip'; const shortName=activeLeague.length>28?activeLeague.slice(0,26)+'…':activeLeague; chip.innerHTML=`${shortName} <span class="filter-chip-x">×</span>`; chip.addEventListener('click',()=>{ activeLeague='all'; buildFilterSidebar(); renderGrid(); }); chips.appendChild(chip); }
+  if(activeLeague!=='all'){ const body=document.getElementById('accordion-body-league'); const trigger=document.querySelector('[data-accordion="league"]'); if(body&&!body.classList.contains('open')){ body.classList.add('open'); trigger&&trigger.classList.add('open'); } }
 }
 
+document.addEventListener('click',e=>{ const trigger=e.target.closest('.accordion-trigger'); if(!trigger) return; const key=trigger.dataset.accordion; const body=document.getElementById('accordion-body-'+key); if(!body) return; trigger.classList.toggle('open'); body.classList.toggle('open'); });
+
 /* ── Browse: grid ── */
-let activeStep='all', searchQuery='';
 function buildCard(raw) {
   const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
   const div=document.createElement('div'); div.className='club-card';
@@ -629,18 +690,14 @@ function renderGrid() {
   const f=ALL_CLUBS.filter(raw=>{
     const c=N(raw), q=searchQuery.toLowerCase();
     return (c.name.toLowerCase().includes(q)||(c.town||'').toLowerCase().includes(q)||(c.county||'').toLowerCase().includes(q)||c.league.toLowerCase().includes(q))
-      &&(activeStep==='all'||String(c.step)===activeStep);
+      &&(activeStep==='all'||String(c.step)===activeStep)
+      &&(activeLeague==='all'||c.league===activeLeague);
   });
   count.textContent=`${f.length} club${f.length!==1?'s':''} shown`;
   noRes.style.display=f.length===0?'block':'none';
   f.forEach(raw=>grid.appendChild(buildCard(raw)));
 }
 document.getElementById('search-input').addEventListener('input',e=>{searchQuery=e.target.value;renderGrid();});
-document.getElementById('step-filters').addEventListener('click',e=>{
-  const btn=e.target.closest('.step-btn'); if(!btn) return;
-  document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-  activeStep=btn.dataset.step; renderGrid();
-});
 
 /* ── Leagues view ── */
 let leaguesBuilt=false;
@@ -667,7 +724,7 @@ function buildLeaguesView() {
       const pct=Math.round((data.clubs.length/maxClubs)*100);
       const card=document.createElement('div'); card.className='league-card';
       card.innerHTML=`<div class="league-card-name">${lname}</div><div class="league-card-meta"><div class="league-card-region">${data.region||''}</div><div class="league-card-clubs">${data.clubs.length} club${data.clubs.length!==1?'s':''}</div></div><div class="league-card-bar"><div class="league-card-bar-fill" style="width:${pct}%"></div></div>`;
-      card.addEventListener('click',()=>{ showView('browse'); searchQuery=lname; document.getElementById('search-input').value=lname; activeStep='all'; document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active')); document.querySelector('.step-btn[data-step="all"]').classList.add('active'); renderGrid(); });
+      card.addEventListener('click',()=>{ showView('browse'); searchQuery=''; document.getElementById('search-input').value=''; activeStep='all'; activeLeague=lname; buildFilterSidebar(); renderGrid(); });
       grid.appendChild(card);
     });
     container.appendChild(group);
