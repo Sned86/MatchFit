@@ -14,13 +14,16 @@
     ::-webkit-scrollbar-track { background: #1A1814; }
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
+    /* ── Site banner ── */
+    #site-banner { display: block; width: 100%; line-height: 0; cursor: pointer; }
+    #site-banner img { width: 100%; height: auto; display: block; object-fit: cover; }
+
     /* ── Nav ── */
     #site-nav {
       position: sticky; top: 0; z-index: 200;
       background: rgba(26,24,20,0.94); backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.07);
     }
-    .nav-top { padding: 0 24px; display: flex; align-items: center; justify-content: center; height: 52px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .nav-bottom { padding: 0 24px; display: flex; align-items: center; justify-content: center; height: 40px; gap: 2px; }
     .nav-logo { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; letter-spacing: 0.01em; line-height: 1.25; border: none; background: none; text-align: center; }
     .nav-logo span { display: block; font-size: 9px; font-weight: 400; font-style: italic; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; font-family: 'DM Sans', sans-serif; }
@@ -267,14 +270,13 @@
 </head>
 <body>
 
+<!-- ── Banner ── -->
+<div id="site-banner" onclick="showView('home')">
+  <img src="https://huokcisnlcaezqcroyon.supabase.co/storage/v1/object/public/misc%20graphics/Gemini_Generated_Image_jzt5xmjzt5xmjzt5.png" alt="The Non-League Ground Directory" />
+</div>
+
 <!-- ── Nav ── -->
 <nav id="site-nav">
-  <div class="nav-top">
-    <button class="nav-logo" onclick="showView('home')">
-      The Non-League Ground Directory
-      <span>Community-powered · England</span>
-    </button>
-  </div>
   <div class="nav-bottom">
     <button class="nav-link active" data-view="home"    onclick="showView('home')">Home</button>
     <button class="nav-link"        data-view="browse"  onclick="showView('browse')">Browse</button>
