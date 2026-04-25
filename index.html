@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Non-League Ground Directory</title>
+  <title>GROUNDED</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -16,7 +15,7 @@
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
     /* ── Site banner ── */
-    #site-banner { display: block; width: 100%; line-height: 0; cursor: pointer; padding: 16px 0; }
+    #site-banner { display: block; width: 100%; line-height: 0; cursor: pointer; }
     #site-banner img { width: 50%; height: auto; display: block; margin: 0 auto; }
 
     /* ── Nav ── */
@@ -267,108 +266,6 @@
       #home-stats { flex-wrap: wrap; gap: 20px; justify-content: center; }
       .home-stat { border-right: none !important; }
     }
-
-    /* ══════════════════════ AUTH MODAL ══════════════════════ */
-    #auth-overlay { display: none; position: fixed; inset: 0; z-index: 400; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); }
-    #auth-overlay.open { display: flex; }
-    #auth-box { background: #221F1A; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; width: 100%; max-width: 420px; padding: 36px 32px 32px; position: relative; box-shadow: 0 32px 80px rgba(0,0,0,0.6); }
-    #auth-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.08); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; color: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-    #auth-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
-    .auth-title { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 6px; }
-    .auth-sub { font-size: 13px; color: rgba(255,255,255,0.42); margin-bottom: 24px; line-height: 1.5; }
-    .auth-google-btn { width: 100%; padding: 12px; background: #fff; color: #1A1814; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; margin-bottom: 20px; }
-    .auth-google-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
-    .auth-google-btn svg { flex-shrink: 0; }
-    .auth-divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-    .auth-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
-    .auth-divider-text { font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 0.06em; }
-    .auth-field { margin-bottom: 14px; }
-    .auth-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 6px; display: block; text-transform: uppercase; }
-    .auth-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 11px 14px; color: #fff; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
-    .auth-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); }
-    .auth-input::placeholder { color: rgba(255,255,255,0.2); }
-    .auth-submit { width: 100%; padding: 13px; background: #fff; color: #1A1814; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 6px; }
-    .auth-submit:hover { background: rgba(255,255,255,0.88); }
-    .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-    .auth-switch { text-align: center; margin-top: 18px; font-size: 13px; color: rgba(255,255,255,0.35); }
-    .auth-switch-btn { color: rgba(255,255,255,0.7); background: none; border: none; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; text-decoration: underline; padding: 0; }
-    .auth-switch-btn:hover { color: #fff; }
-    .auth-msg { font-size: 13px; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; display: none; }
-    .auth-msg.error { background: rgba(220,50,50,0.15); border: 1px solid rgba(220,50,50,0.3); color: #ff8080; display: block; }
-    .auth-msg.success { background: rgba(50,200,100,0.12); border: 1px solid rgba(50,200,100,0.25); color: #6ddfaa; display: block; }
-
-    /* ── Nav account button ── */
-    #nav-account-btn { padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s; border: 1px solid rgba(255,255,255,0.18); background: none; color: rgba(255,255,255,0.65); font-family: 'DM Sans', sans-serif; letter-spacing: 0.01em; display: flex; align-items: center; gap: 6px; }
-    #nav-account-btn:hover { border-color: rgba(255,255,255,0.35); color: #fff; }
-    #nav-account-btn.signed-in { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: #fff; }
-    .nav-avatar { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; overflow: hidden; }
-
-    /* ══════════════════════ ACCOUNT VIEW ══════════════════════ */
-    #account-inner { max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
-    .account-hero { padding: 48px 0 36px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 40px; display: flex; align-items: center; gap: 24px; }
-    .account-avatar-lg { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; flex-shrink: 0; }
-    .account-hero-text { flex: 1; }
-    .account-hero-name { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
-    .account-hero-email { font-size: 13px; color: rgba(255,255,255,0.38); }
-    .account-signout { padding: 8px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.18s; }
-    .account-signout:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
-    .account-section { margin-bottom: 48px; }
-    .account-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-    .account-section-title em { font-style: normal; color: rgba(255,255,255,0.35); font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 400; }
-    /* Postcode setting */
-    .postcode-row { display: flex; gap: 10px; align-items: center; }
-    .postcode-input { flex: 1; max-width: 200px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; text-transform: uppercase; }
-    .postcode-input:focus { border-color: rgba(255,255,255,0.28); }
-    .postcode-input::placeholder { color: rgba(255,255,255,0.2); text-transform: none; }
-    .postcode-save { padding: 10px 18px; background: #fff; color: #1A1814; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.18s; }
-    .postcode-save:hover { background: rgba(255,255,255,0.88); }
-    .postcode-hint { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 8px; line-height: 1.5; }
-    /* Nearby list */
-    .nearby-list { display: flex; flex-direction: column; gap: 8px; }
-    .nearby-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; transition: background 0.18s; }
-    .nearby-row:hover { background: rgba(255,255,255,0.06); }
-    .nearby-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .nearby-name { font-size: 14px; font-weight: 700; flex: 1; }
-    .nearby-meta { font-size: 12px; color: rgba(255,255,255,0.38); }
-    .nearby-dist { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.7); white-space: nowrap; }
-    /* Favourites */
-    .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-    .fav-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; gap: 8px; position: relative; }
-    .fav-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
-    .fav-card-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
-    .fav-card-meta { font-size: 12px; color: rgba(255,255,255,0.38); }
-    .fav-card-score { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; }
-    .fav-remove { position: absolute; top: 10px; right: 10px; background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px; transition: color 0.15s; }
-    .fav-remove:hover { color: rgba(255,255,255,0.6); }
-    /* My ratings */
-    .my-rating-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; transition: background 0.18s; }
-    .my-rating-row:hover { background: rgba(255,255,255,0.06); }
-    .my-rating-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .my-rating-name { font-size: 14px; font-weight: 700; flex: 1; }
-    .my-rating-score { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; }
-    .my-rating-date { font-size: 11px; color: rgba(255,255,255,0.3); }
-    .account-empty { font-size: 14px; color: rgba(255,255,255,0.28); padding: 20px 0; font-style: italic; }
-    /* Profile settings */
-    .settings-grid { display: grid; gap: 14px; }
-
-    /* ── Favourite heart button on cards ── */
-    .fav-btn { position: absolute; bottom: 14px; right: 14px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s; font-size: 14px; z-index: 2; }
-    .fav-btn:hover { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.3); }
-    .fav-btn.active { background: rgba(220,50,50,0.3); border-color: rgba(220,80,80,0.5); }
-
-    /* ── Rating submission in modal ── */
-    .rating-submit-block { background: rgba(0,0,0,0.12); border-radius: 8px; padding: 16px; margin-top: 14px; }
-    .rating-submit-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; margin-bottom: 14px; }
-    .star-input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .star-input-label { font-size: 13px; flex: 1; }
-    .star-input-stars { display: flex; gap: 3px; cursor: pointer; }
-    .star-input-stars svg { transition: opacity 0.1s; }
-    .star-input-stars svg:hover ~ svg { opacity: 0.3; }
-    .rating-submit-btn { width: 100%; padding: 11px; background: rgba(255,255,255,0.9); color: #1A1814; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 12px; transition: all 0.18s; }
-    .rating-submit-btn:hover { background: #fff; }
-    .rating-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .rating-signin-prompt { font-size: 13px; color: rgba(255,255,255,0.45); text-align: center; padding: 12px 0 4px; }
-    .rating-signin-prompt button { color: rgba(255,255,255,0.8); background: none; border: none; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -385,46 +282,8 @@
     <button class="nav-link"        data-view="browse"  onclick="showView('browse')">Browse</button>
     <button class="nav-link"        data-view="leagues" onclick="showView('leagues')">Leagues</button>
     <button class="nav-link"        data-view="about"   onclick="showView('about')">About</button>
-    <button id="nav-account-btn" onclick="handleAccountNav()">
-      <span id="nav-avatar" class="nav-avatar">?</span>
-      <span id="nav-account-label">Sign in</span>
-    </button>
   </div>
 </nav>
-
-<!-- ══════════════════════════════════
-     AUTH MODAL
-══════════════════════════════════ -->
-<div id="auth-overlay">
-  <div id="auth-box">
-    <button id="auth-close" onclick="closeAuth()">×</button>
-    <div id="auth-title" class="auth-title">Sign in</div>
-    <div id="auth-sub" class="auth-sub">Join the directory — rate grounds, save favourites, find nearby clubs.</div>
-    <div id="auth-msg" class="auth-msg"></div>
-
-    <button class="auth-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="auth-divider"><div class="auth-divider-line"></div><div class="auth-divider-text">or</div><div class="auth-divider-line"></div></div>
-
-    <div id="auth-form-signin">
-      <div class="auth-field"><label class="auth-label">Email</label><input id="auth-email" class="auth-input" type="email" placeholder="you@example.com" /></div>
-      <div class="auth-field"><label class="auth-label">Password</label><input id="auth-password" class="auth-input" type="password" placeholder="••••••••" /></div>
-      <button class="auth-submit" onclick="signInEmail()">Sign in</button>
-      <div class="auth-switch">No account? <button class="auth-switch-btn" onclick="switchAuthMode('signup')">Create one</button></div>
-    </div>
-
-    <div id="auth-form-signup" style="display:none">
-      <div class="auth-field"><label class="auth-label">Display name</label><input id="auth-name" class="auth-input" type="text" placeholder="Your name" /></div>
-      <div class="auth-field"><label class="auth-label">Email</label><input id="auth-email-up" class="auth-input" type="email" placeholder="you@example.com" /></div>
-      <div class="auth-field"><label class="auth-label">Password</label><input id="auth-password-up" class="auth-input" type="password" placeholder="At least 8 characters" /></div>
-      <button class="auth-submit" onclick="signUpEmail()">Create account</button>
-      <div class="auth-switch">Already have one? <button class="auth-switch-btn" onclick="switchAuthMode('signin')">Sign in</button></div>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════════════════════════════
      HOME
@@ -436,9 +295,9 @@
     <div class="home-pitch-lines"></div>
     <div class="home-hero-inner">
       <h1 class="home-title">
-        Every ground.<br>
-        Every terrace.<br>
-        <span class="home-title-italic">Every story.</span>
+        Every league.<br>
+        Every club.<br>
+        <span class="home-title-italic">Every ground.</span>
       </h1>
       <p class="home-strapline">The community directory of non-league football grounds — from the National League to the county leagues. Honest ratings, local knowledge, and a love of the game.</p>
     </div>
@@ -623,47 +482,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     ACCOUNT
-══════════════════════════════════ -->
-<div id="view-account" class="view">
-  <div id="account-inner">
-
-    <div class="account-hero" id="account-hero-block">
-      <div class="account-avatar-lg" id="account-avatar-lg">?</div>
-      <div class="account-hero-text">
-        <div class="account-hero-name" id="account-hero-name">—</div>
-        <div class="account-hero-email" id="account-hero-email">—</div>
-      </div>
-      <button class="account-signout" onclick="signOut()">Sign out</button>
-    </div>
-
-    <!-- Postcode / Nearby -->
-    <div class="account-section">
-      <div class="account-section-title">Nearby Grounds <em>based on your postcode</em></div>
-      <div class="postcode-row">
-        <input id="postcode-input" class="postcode-input" type="text" placeholder="e.g. PR5 6AY" maxlength="8" />
-        <button class="postcode-save" onclick="savePostcode()">Find grounds</button>
-      </div>
-      <div class="postcode-hint">Enter your home postcode to see non-league grounds near you.</div>
-      <div id="nearby-list" class="nearby-list" style="margin-top:20px"></div>
-    </div>
-
-    <!-- Favourites -->
-    <div class="account-section">
-      <div class="account-section-title">Favourites <em id="fav-count-label"></em></div>
-      <div id="fav-grid" class="fav-grid"></div>
-    </div>
-
-    <!-- My Ratings -->
-    <div class="account-section">
-      <div class="account-section-title">My Ratings <em id="my-ratings-count-label"></em></div>
-      <div id="my-ratings-list" style="display:flex;flex-direction:column;gap:8px"></div>
-    </div>
-
-  </div>
-</div>
-
 <!-- ── Modal ── -->
 <div id="modal-overlay">
   <div id="modal-box">
@@ -673,139 +491,10 @@
 </div>
 
 <script>
-/* ── Supabase client ── */
-const { createClient } = supabase;
-const sb = createClient(
-  'https://huokcisnlcaezqcroyon.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8'
-);
+/* ── Config ── */
 const SUPABASE_URL      = 'https://huokcisnlcaezqcroyon.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1b2tjaXNubGNhZXpxY3JveW9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTQ4NjMsImV4cCI6MjA4OTQ5MDg2M30.1tQXmVHyBWpyF4V7yD4sb5JiCDeKmgSBfnaJzp_Qjv8';
 const HEADERS = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
-
-/* ── Auth state ── */
-let CURRENT_USER = null;
-let USER_FAVOURITES = new Set(); // club ids
-let USER_RATINGS = {};           // club_id -> {location,friendliness,food,facilities}
-let USER_POSTCODE = null;
-
-/* ── Auth init ── */
-sb.auth.onAuthStateChange(async (event, session) => {
-  CURRENT_USER = session?.user || null;
-  updateNavAuth();
-  if (CURRENT_USER) {
-    await Promise.all([loadFavourites(), loadMyRatings(), loadUserProfile()]);
-    renderGrid(); // re-render cards to show heart states
-  } else {
-    USER_FAVOURITES = new Set();
-    USER_RATINGS = {};
-    USER_POSTCODE = null;
-    renderGrid();
-  }
-});
-
-function updateNavAuth() {
-  const btn   = document.getElementById('nav-account-btn');
-  const label = document.getElementById('nav-account-label');
-  const avatar= document.getElementById('nav-avatar');
-  if (CURRENT_USER) {
-    const name = CURRENT_USER.user_metadata?.full_name || CURRENT_USER.email || '';
-    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
-    btn.classList.add('signed-in');
-    label.textContent = name.split(' ')[0] || 'Account';
-    avatar.textContent = initials;
-  } else {
-    btn.classList.remove('signed-in');
-    label.textContent = 'Sign in';
-    avatar.textContent = '?';
-  }
-}
-
-function handleAccountNav() {
-  if (CURRENT_USER) {
-    showView('account');
-  } else {
-    openAuth('signin');
-  }
-}
-
-/* ── Auth modal ── */
-function openAuth(mode='signin') {
-  document.getElementById('auth-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  switchAuthMode(mode);
-  clearAuthMsg();
-}
-function closeAuth() {
-  document.getElementById('auth-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function switchAuthMode(mode) {
-  const isSignIn = mode === 'signin';
-  document.getElementById('auth-title').textContent = isSignIn ? 'Sign in' : 'Create account';
-  document.getElementById('auth-sub').textContent = isSignIn
-    ? 'Welcome back — sign in to your account.'
-    : 'Join the directory — rate grounds, save favourites, find nearby clubs.';
-  document.getElementById('auth-form-signin').style.display = isSignIn ? 'block' : 'none';
-  document.getElementById('auth-form-signup').style.display = isSignIn ? 'none' : 'block';
-  clearAuthMsg();
-}
-function showAuthMsg(text, type='error') {
-  const el = document.getElementById('auth-msg');
-  el.textContent = text;
-  el.className = 'auth-msg ' + type;
-}
-function clearAuthMsg() {
-  const el = document.getElementById('auth-msg');
-  el.className = 'auth-msg';
-  el.textContent = '';
-}
-
-async function signInWithGoogle() {
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.href }
-  });
-  if (error) showAuthMsg(error.message);
-}
-
-async function signInEmail() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  if (!email || !password) { showAuthMsg('Please enter your email and password.'); return; }
-  const btn = document.querySelector('#auth-form-signin .auth-submit');
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  btn.disabled = false; btn.textContent = 'Sign in';
-  if (error) { showAuthMsg(error.message); return; }
-  closeAuth();
-}
-
-async function signUpEmail() {
-  const name     = document.getElementById('auth-name').value.trim();
-  const email    = document.getElementById('auth-email-up').value.trim();
-  const password = document.getElementById('auth-password-up').value;
-  if (!name || !email || !password) { showAuthMsg('Please fill in all fields.'); return; }
-  if (password.length < 8) { showAuthMsg('Password must be at least 8 characters.'); return; }
-  const btn = document.querySelector('#auth-form-signup .auth-submit');
-  btn.disabled = true; btn.textContent = 'Creating account…';
-  const { error } = await sb.auth.signUp({
-    email, password,
-    options: { data: { full_name: name } }
-  });
-  btn.disabled = false; btn.textContent = 'Create account';
-  if (error) { showAuthMsg(error.message); return; }
-  showAuthMsg('Check your email to confirm your account, then sign in.', 'success');
-}
-
-async function signOut() {
-  await sb.auth.signOut();
-  showView('home');
-}
-
-document.getElementById('auth-overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeAuth();
-});
 
 /* ── Router ── */
 function showView(name) {
@@ -817,14 +506,13 @@ function showView(name) {
   if (b) b.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (name === 'leagues' && ALL_CLUBS.length) buildLeaguesView();
-  if (name === 'account') buildAccountView();
 }
 
 /* ── Data ── */
 let ALL_CLUBS = [];
 const MOCK_CLUBS = [
-  { id:-1, name:'Bamber Bridge FC', nickname:'Brig', league_id:1, league_name:'Northern Premier League Premier Division', step:3, region:'North West', ground:'Sir Tom Finney Stadium', town:'Bamber Bridge', county:'Lancashire', founded:1952, capacity:3000, colour_primary:'#CC0000', colour_secondary:'#FFFFFF', colour_names:['Red','White'], badge_url:null, tags:['Car park','Covered terrace','Bar on site'], highlights:['Scenic ground','Historic club'], website:null, avg_overall:4.1, avg_location:3.9, avg_friendliness:4.6, avg_food:3.8, avg_facilities:4.0, rating_count:18, lat:53.7271, lng:-2.6570 },
-  { id:-2, name:'Dulwich Hamlet FC', nickname:'The Hamlet', league_id:2, league_name:'Isthmian League Premier Division', step:3, region:'South East', ground:'Champion Hill', town:'Dulwich', county:'Greater London', founded:1893, capacity:3000, colour_primary:'#FC03A5', colour_secondary:'#1C2B6B', colour_names:['Pink','Navy'], badge_url:null, tags:['Pie van','Real ale bar','Terracing','Dog friendly'], highlights:['Central location','Iconic ground','Vibrant matchday'], website:null, avg_overall:4.7, avg_location:4.2, avg_friendliness:4.9, avg_food:4.6, avg_facilities:4.3, rating_count:41, lat:51.4512, lng:-0.0796 },
+  { id:-1, name:'Bamber Bridge FC', nickname:'Brig', league_id:1, league_name:'Northern Premier League Premier Division', step:3, region:'North West', ground:'Sir Tom Finney Stadium', town:'Bamber Bridge', county:'Lancashire', founded:1952, capacity:3000, colour_primary:'#CC0000', colour_secondary:'#FFFFFF', colour_names:['Red','White'], badge_url:null, tags:['Car park','Covered terrace','Bar on site'], highlights:['Scenic ground','Historic club'], website:null, avg_overall:4.1, avg_location:3.9, avg_friendliness:4.6, avg_food:3.8, avg_facilities:4.0, rating_count:18 },
+  { id:-2, name:'Dulwich Hamlet FC', nickname:'The Hamlet', league_id:2, league_name:'Isthmian League Premier Division', step:3, region:'South East', ground:'Champion Hill', town:'Dulwich', county:'Greater London', founded:1893, capacity:3000, colour_primary:'#FC03A5', colour_secondary:'#1C2B6B', colour_names:['Pink','Navy'], badge_url:null, tags:['Pie van','Real ale bar','Terracing','Dog friendly'], highlights:['Central location','Iconic ground','Vibrant matchday'], website:null, avg_overall:4.7, avg_location:4.2, avg_friendliness:4.9, avg_food:4.6, avg_facilities:4.3, rating_count:41 },
 ];
 
 async function loadClubs() {
@@ -845,190 +533,6 @@ async function loadClubs() {
   buildFilterSidebar();
   renderGrid();
   buildHomeSections();
-}
-
-/* ── Favourites ── */
-async function loadFavourites() {
-  if (!CURRENT_USER) return;
-  const { data, error } = await sb.from('favourites').select('club_id');
-  if (!error && data) USER_FAVOURITES = new Set(data.map(r => r.club_id));
-}
-
-async function toggleFavourite(clubId, e) {
-  e && e.stopPropagation();
-  if (!CURRENT_USER) { openAuth('signin'); return; }
-  const isFav = USER_FAVOURITES.has(clubId);
-  if (isFav) {
-    await sb.from('favourites').delete().eq('club_id', clubId).eq('user_id', CURRENT_USER.id);
-    USER_FAVOURITES.delete(clubId);
-  } else {
-    await sb.from('favourites').insert({ club_id: clubId, user_id: CURRENT_USER.id });
-    USER_FAVOURITES.add(clubId);
-  }
-  // Update all heart buttons for this club
-  document.querySelectorAll(`.fav-btn[data-club-id="${clubId}"]`).forEach(btn => {
-    btn.classList.toggle('active', USER_FAVOURITES.has(clubId));
-    btn.title = USER_FAVOURITES.has(clubId) ? 'Remove from favourites' : 'Add to favourites';
-    btn.innerHTML = USER_FAVOURITES.has(clubId) ? '♥' : '♡';
-  });
-}
-
-/* ── My Ratings ── */
-async function loadMyRatings() {
-  if (!CURRENT_USER) return;
-  const { data, error } = await sb.from('ratings').select('*').eq('user_id', CURRENT_USER.id);
-  if (!error && data) {
-    USER_RATINGS = {};
-    data.forEach(r => { USER_RATINGS[r.club_id] = r; });
-  }
-}
-
-/* ── User profile (postcode) ── */
-async function loadUserProfile() {
-  if (!CURRENT_USER) return;
-  // We'll store postcode in user metadata
-  USER_POSTCODE = CURRENT_USER.user_metadata?.postcode || null;
-  if (document.getElementById('postcode-input')) {
-    document.getElementById('postcode-input').value = USER_POSTCODE || '';
-  }
-}
-
-async function savePostcode() {
-  if (!CURRENT_USER) { openAuth('signin'); return; }
-  const pc = document.getElementById('postcode-input').value.trim().toUpperCase();
-  if (!pc) return;
-  const btn = document.querySelector('.postcode-save');
-  btn.textContent = 'Looking up…'; btn.disabled = true;
-  try {
-    const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
-    const data = await res.json();
-    if (data.status !== 200) throw new Error('Invalid postcode');
-    const { latitude, longitude } = data.result;
-    // Save to user metadata
-    await sb.auth.updateUser({ data: { postcode: pc, lat: latitude, lng: longitude } });
-    USER_POSTCODE = pc;
-    CURRENT_USER.user_metadata = { ...CURRENT_USER.user_metadata, postcode: pc, lat: latitude, lng: longitude };
-    renderNearbyGrounds(latitude, longitude);
-  } catch(err) {
-    alert('Could not look up that postcode. Please check and try again.');
-  }
-  btn.textContent = 'Find grounds'; btn.disabled = false;
-}
-
-function haversineKm(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-function renderNearbyGrounds(userLat, userLng) {
-  const container = document.getElementById('nearby-list');
-  if (!container) return;
-  const withDist = ALL_CLUBS
-    .filter(c => c.lat && c.lng)
-    .map(c => ({ ...c, dist: haversineKm(userLat, userLng, c.lat, c.lng) }))
-    .sort((a, b) => a.dist - b.dist)
-    .slice(0, 8);
-  if (!withDist.length) {
-    container.innerHTML = '<div class="account-empty">No clubs with location data yet — check back as more are added.</div>';
-    return;
-  }
-  container.innerHTML = '';
-  withDist.forEach(raw => {
-    const c = N(raw);
-    const distStr = raw.dist < 1 ? `${Math.round(raw.dist * 1000)}m` : `${raw.dist.toFixed(1)} km`;
-    const row = document.createElement('div'); row.className = 'nearby-row';
-    row.innerHTML = `<div class="nearby-dot" style="background:${c.colours.primary}"></div>
-      <div class="nearby-name">${c.name}</div>
-      <div class="nearby-meta">${c.town||''}${c.county?', '+c.county:''}</div>
-      <div class="nearby-dist">${distStr}</div>`;
-    row.addEventListener('click', () => openModal(c));
-    container.appendChild(row);
-  });
-}
-
-/* ── Account view ── */
-function buildAccountView() {
-  if (!CURRENT_USER) { showView('home'); openAuth('signin'); return; }
-  const name = CURRENT_USER.user_metadata?.full_name || CURRENT_USER.email?.split('@')[0] || 'You';
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('account-avatar-lg').textContent = initials;
-  document.getElementById('account-hero-name').textContent = name;
-  document.getElementById('account-hero-email').textContent = CURRENT_USER.email || '';
-  // Postcode
-  if (USER_POSTCODE) {
-    document.getElementById('postcode-input').value = USER_POSTCODE;
-    const meta = CURRENT_USER.user_metadata;
-    if (meta?.lat && meta?.lng) renderNearbyGrounds(meta.lat, meta.lng);
-  }
-  // Favourites
-  buildFavouritesSection();
-  // My ratings
-  buildMyRatingsSection();
-}
-
-function buildFavouritesSection() {
-  const grid = document.getElementById('fav-grid');
-  const label = document.getElementById('fav-count-label');
-  const favClubs = ALL_CLUBS.filter(c => USER_FAVOURITES.has(c.id));
-  label.textContent = favClubs.length ? `${favClubs.length} saved` : '';
-  if (!favClubs.length) {
-    grid.innerHTML = '<div class="account-empty">No favourites yet — heart a club from the Browse page.</div>';
-    return;
-  }
-  grid.innerHTML = '';
-  favClubs.forEach(raw => {
-    const c = N(raw);
-    const card = document.createElement('div'); card.className = 'fav-card';
-    card.innerHTML = `
-      <button class="fav-remove" title="Remove" onclick="removeFavourite(${c.id},event)">×</button>
-      <div class="fav-card-name">${c.name}</div>
-      <div class="fav-card-meta">${c.town||''}${c.county?', '+c.county:''}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
-        <div class="fav-card-score">${c.rating!=null?parseFloat(c.rating).toFixed(1):'—'}</div>
-        <div class="step-badge" style="font-size:9px">Step ${c.step}</div>
-      </div>`;
-    card.addEventListener('click', () => openModal(c));
-    grid.appendChild(card);
-  });
-}
-
-async function removeFavourite(clubId, e) {
-  e.stopPropagation();
-  await sb.from('favourites').delete().eq('club_id', clubId).eq('user_id', CURRENT_USER.id);
-  USER_FAVOURITES.delete(clubId);
-  document.querySelectorAll(`.fav-btn[data-club-id="${clubId}"]`).forEach(btn => {
-    btn.classList.remove('active'); btn.innerHTML = '♡';
-  });
-  buildFavouritesSection();
-}
-
-function buildMyRatingsSection() {
-  const list = document.getElementById('my-ratings-list');
-  const label = document.getElementById('my-ratings-count-label');
-  const rated = Object.values(USER_RATINGS);
-  label.textContent = rated.length ? `${rated.length} rated` : '';
-  if (!rated.length) {
-    list.innerHTML = '<div class="account-empty">You haven\'t rated any grounds yet.</div>';
-    return;
-  }
-  list.innerHTML = '';
-  rated.forEach(r => {
-    const club = ALL_CLUBS.find(c => c.id === r.club_id);
-    if (!club) return;
-    const c = N(club);
-    const avg = ((r.location + r.friendliness + r.food + r.facilities) / 4).toFixed(1);
-    const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '';
-    const row = document.createElement('div'); row.className = 'my-rating-row';
-    row.innerHTML = `<div class="my-rating-dot" style="background:${c.colours.primary}"></div>
-      <div class="my-rating-name">${c.name}</div>
-      <div class="my-rating-date">${date}</div>
-      <div class="my-rating-score">${avg}</div>`;
-    row.addEventListener('click', () => openModal(c));
-    list.appendChild(row);
-  });
 }
 
 /* ── Stats ── */
@@ -1068,6 +572,7 @@ function ratingPills(c) {
 
 /* ── Home sections ── */
 function buildHomeSections() {
+  // Featured: top 4 by rating
   const grid = document.getElementById('home-featured-grid');
   const top = ALL_CLUBS.filter(c=>c.avg_overall!=null).sort((a,b)=>b.avg_overall-a.avg_overall).slice(0,4);
   const toShow = top.length >= 2 ? top : ALL_CLUBS.slice(0,4);
@@ -1099,6 +604,7 @@ function buildHomeSections() {
     grid.appendChild(card);
   });
 
+  // Recent: most reviewed
   const rec = document.getElementById('home-recent');
   const byRatings = ALL_CLUBS.filter(c=>c.rating_count>=1).sort((a,b)=>b.rating_count-a.rating_count).slice(0,5);
   const recShow = byRatings.length ? byRatings : ALL_CLUBS.slice(0,5);
@@ -1114,6 +620,7 @@ function buildHomeSections() {
   });
 }
 
+/* ── Browse: featured strip (no-op) ── */
 function buildFeaturedStrip() {}
 
 /* ── Browse: filter sidebar ── */
@@ -1161,9 +668,7 @@ function buildCard(raw) {
   const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
   const div=document.createElement('div'); div.className='club-card';
   div.style.background=c.colours.primary; div.style.color=tc; div.style.boxShadow=`0 4px 16px ${c.colours.primary}33`;
-  div.style.position='relative';
   const pills=[...(c.highlights||[]),...ratingPills(c)];
-  const isFav = USER_FAVOURITES.has(c.id);
   div.innerHTML=`<div class="card-stripe" style="background:linear-gradient(90deg,${c.colours.primary} 50%,${c.colours.secondary} 50%)"></div>
     <div class="card-body">
       <div class="card-header">
@@ -1176,8 +681,7 @@ function buildCard(raw) {
       </div>
       ${pills.length?`<div class="card-pills">${pills.slice(0,3).map(p=>`<span class="card-pill">${p}</span>`).join('')}</div>`:''}
       <div class="card-footer">${starsHTML(c.rating)}<div class="step-badge">Step ${c.step}</div></div>
-    </div>
-    <button class="fav-btn ${isFav?'active':''}" data-club-id="${c.id}" title="${isFav?'Remove from favourites':'Add to favourites'}" onclick="toggleFavourite(${c.id},event)">${isFav?'♥':'♡'}</button>`;
+    </div>`;
   div.addEventListener('mouseenter',()=>{div.style.transform='translateY(-4px)';div.style.boxShadow=`0 16px 40px ${c.colours.primary}55`;});
   div.addEventListener('mouseleave',()=>{div.style.transform='translateY(0)';div.style.boxShadow=`0 4px 16px ${c.colours.primary}33`;});
   div.addEventListener('click',()=>openModal(c)); return div;
@@ -1230,11 +734,7 @@ function buildLeaguesView() {
 }
 
 /* ── Modal ── */
-let MODAL_RATING_STATE = { location: 0, friendliness: 0, food: 0, facilities: 0 };
-let MODAL_CLUB_ID = null;
-
 function openModal(c) {
-  MODAL_CLUB_ID = c.id;
   const tc=isLight(c.colours.primary)?'#111':'#fff';
   const dimC=isLight(c.colours.primary)?'rgba(0,0,0,0.55)':'rgba(255,255,255,0.65)';
   document.getElementById('modal-stripe').style.background=`repeating-linear-gradient(90deg,${c.colours.primary} 0,${c.colours.primary} 30px,${c.colours.secondary} 30px,${c.colours.secondary} 60px)`;
@@ -1243,25 +743,6 @@ function openModal(c) {
   const facts=[['Step',`Step ${c.step}`],['League',c.league],['Ground',c.ground],['Town',(c.town||'')+(c.county?', '+c.county:'')]].map(([l,v])=>`<div class="fact-box"><div class="fact-label" style="color:${dimC}">${l}</div><div class="fact-value">${v||'—'}</div></div>`).join('');
   const tags=(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
   const rc=c.rating_count?`<div style="font-size:11px;opacity:0.5;margin-top:4px">${c.rating_count} rating${c.rating_count!==1?'s':''}</div>`:'';
-
-  // Rating submission block
-  const existingRating = USER_RATINGS[c.id];
-  MODAL_RATING_STATE = existingRating
-    ? { location: existingRating.location, friendliness: existingRating.friendliness, food: existingRating.food, facilities: existingRating.facilities }
-    : { location: 0, friendliness: 0, food: 0, facilities: 0 };
-
-  const ratingSubmitBlock = CURRENT_USER
-    ? `<div class="rating-submit-block">
-        <div class="rating-submit-title">${existingRating ? 'Update your rating' : 'Rate this ground'}</div>
-        ${['location','friendliness','food','facilities'].map(k => `
-          <div class="star-input-row">
-            <div class="star-input-label">${{location:'Location / Access',friendliness:'Friendliness',food:'Food & Drink',facilities:'Facilities'}[k]}</div>
-            <div class="star-input-stars" id="stars-${k}" data-key="${k}">${renderStarInputs(k, MODAL_RATING_STATE[k], tc)}</div>
-          </div>`).join('')}
-        <button class="rating-submit-btn" id="rating-submit-btn" onclick="submitRating(${c.id})">${existingRating ? 'Update rating' : 'Submit rating'}</button>
-      </div>`
-    : `<div class="rating-signin-prompt">Want to rate this ground? <button onclick="closeModal();openAuth('signin')">Sign in</button></div>`;
-
   document.getElementById('modal-body').innerHTML=`
     <button id="modal-close" style="color:${tc}" onclick="closeModal()">×</button>
     <div class="modal-header">
@@ -1277,85 +758,13 @@ function openModal(c) {
       <div class="ratings-title" style="color:${dimC}">Community Ratings</div>
       ${c.rating!=null?`<div class="overall-score">${parseFloat(c.rating).toFixed(1)}</div><div style="margin-bottom:14px">${starsHTML(c.rating)}${rc}</div>${ratingRows}`:`<div style="opacity:0.4;font-size:13px;padding:4px 0">No ratings yet — be the first!</div>`}
     </div>
-    ${ratingSubmitBlock}
-    ${tags?`<div class="tags-row" style="margin-top:14px">${tags}</div>`:''}`;
-
-  // Attach star click handlers
-  ['location','friendliness','food','facilities'].forEach(key => {
-    const container = document.getElementById('stars-' + key);
-    if (!container) return;
-    container.querySelectorAll('svg').forEach((star, i) => {
-      star.addEventListener('click', () => {
-        MODAL_RATING_STATE[key] = i + 1;
-        container.innerHTML = renderStarInputs(key, i + 1, tc);
-        reattachStarHandlers(key, tc);
-      });
-      star.addEventListener('mouseenter', () => highlightStars(container, i, tc));
-      star.addEventListener('mouseleave', () => { container.innerHTML = renderStarInputs(key, MODAL_RATING_STATE[key], tc); reattachStarHandlers(key, tc); });
-    });
-  });
-
+    ${tags?`<div class="tags-row">${tags}</div>`:''}`;
   document.getElementById('modal-overlay').classList.add('open');
   document.body.style.overflow='hidden';
 }
-
-function renderStarInputs(key, value, tc) {
-  return [1,2,3,4,5].map(s =>
-    `<svg width="18" height="18" viewBox="0 0 20 20" fill="${s<=value?'currentColor':'none'}" stroke="currentColor" stroke-width="1.5" style="cursor:pointer;opacity:${s<=value?1:0.4}"><polygon points="10,2 12.5,7.5 18,8 14,12 15.5,18 10,15 4.5,18 6,12 2,8 7.5,7.5"/></svg>`
-  ).join('');
-}
-
-function highlightStars(container, upTo, tc) {
-  container.querySelectorAll('svg').forEach((star, i) => {
-    star.setAttribute('fill', i <= upTo ? 'currentColor' : 'none');
-    star.style.opacity = i <= upTo ? '1' : '0.4';
-  });
-}
-
-function reattachStarHandlers(key, tc) {
-  const container = document.getElementById('stars-' + key);
-  if (!container) return;
-  container.querySelectorAll('svg').forEach((star, i) => {
-    star.addEventListener('click', () => {
-      MODAL_RATING_STATE[key] = i + 1;
-      container.innerHTML = renderStarInputs(key, i + 1, tc);
-      reattachStarHandlers(key, tc);
-    });
-    star.addEventListener('mouseenter', () => highlightStars(container, i, tc));
-    star.addEventListener('mouseleave', () => { container.innerHTML = renderStarInputs(key, MODAL_RATING_STATE[key], tc); reattachStarHandlers(key, tc); });
-  });
-}
-
-async function submitRating(clubId) {
-  if (!CURRENT_USER) return;
-  const { location, friendliness, food, facilities } = MODAL_RATING_STATE;
-  if (!location || !friendliness || !food || !facilities) {
-    alert('Please rate all four categories before submitting.'); return;
-  }
-  const btn = document.getElementById('rating-submit-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-  const { error } = await sb.from('ratings').upsert({
-    club_id: clubId,
-    user_id: CURRENT_USER.id,
-    location, friendliness, food, facilities
-  }, { onConflict: 'user_id,club_id' });
-  if (error) {
-    alert('Could not save rating: ' + error.message);
-    if (btn) { btn.disabled = false; btn.textContent = 'Submit rating'; }
-    return;
-  }
-  USER_RATINGS[clubId] = { club_id: clubId, location, friendliness, food, facilities, created_at: new Date().toISOString() };
-  if (btn) { btn.textContent = '✓ Saved!'; }
-  // Reload clubs to update averages
-  setTimeout(async () => {
-    await loadClubs();
-    closeModal();
-  }, 800);
-}
-
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow=''; }
 document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){ closeModal(); closeAuth(); }});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 loadClubs();
 </script>
