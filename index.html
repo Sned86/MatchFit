@@ -473,19 +473,11 @@
       </div>
       <div id="active-chips"></div>
       <div class="filter-accordion">
-        <button class="accordion-trigger open" data-accordion="step">
+        <button class="accordion-trigger" data-accordion="step">
           Step <span class="accordion-arrow">▼</span>
         </button>
-        <div class="accordion-body open" id="accordion-body-step">
+        <div class="accordion-body" id="accordion-body-step">
           <div class="accordion-inner" id="step-filter-list"></div>
-        </div>
-      </div>
-      <div class="filter-accordion">
-        <button class="accordion-trigger" data-accordion="region">
-          Region <span class="accordion-arrow">▼</span>
-        </button>
-        <div class="accordion-body" id="accordion-body-region">
-          <div class="accordion-inner" id="region-filter-list"></div>
         </div>
       </div>
       <div class="filter-accordion">
@@ -1097,76 +1089,60 @@ function buildHomeSections() {
 function buildFeaturedStrip() {}
 
 /* ── Browse: filter sidebar ── */
-let activeStep='all', activeRegion='all', activeLeague='all', activeCounty='all', searchQuery='';
+// All filters are Sets for multi-select; empty Set = "all"
+let activeSteps=new Set(), activeLeagues=new Set(), activeCounties=new Set(), searchQuery='';
+
+function toggleSet(set, value) {
+  if(set.has(value)) set.delete(value); else set.add(value);
+}
 
 function buildFilterSidebar() {
   // ── Step ──
-  const steps=[1,2,3,4,5,6];
   const stepList=document.getElementById('step-filter-list');
   stepList.innerHTML='';
-  steps.forEach(s=>{
+  [1,2,3,4,5,6].forEach(s=>{
     const count=ALL_CLUBS.filter(c=>String(c.step)===String(s)).length;
     if(!count) return;
     const div=document.createElement('div');
-    div.className='filter-opt'+(activeStep===String(s)?' active':'');
+    div.className='filter-opt'+(activeSteps.has(String(s))?' active':'');
     div.innerHTML=`<div class="filter-opt-check"><svg class="check-tick" width="8" height="8" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#1A1814" stroke-width="2" stroke-linecap="round"/></svg></div><span class="filter-opt-label">Step ${s}</span><span class="filter-opt-count">${count}</span>`;
     div.addEventListener('click',()=>{
-      activeStep = activeStep===String(s) ? 'all' : String(s);
-      activeRegion='all'; activeLeague='all';
+      toggleSet(activeSteps, String(s));
+      // Clear leagues that no longer belong to any active step
+      if(activeSteps.size>0) {
+        const validLeagues=new Set(ALL_CLUBS.filter(c=>activeSteps.has(String(c.step))).map(c=>N(c).league));
+        activeLeagues.forEach(l=>{ if(!validLeagues.has(l)) activeLeagues.delete(l); });
+      }
       buildFilterSidebar(); renderGrid();
     });
     stepList.appendChild(div);
   });
 
-  // ── Region — narrows by active step ──
-  const regionList=document.getElementById('region-filter-list');
-  regionList.innerHTML='';
-  const regionMap=new Map();
-  ALL_CLUBS.forEach(raw=>{
-    if(activeStep!=='all' && String(raw.step)!==activeStep) return;
-    const r=raw.region||''; if(!r) return;
-    regionMap.set(r,(regionMap.get(r)||0)+1);
-  });
-  [...regionMap.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([rname,count])=>{
-    const div=document.createElement('div');
-    div.className='filter-opt'+(activeRegion===rname?' active':'');
-    div.innerHTML=`<div class="filter-opt-check"><svg class="check-tick" width="8" height="8" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#1A1814" stroke-width="2" stroke-linecap="round"/></svg></div><span class="filter-opt-label">${rname}</span><span class="filter-opt-count">${count}</span>`;
-    div.addEventListener('click',()=>{
-      activeRegion = activeRegion===rname ? 'all' : rname;
-      activeLeague='all';
-      buildFilterSidebar(); renderGrid();
-    });
-    regionList.appendChild(div);
-  });
-
-  // ── League — narrows by active step + region ──
+  // ── League — narrows by active steps + regions ──
   const leagueList=document.getElementById('league-filter-list');
   leagueList.innerHTML='';
   const byStep={};
   ALL_CLUBS.forEach(raw=>{
     const c=N(raw);
-    if(activeStep!=='all' && String(c.step)!==activeStep) return;
-    if(activeRegion!=='all' && (raw.region||'')!==activeRegion) return;
+    if(activeSteps.size>0 && !activeSteps.has(String(c.step))) return;
     if(!byStep[c.step]) byStep[c.step]=new Map();
-    if(!byStep[c.step].has(c.league)) byStep[c.step].set(c.league,0);
-    byStep[c.step].set(c.league,byStep[c.step].get(c.league)+1);
+    byStep[c.step].set(c.league,(byStep[c.step].get(c.league)||0)+1);
   });
-  const stepsToShow=activeStep==='all'?Object.keys(byStep).sort((a,b)=>a-b):[activeStep];
+  const stepsToShow=activeSteps.size>0?[...activeSteps].map(Number).sort((a,b)=>a-b):Object.keys(byStep).sort((a,b)=>a-b);
   stepsToShow.forEach(step=>{
     if(!byStep[step]) return;
-    // Only show step group header when showing multiple steps
-    if(activeStep==='all'){
+    if(activeSteps.size!==1){
       const label=document.createElement('div'); label.className='league-group-label'; label.textContent='Step '+step; leagueList.appendChild(label);
     }
     [...byStep[step].entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([lname,count])=>{
-      const div=document.createElement('div'); div.className='filter-opt'+(activeLeague===lname?' active':'');
+      const div=document.createElement('div'); div.className='filter-opt'+(activeLeagues.has(lname)?' active':'');
       div.innerHTML=`<div class="filter-opt-check"><svg class="check-tick" width="8" height="8" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#1A1814" stroke-width="2" stroke-linecap="round"/></svg></div><span class="filter-opt-label">${lname}</span><span class="filter-opt-count">${count}</span>`;
-      div.addEventListener('click',()=>{ activeLeague=activeLeague===lname?'all':lname; buildFilterSidebar(); renderGrid(); });
+      div.addEventListener('click',()=>{ toggleSet(activeLeagues, lname); buildFilterSidebar(); renderGrid(); });
       leagueList.appendChild(div);
     });
   });
 
-  // ── County — independent axis ──
+  // ── County — independent ──
   const countyList=document.getElementById('county-filter-list');
   countyList.innerHTML='';
   const countyMap=new Map();
@@ -1176,26 +1152,28 @@ function buildFilterSidebar() {
   });
   [...countyMap.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([cname,count])=>{
     const div=document.createElement('div');
-    div.className='filter-opt'+(activeCounty===cname?' active':'');
+    div.className='filter-opt'+(activeCounties.has(cname)?' active':'');
     div.innerHTML=`<div class="filter-opt-check"><svg class="check-tick" width="8" height="8" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="#1A1814" stroke-width="2" stroke-linecap="round"/></svg></div><span class="filter-opt-label">${cname}</span><span class="filter-opt-count">${count}</span>`;
-    div.addEventListener('click',()=>{ activeCounty=activeCounty===cname?'all':cname; buildFilterSidebar(); renderGrid(); });
+    div.addEventListener('click',()=>{ toggleSet(activeCounties, cname); buildFilterSidebar(); renderGrid(); });
     countyList.appendChild(div);
   });
 
   // ── Active chips ──
   const chips=document.getElementById('active-chips'); chips.innerHTML='';
-  const addChip=(label,clear)=>{ const chip=document.createElement('div'); chip.className='filter-chip'; const short=label.length>26?label.slice(0,24)+'…':label; chip.innerHTML=`${short} <span class="filter-chip-x">×</span>`; chip.addEventListener('click',()=>{ clear(); buildFilterSidebar(); renderGrid(); }); chips.appendChild(chip); };
-  if(activeStep!=='all')   addChip(`Step ${activeStep}`, ()=>{ activeStep='all'; activeRegion='all'; activeLeague='all'; });
-  if(activeRegion!=='all') addChip(activeRegion, ()=>{ activeRegion='all'; activeLeague='all'; });
-  if(activeLeague!=='all') addChip(activeLeague, ()=>{ activeLeague='all'; });
-  if(activeCounty!=='all') addChip(activeCounty, ()=>{ activeCounty='all'; });
+  const addChip=(label,onClear)=>{ const chip=document.createElement('div'); chip.className='filter-chip'; const short=label.length>26?label.slice(0,24)+'…':label; chip.innerHTML=`${short} <span class="filter-chip-x">×</span>`; chip.addEventListener('click',()=>{ onClear(); buildFilterSidebar(); renderGrid(); }); chips.appendChild(chip); };
+  activeSteps.forEach(s   => addChip(`Step ${s}`,  ()=>{ activeSteps.delete(s); }));
+  activeLeagues.forEach(l  => addChip(l,            ()=>{ activeLeagues.delete(l); }));
+  activeCounties.forEach(c => addChip(c,            ()=>{ activeCounties.delete(c); }));
 
-  // Auto-open region accordion when active
-  if(activeRegion!=='all'){ const body=document.getElementById('accordion-body-region'); const trigger=document.querySelector('[data-accordion="region"]'); if(body&&!body.classList.contains('open')){ body.classList.add('open'); trigger&&trigger.classList.add('open'); } }
-  // Auto-open league accordion when active
-  if(activeLeague!=='all'){ const body=document.getElementById('accordion-body-league'); const trigger=document.querySelector('[data-accordion="league"]'); if(body&&!body.classList.contains('open')){ body.classList.add('open'); trigger&&trigger.classList.add('open'); } }
-  // Auto-open county accordion when active
-  if(activeCounty!=='all'){ const body=document.getElementById('accordion-body-county'); const trigger=document.querySelector('[data-accordion="county"]'); if(body&&!body.classList.contains('open')){ body.classList.add('open'); trigger&&trigger.classList.add('open'); } }
+  // Auto-open accordions when they have active selections
+  ['step','league','county'].forEach(key=>{
+    const sets={step:activeSteps,league:activeLeagues,county:activeCounties};
+    if([...sets[key]].length>0){
+      const body=document.getElementById('accordion-body-'+key);
+      const trigger=document.querySelector(`[data-accordion="${key}"]`);
+      if(body&&!body.classList.contains('open')){ body.classList.add('open'); trigger&&trigger.classList.add('open'); }
+    }
+  });
 }
 
 document.addEventListener('click',e=>{ const trigger=e.target.closest('.accordion-trigger'); if(!trigger) return; const key=trigger.dataset.accordion; const body=document.getElementById('accordion-body-'+key); if(!body) return; trigger.classList.toggle('open'); body.classList.toggle('open'); });
@@ -1232,10 +1210,9 @@ function renderGrid() {
   const f=ALL_CLUBS.filter(raw=>{
     const c=N(raw), q=searchQuery.toLowerCase();
     return (c.name.toLowerCase().includes(q)||(c.town||'').toLowerCase().includes(q)||(c.county||'').toLowerCase().includes(q)||c.league.toLowerCase().includes(q))
-      &&(activeStep==='all'||String(c.step)===activeStep)
-      &&(activeRegion==='all'||(raw.region||'')===activeRegion)
-      &&(activeLeague==='all'||c.league===activeLeague)
-      &&(activeCounty==='all'||(raw.county||'')===activeCounty);
+      &&(activeSteps.size===0   || activeSteps.has(String(c.step)))
+      &&(activeLeagues.size===0  || activeLeagues.has(c.league))
+      &&(activeCounties.size===0 || activeCounties.has(raw.county||''));
   });
   count.textContent=`${f.length} club${f.length!==1?'s':''} shown`;
   noRes.style.display=f.length===0?'block':'none';
