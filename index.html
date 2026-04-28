@@ -117,7 +117,6 @@
     .accordion-arrow { font-size: 9px; opacity: 0.5; transition: transform 0.22s; flex-shrink: 0; }
     .accordion-trigger.open .accordion-arrow { transform: rotate(180deg); opacity: 0.8; }
     .accordion-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
-    .accordion-body.open { max-height: 700px; }
     .accordion-inner { padding-bottom: 10px; display: flex; flex-direction: column; gap: 1px; }
     .filter-opt { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; transition: background 0.14s; font-size: 13px; color: rgba(255,255,255,0.55); user-select: none; }
     .filter-opt:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
@@ -134,8 +133,9 @@
     .league-sub-trigger.open { color: rgba(255,255,255,0.65); }
     .league-sub-arrow { font-size: 8px; opacity: 0.5; transition: transform 0.2s; flex-shrink: 0; }
     .league-sub-trigger.open .league-sub-arrow { transform: rotate(180deg); opacity: 0.75; }
-    .league-sub-body { overflow: hidden; max-height: 0; transition: max-height 0.25s ease; }
-    .league-sub-body.open { max-height: 400px; }
+    .league-sub-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+    .league-sub-body.open { max-height: 2000px; }
+    .accordion-body.open { max-height: 4000px; }
     .league-sub-inner { padding: 2px 0 6px 8px; display: flex; flex-direction: column; gap: 1px; }
     #browse-divider { width: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0; align-self: stretch; margin: 28px 28px 0; }
     #browse-main { flex: 1; min-width: 0; padding-top: 28px; }
