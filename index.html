@@ -339,7 +339,7 @@
     .settings-grid { display: grid; gap: 14px; }
 
     /* ── Favourite heart button on cards ── */
-    .fav-btn { position: absolute; bottom: 14px; right: 14px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s; font-size: 14px; z-index: 2; }
+    .fav-btn { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; width: 30px; height: 30px; min-width: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s; font-size: 14px; flex-shrink: 0; }
     .fav-btn:hover { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.3); }
     .fav-btn.active { background: rgba(220,50,50,0.3); border-color: rgba(220,80,80,0.5); }
 
@@ -1224,7 +1224,6 @@ function buildCard(raw) {
   const c=N(raw); const tc=isLight(c.colours.primary)?'#111':'#fff';
   const div=document.createElement('div'); div.className='club-card';
   div.style.background=c.colours.primary; div.style.color=tc; div.style.boxShadow=`0 4px 16px ${c.colours.primary}33`;
-  div.style.position='relative';
   const pills=[...(c.highlights||[]),...ratingPills(c)];
   const isFav = USER_FAVOURITES.has(c.id);
   div.innerHTML=`<div class="card-stripe" style="background:linear-gradient(90deg,${c.colours.primary} 50%,${c.colours.secondary} 50%)"></div>
@@ -1238,9 +1237,8 @@ function buildCard(raw) {
         <div class="card-meta-row"><svg class="meta-icon" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${c.town||''}${c.county?', '+c.county:''}</div>
       </div>
       ${pills.length?`<div class="card-pills">${pills.slice(0,3).map(p=>`<span class="card-pill">${p}</span>`).join('')}</div>`:''}
-      <div class="card-footer">${starsHTML(c.rating)}<div class="step-badge">Step ${c.step}</div></div>
-    </div>
-    <button class="fav-btn ${isFav?'active':''}" data-club-id="${c.id}" title="${isFav?'Remove from favourites':'Add to favourites'}" onclick="toggleFavourite(${c.id},event)">${isFav?'♥':'♡'}</button>`;
+      <div class="card-footer">${starsHTML(c.rating)}<div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div class="step-badge">Step ${c.step}</div><button class="fav-btn ${isFav?'active':''}" data-club-id="${c.id}" title="${isFav?'Remove from favourites':'Add to favourites'}" onclick="toggleFavourite(${c.id},event)">${isFav?'♥':'♡'}</button></div></div>
+    </div>`;
   div.addEventListener('mouseenter',()=>{div.style.transform='translateY(-4px)';div.style.boxShadow=`0 16px 40px ${c.colours.primary}55`;});
   div.addEventListener('mouseleave',()=>{div.style.transform='translateY(0)';div.style.boxShadow=`0 4px 16px ${c.colours.primary}33`;});
   div.addEventListener('click',()=>openModal(c)); return div;
