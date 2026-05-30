@@ -343,6 +343,17 @@
     .fav-btn:hover { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.3); }
     .fav-btn.active { background: rgba(220,50,50,0.3); border-color: rgba(220,80,80,0.5); }
 
+    /* ── Expandable fact boxes ── */
+    .fact-box { cursor: pointer; transition: background 0.15s; user-select: none; }
+    .fact-box:hover { background: rgba(0,0,0,0.2); }
+    .fact-box-header { display: flex; align-items: center; justify-content: space-between; }
+    .fact-expand-arrow { font-size: 8px; opacity: 0.35; transition: transform 0.22s; flex-shrink: 0; margin-left: 4px; }
+    .fact-box.expanded .fact-expand-arrow { transform: rotate(180deg); opacity: 0.6; }
+    .fact-expand-panel { overflow: hidden; max-height: 0; transition: max-height 0.35s ease; }
+    .fact-expand-panel.open { max-height: 600px; }
+    .fact-expand-inner { padding-top: 8px; font-size: 12px; line-height: 1.65; opacity: 0.75; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; }
+    .fact-expand-inner.loading::after { content: ''; display: inline-block; width: 10px; height: 10px; border: 1.5px solid rgba(255,255,255,0.2); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; margin-left: 6px; vertical-align: middle; }
+
     /* ── Rating submission in modal ── */
     .rating-submit-block { background: rgba(0,0,0,0.12); border-radius: 8px; padding: 16px; margin-top: 14px; }
     .rating-submit-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; margin-bottom: 14px; }
@@ -1267,10 +1278,28 @@ function openModal(c) {
   MODAL_CLUB_ID = c.id;
   const tc=isLight(c.colours.primary)?'#111':'#fff';
   const dimC=isLight(c.colours.primary)?'rgba(0,0,0,0.55)':'rgba(255,255,255,0.65)';
-  document.getElementById('modal-stripe').style.background=`repeating-linear-gradient(90deg,${c.colours.primary} 0,${c.colours.primary} 30px,${c.colours.secondary} 30px,${c.colours.secondary} 60px)`;
+  document.getElementById('modal-stripe').style.background=c.colours.secondary;
   const box=document.getElementById('modal-box'); box.style.background=c.colours.primary; box.style.color=tc; box.style.boxShadow=`0 24px 80px ${c.colours.primary}88`;
   const ratingRows=[['Location / Access',c.ratings.location],['Friendliness',c.ratings.friendliness],['Food & Drink',c.ratings.food],['Facilities',c.ratings.facilities]].map(([l,v])=>v!=null?`<div class="rating-bar-row"><div class="rating-bar-header"><span>${l}</span><span>${parseFloat(v).toFixed(1)}</span></div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:${(v/5)*100}%"></div></div></div>`:'').join('');
-  const facts=[['Step',`Step ${c.step}`],['League',c.league],['Ground',c.ground],['Town',(c.town||'')+(c.county?', '+c.county:'')]].map(([l,v])=>`<div class="fact-box"><div class="fact-label" style="color:${dimC}">${l}</div><div class="fact-value">${v||'—'}</div></div>`).join('');
+  const factDefs=[
+    { key:'step',   label:'Step',   value:`Step ${c.step}`,   prompt:`In the English non-league football pyramid, what is Step ${c.step}? Name the leagues at that level and describe how it fits into the pyramid structure. Keep it to 2-3 sentences, plain prose, no markdown.` },
+    { key:'league', label:'League', value:c.league||'—',      prompt:`Give a short factual overview of ${c.league||'this league'} — its history, the region it covers, and the kind of clubs that play in it. 2-3 sentences, plain prose, no markdown.` },
+    { key:'ground', label:'Ground', value:c.ground||'—',      prompt:`${c.ground||'This ground'} is the home of ${c.name}, located in ${c.town||'England'}${c.county?', '+c.county:''}. Briefly describe the nearest transport links for visiting fans — train stations, bus routes, and parking — based on general knowledge of the area. Be practical and specific if you can. 3-4 sentences, plain prose, no markdown.` },
+    { key:'town',   label:'Town',   value:(c.town||'')+(c.county?', '+c.county:''), prompt:`Give a short flavourful description of ${c.town||'this town'}${c.county?', '+c.county:''} — what it's known for, its character, anything interesting for a visiting football fan. 2-3 sentences, plain prose, no markdown.` },
+  ];
+  const facts=factDefs.map(f=>`
+    <div class="fact-box" id="fact-${f.key}" data-fact-key="${f.key}">
+      <div class="fact-box-header">
+        <div>
+          <div class="fact-label" style="color:${dimC}">${f.label}</div>
+          <div class="fact-value">${f.value||'—'}</div>
+        </div>
+        <span class="fact-expand-arrow">▼</span>
+      </div>
+      <div class="fact-expand-panel" id="fact-panel-${f.key}">
+        <div class="fact-expand-inner" id="fact-inner-${f.key}"></div>
+      </div>
+    </div>`).join('');
   const tags=(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
   const rc=c.rating_count?`<div style="font-size:11px;opacity:0.5;margin-top:4px">${c.rating_count} rating${c.rating_count!==1?'s':''}</div>`:'';
 
@@ -1309,6 +1338,13 @@ function openModal(c) {
     </div>
     ${ratingSubmitBlock}
     ${tags?`<div class="tags-row" style="margin-top:14px">${tags}</div>`:''}`;
+
+  // Attach fact-box expand handlers
+  factDefs.forEach(f => {
+    const box = document.getElementById('fact-' + f.key);
+    if (!box) return;
+    box.addEventListener('click', () => expandFact(f.key, f.prompt));
+  });
 
   // Attach star click handlers
   ['location','friendliness','food','facilities'].forEach(key => {
@@ -1381,6 +1417,52 @@ async function submitRating(clubId) {
     await loadClubs();
     closeModal();
   }, 800);
+}
+
+/* ── Fact box AI expand ── */
+const FACT_CACHE = {};
+
+async function expandFact(key, prompt) {
+  const box = document.getElementById('fact-' + key);
+  const panel = document.getElementById('fact-panel-' + key);
+  const inner = document.getElementById('fact-inner-' + key);
+  if (!box || !panel || !inner) return;
+
+  const isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    box.classList.remove('expanded');
+    return;
+  }
+
+  panel.classList.add('open');
+  box.classList.add('expanded');
+
+  // Use cache if already fetched
+  if (FACT_CACHE[key]) { inner.textContent = FACT_CACHE[key]; return; }
+
+  inner.className = 'fact-expand-inner loading';
+  inner.textContent = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || 'No information available.';
+    FACT_CACHE[key] = text;
+    inner.className = 'fact-expand-inner';
+    inner.textContent = text;
+  } catch(e) {
+    inner.className = 'fact-expand-inner';
+    inner.textContent = 'Could not load information right now.';
+  }
 }
 
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow=''; }
